@@ -365,7 +365,7 @@ const CanvasWorkspace = () => {
                                 zIndex: frame.zIndex
                             }}
                         >
-                            <FrameContent frame={frame} />
+                            <FrameContent frame={frame} ppi={PPI} />
                         </div>
                     ))}
                 </div>

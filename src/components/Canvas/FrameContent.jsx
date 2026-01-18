@@ -2,19 +2,15 @@ import React from 'react';
 import { useImage } from '../../hooks/useImage';
 import styles from './CanvasWorkspace.module.css'; // Reusing styles
 
-const FrameContent = ({ frame }) => {
+const FrameContent = ({ frame, ppi }) => {
     const imageUrl = useImage(frame.imageId);
+
+    // Default PPI if not provided (fallback)
+    const PPI = ppi || 10;
 
     return (
         <div className={styles.frameContent}>
-            {/* If matted, the image is 'inside' the matting window. 
-                Visually, we can render the image BEHIND the matting div? 
-                Or render the Matting div with a 'window' using border?
-                A simpler CSS approach for matting:
-                Matting Div is absolute, has borders equal to the mat width. 
-                Center is transparent. 
-                Image is behind it.
-            */}
+            {/* ... image ... */}
 
             {/* Empty State Label */}
             {!imageUrl && (
@@ -61,23 +57,14 @@ const FrameContent = ({ frame }) => {
                     className={styles.mattingOverlay}
                     style={{
                         zIndex: 2,
-                        // We want a hole in the middle.
-                        // We can use a huge border with a transparent center? 
-                        // Or box-shadow based cutout.
-                        // Or easy way: 4 rects (top, bottom, left, right).
-                        // Let's use the Border trick.
-                        // Parent (frame) matches outer dimensions.
-                        // We need to calculate border widths.
-                        // frame.width (outer) vs frame.matted.width (inner).
-                        // borderX = (outerW - innerW) / 2
+                        // Use Pixel values for borders.
+                        // border-width does NOT support percentages.
+                        // We use PPI passed from parent to convert inches to px.
 
-                        // If we use %, we need relative to container.
-                        // borderLeft = ( (W - w_inner) / 2 ) / W * 100 %
-
-                        borderLeftWidth: `${((frame.width - frame.matted.width) / 2 / frame.width) * 100}%`,
-                        borderRightWidth: `${((frame.width - frame.matted.width) / 2 / frame.width) * 100}%`,
-                        borderTopWidth: `${((frame.height - frame.matted.height) / 2 / frame.height) * 100}%`,
-                        borderBottomWidth: `${((frame.height - frame.matted.height) / 2 / frame.height) * 100}%`,
+                        borderLeftWidth: `${(frame.width - frame.matted.width) / 2 * PPI}px`,
+                        borderRightWidth: `${(frame.width - frame.matted.width) / 2 * PPI}px`,
+                        borderTopWidth: `${(frame.height - frame.matted.height) / 2 * PPI}px`,
+                        borderBottomWidth: `${(frame.height - frame.matted.height) / 2 * PPI}px`,
 
                         borderStyle: 'solid',
                         borderColor: '#fff', // Mat color
