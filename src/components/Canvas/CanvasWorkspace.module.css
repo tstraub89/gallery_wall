@@ -56,12 +56,12 @@
    If Right is Short, Right Bottom is at, say, 50%.
    So polygon(0 0, 100% 0, 100% 60%, 0 100%).
 */
-.wall[class*="staircase-asc"] {
+/* Staircase Shapes */
+.staircase-asc {
     clip-path: polygon(0 0, 100% 0, 100% 60%, 0 100%);
 }
 
-/* Descending: Opposite. Left is Short, Right is Tall. */
-.wall[class*="staircase-desc"] {
+.staircase-desc {
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 60%);
 }
 
