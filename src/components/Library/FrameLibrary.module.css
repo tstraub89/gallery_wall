@@ -1,0 +1,20 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header h2 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.scrollArea {
+    flex: 1;
+    overflow-y: auto;
+}
