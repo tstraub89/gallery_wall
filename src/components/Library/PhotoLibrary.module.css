@@ -28,18 +28,27 @@
     background: #0062cc;
 }
 
-.grid {
+.scrollWrapper {
     flex: 1;
     overflow-y: auto;
     padding: 10px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    align-content: start;
+}
+
+.masonryGrid {
+    /* The masonry container itself should auto-grow in height */
+    column-count: 2;
+    column-gap: 10px;
+    height: auto;
+    /* Ensure it grows vertically */
+    min-height: 100%;
+    /* Fill at least the view */
 }
 
 .photoItem {
-    aspect-ratio: 1;
+    /* Avoid breaking inside columns */
+    break-inside: avoid;
+    margin-bottom: 10px;
+    /* Gap for columns */
     background: #f0f0f0;
     border-radius: 4px;
     overflow: hidden;
@@ -47,22 +56,15 @@
     position: relative;
     border: 1px solid #ddd;
     transition: transform 0.1s, box-shadow 0.1s;
+    display: flex;
+    /* Remove extra space below image */
 }
 
-.photoItem:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-color: #007aff;
-}
-
-.photoItem:active {
-    cursor: grabbing;
-}
+/* ... hover styles ... */
 
 .photoItem img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
+    height: auto;
     display: block;
 }
 
@@ -79,7 +81,7 @@
 }
 
 .emptyState {
-    grid-column: 1 / -1;
+    column-span: all;
     text-align: center;
     color: #999;
     padding: 20px;

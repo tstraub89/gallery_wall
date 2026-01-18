@@ -80,20 +80,22 @@ const PhotoLibrary = () => {
                 />
             </div>
 
-            <div className={styles.grid}>
-                {currentProject.images && currentProject.images.length > 0 ? (
-                    currentProject.images.map(imageId => (
-                        <PhotoItem
-                            key={imageId}
-                            imageId={imageId}
-                            isUsed={usedImageIds.has(imageId)}
-                        />
-                    ))
-                ) : (
-                    <div className={styles.emptyState}>
-                        No photos yet. Click "Add Photos" or drag them here to start.
-                    </div>
-                )}
+            <div className={styles.scrollWrapper}>
+                <div className={styles.masonryGrid}>
+                    {currentProject.images && currentProject.images.length > 0 ? (
+                        currentProject.images.map(imageId => (
+                            <PhotoItem
+                                key={imageId}
+                                imageId={imageId}
+                                isUsed={usedImageIds.has(imageId)}
+                            />
+                        ))
+                    ) : (
+                        <div className={styles.emptyState}>
+                            No photos yet. Click "Add Photos" or drag them here to start.
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
