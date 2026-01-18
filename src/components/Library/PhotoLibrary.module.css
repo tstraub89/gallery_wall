@@ -12,8 +12,13 @@
     flex-shrink: 0;
 }
 
+.btnRow {
+    display: flex;
+    gap: 8px;
+}
+
 .uploadBtn {
-    width: 100%;
+    flex: 1;
     padding: 8px;
     background: #007aff;
     color: white;
@@ -26,6 +31,23 @@
 
 .uploadBtn:hover {
     background: #0062cc;
+}
+
+.deleteBtn {
+    padding: 8px 12px;
+    background: #ffebee;
+    border: 1px solid #ffcdd2;
+    color: #c62828;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.deleteBtn:hover {
+    background: #ffcdd2;
 }
 
 .scrollWrapper {
@@ -78,6 +100,28 @@
     font-size: 10px;
     padding: 4px;
     text-align: center;
+}
+
+.photoItem.selected {
+    box-shadow: 0 0 0 3px #007aff;
+    transform: scale(0.98);
+}
+
+.selectedOverlay {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #007aff;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .emptyState {
