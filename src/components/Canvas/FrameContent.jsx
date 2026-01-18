@@ -41,6 +41,7 @@ const FrameContent = ({ frame }) => {
                         width: '100%',
                         height: '100%',
                         objectFit: 'cover',
+                        objectPosition: `calc(50% + ${frame.imageState?.x || 0}px) calc(50% + ${frame.imageState?.y || 0}px)`,
                         position: 'absolute',
                         top: 0,
                         left: 0,
@@ -48,7 +49,6 @@ const FrameContent = ({ frame }) => {
                         // Image Transforms
                         transform: `
                             scale(${frame.imageState?.scale || 1}) 
-                            translate(${frame.imageState?.x || 0}px, ${frame.imageState?.y || 0}px) 
                             rotate(${frame.imageState?.rotation || 0}deg)
                         `
                     }}

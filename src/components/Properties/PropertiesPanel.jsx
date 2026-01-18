@@ -88,21 +88,36 @@ const PropertiesPanel = () => {
                                 />
                             </div>
                             <div className={styles.propGroup}>
-                                <label>Position (X / Y)</label>
+                                <label>Position X</label>
                                 <div className={styles.row}>
                                     <input
-                                        type="number"
-                                        placeholder="X"
+                                        type="range" min="-500" max="500"
                                         value={frame.imageState?.x || 0}
                                         onChange={(e) => handleImageChange('x', parseFloat(e.target.value))}
-                                        style={{ width: '50px' }}
+                                        className={styles.slider}
                                     />
                                     <input
                                         type="number"
-                                        placeholder="Y"
+                                        value={frame.imageState?.x || 0}
+                                        onChange={(e) => handleImageChange('x', parseFloat(e.target.value))}
+                                        className={styles.numberInput}
+                                    />
+                                </div>
+                            </div>
+                            <div className={styles.propGroup}>
+                                <label>Position Y</label>
+                                <div className={styles.row}>
+                                    <input
+                                        type="range" min="-500" max="500"
                                         value={frame.imageState?.y || 0}
                                         onChange={(e) => handleImageChange('y', parseFloat(e.target.value))}
-                                        style={{ width: '50px' }}
+                                        className={styles.slider}
+                                    />
+                                    <input
+                                        type="number"
+                                        value={frame.imageState?.y || 0}
+                                        onChange={(e) => handleImageChange('y', parseFloat(e.target.value))}
+                                        className={styles.numberInput}
                                     />
                                 </div>
                             </div>

@@ -46,6 +46,17 @@
 .row {
     display: flex;
     gap: var(--spacing-sm);
+    align-items: center;
+}
+
+.slider {
+    flex: 1;
+}
+
+.numberInput {
+    width: 60px;
+    /* Fixed width for numbers */
+    flex-shrink: 0;
 }
 
 .info {
