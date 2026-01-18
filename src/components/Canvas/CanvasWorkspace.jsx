@@ -8,7 +8,7 @@ import FrameContent from './FrameContent';
 const PPI = 10;
 
 const CanvasWorkspace = () => {
-    const { currentProject, updateProject, selectFrame, selectedFrameIds, setSelection } = useProject();
+    const { currentProject, updateProject, selectFrame, selectedFrameIds, setSelection, addImageToLibrary } = useProject();
 
     // Viewport State
     const [scale, setScale] = useState(1);
@@ -234,38 +234,42 @@ const CanvasWorkspace = () => {
     const handleDrop = async (e) => {
         e.preventDefault();
 
-        // 1. Handle File Drops (Images)
+        // 1. Handle File Drops (Images from OS)
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const file = e.dataTransfer.files[0];
             if (file.type.startsWith('image/')) {
-                // Determine drop target (Frame?)
-                const frameEl = e.target.closest(`.${styles.frame}`);
-                if (frameEl) {
-                    const frameId = frameEl.getAttribute('data-frame-id');
-                    if (frameId) {
-                        // Save image and update frame
-                        try {
-                            const imageId = uuidv4();
-                            await saveImage(imageId, file);
+                try {
+                    // Always save to library first
+                    const imageId = uuidv4();
+                    await saveImage(imageId, file);
+                    addImageToLibrary(currentProject.id, imageId);
+
+                    // If dropped on a frame, apply it
+                    const frameEl = e.target.closest(`.${styles.frame}`);
+                    if (frameEl) {
+                        const frameId = frameEl.getAttribute('data-frame-id');
+                        if (frameId) {
                             const updatedFrames = currentProject.frames.map(f =>
                                 f.id === frameId ? { ...f, imageId } : f
                             );
                             updateProject(currentProject.id, { frames: updatedFrames });
-                        } catch (err) {
-                            console.error("Failed to save image", err);
                         }
                     }
+                } catch (err) {
+                    console.error("Failed to save image", err);
                 }
             }
             return;
         }
 
-        // 2. Handle Library Drops (JSON)
+        // 2. Handle Application Drops (JSON)
         const dataStr = e.dataTransfer.getData('application/json');
         if (!dataStr) return;
 
         try {
             const data = JSON.parse(dataStr);
+
+            // A. Frame Template Drop
             if (data.type === 'FRAME_LIBRARY_ITEM') {
                 const rect = containerRef.current.getBoundingClientRect();
                 const mouseX = e.clientX - rect.left;
@@ -299,6 +303,20 @@ const CanvasWorkspace = () => {
                 updateProject(currentProject.id, {
                     frames: [...currentProject.frames, newFrame]
                 });
+            }
+
+            // B. Photo Library Drop
+            if (data.type === 'PHOTO_LIBRARY_ITEM') {
+                const frameEl = e.target.closest(`.${styles.frame}`);
+                if (frameEl) {
+                    const frameId = frameEl.getAttribute('data-frame-id');
+                    if (frameId) {
+                        const updatedFrames = currentProject.frames.map(f =>
+                            f.id === frameId ? { ...f, imageId: data.imageId } : f
+                        );
+                        updateProject(currentProject.id, { frames: updatedFrames });
+                    }
+                }
             }
         } catch (err) {
             console.error("Drop error", err);

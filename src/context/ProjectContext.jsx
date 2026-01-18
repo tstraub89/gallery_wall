@@ -126,6 +126,31 @@ export const ProjectProvider = ({ children }) => {
         });
     };
 
+    // --- Image Library Operations ---
+
+    const addImageToLibrary = (projectId, imageId) => {
+        setData(prev => {
+            const project = prev.projects[projectId];
+            if (!project) return prev;
+
+            // Avoid duplicates
+            if (project.images && project.images.includes(imageId)) return prev;
+
+            const currentImages = project.images || [];
+
+            return {
+                ...prev,
+                projects: {
+                    ...prev.projects,
+                    [projectId]: {
+                        ...project,
+                        images: [imageId, ...currentImages]
+                    }
+                }
+            };
+        });
+    };
+
     const currentProjectRaw = data.currentProjectId ? data.projects[data.currentProjectId] : null;
 
     // Safety: Ensure arrays exist even if localStorage has old data
@@ -133,6 +158,7 @@ export const ProjectProvider = ({ children }) => {
         ...currentProjectRaw,
         frames: currentProjectRaw.frames || [],
         library: currentProjectRaw.library || [],
+        images: currentProjectRaw.images || [],
         wallConfig: currentProjectRaw.wallConfig || createNewProject().wallConfig
     } : null;
 
@@ -151,6 +177,7 @@ export const ProjectProvider = ({ children }) => {
             deleteProject,
             updateProject,
             addToLibrary,
+            addImageToLibrary,
             selectFrame,
             setSelection
         }}>
