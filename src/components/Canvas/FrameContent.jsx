@@ -71,10 +71,10 @@ const FrameContent = ({ frame, ppi }) => {
                         // border-width does NOT support percentages.
                         // We use PPI passed from parent to convert inches to px.
 
-                        borderLeftWidth: `${Math.max(0, (frame.width - frame.matted.width) / 2 - borderThickness) * PPI}px`,
-                        borderRightWidth: `${Math.max(0, (frame.width - frame.matted.width) / 2 - borderThickness) * PPI}px`,
-                        borderTopWidth: `${Math.max(0, (frame.height - frame.matted.height) / 2 - borderThickness) * PPI}px`,
-                        borderBottomWidth: `${Math.max(0, (frame.height - frame.matted.height) / 2 - borderThickness) * PPI}px`,
+                        borderLeftWidth: `${Math.max(0, (frame.width - frame.matted.width) / 2) * PPI}px`,
+                        borderRightWidth: `${Math.max(0, (frame.width - frame.matted.width) / 2) * PPI}px`,
+                        borderTopWidth: `${Math.max(0, (frame.height - frame.matted.height) / 2) * PPI}px`,
+                        borderBottomWidth: `${Math.max(0, (frame.height - frame.matted.height) / 2) * PPI}px`,
 
                         borderStyle: 'solid',
                         borderColor: '#fff', // Mat color

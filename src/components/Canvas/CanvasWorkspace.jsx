@@ -382,6 +382,8 @@ const CanvasWorkspace = () => {
                             }
                         }
 
+                        const bWidthPx = frame.borderWidth !== undefined ? frame.borderWidth * PPI : 1;
+
                         return (
                             <div
                                 key={frame.id}
@@ -390,17 +392,17 @@ const CanvasWorkspace = () => {
                                 onMouseDown={(e) => handleFrameMouseDown(e, frame)}
                                 onDragStart={(e) => e.preventDefault()}
                                 style={{
-                                    left: `${displayX}px`,
-                                    top: `${displayY}px`,
+                                    left: `${displayX - bWidthPx}px`,
+                                    top: `${displayY - bWidthPx}px`,
                                     width: `${frame.width * PPI}px`,
                                     height: `${frame.height * PPI}px`,
                                     transform: `rotate(${frame.rotation}deg)`,
                                     zIndex: frame.zIndex,
                                     userSelect: 'none',
-                                    // Frame Thickness logic
-                                    borderWidth: frame.borderWidth !== undefined ? `${frame.borderWidth * PPI}px` : undefined,
+                                    // Frame Thickness logic: Additive
+                                    borderWidth: `${bWidthPx}px`,
                                     borderStyle: 'solid',
-                                    boxSizing: 'border-box'
+                                    boxSizing: 'content-box'
                                 }}
                             >
                                 <FrameContent frame={frame} ppi={PPI} />
