@@ -5,14 +5,15 @@ import { v4 as uuidv4 } from 'uuid';
 import { saveImage } from '../../utils/imageStore';
 import FrameContent from './FrameContent';
 
-const PPI = 10;
+import { PPI, GRID_SIZE } from '../../constants';
 
 const CanvasWorkspace = () => {
-    const { currentProject, updateProject, selectFrame, selectedFrameIds, setSelection, addImageToLibrary } = useProject();
+    const { currentProject, updateProject, selectFrame, selectedFrameIds, setSelection, addImageToLibrary, undo, redo, canUndo, canRedo } = useProject();
 
     // Viewport State
     const [scale, setScale] = useState(1);
     const [pan, setPan] = useState({ x: 0, y: 0 });
+    const [dragDelta, setDragDelta] = useState({ x: 0, y: 0 });
     const containerRef = useRef(null);
 
     // Interaction State
@@ -28,7 +29,7 @@ const CanvasWorkspace = () => {
     // Grid State
     const [showGrid, setShowGrid] = useState(true);
     const [snapToGrid, setSnapToGrid] = useState(true);
-    const GRID_SIZE = 1;
+
 
     // Keyboard Shortcuts
     useEffect(() => {
@@ -53,11 +54,27 @@ const CanvasWorkspace = () => {
                     setSelection([]);
                 }
             }
+            // Undo / Redo
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    // Redo
+                    redo();
+                } else {
+                    // Undo
+                    undo();
+                }
+            }
+            // Redo standard (Ctrl+Y)
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+                e.preventDefault();
+                redo();
+            }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [currentProject, selectedFrameIds, updateProject, setSelection]);
+    }, [currentProject, selectedFrameIds, updateProject, setSelection, undo, redo]);
 
     if (!currentProject) {
         return <div className={styles.empty}>Select a project to start planning.</div>;
@@ -103,7 +120,7 @@ const CanvasWorkspace = () => {
 
         // Frame logic is handled by stopPropagation in handleFrameMouseDown, 
         // but if we are here, e.target IS a frame? 
-        // No, if isFrame, we returned? No, we check !isFrame above.
+        // No, we check !isFrame above.
         // If isFrame is true:
         //  e.button === 1 -> enters if.
         //  e.button === 0 -> does NOT enter if.
@@ -159,6 +176,7 @@ const CanvasWorkspace = () => {
         setInitialPositions(positions);
     };
 
+
     const handleMouseMove = (e) => {
         const { clientX, clientY } = e;
         if (isPanning) {
@@ -177,34 +195,9 @@ const CanvasWorkspace = () => {
             const worldDx = dx / scale;
             const worldDy = dy / scale;
 
-            // We update ALL frames in initialPositions
-            let framesToUpdate = [];
-
-            // To support snap properly for a GROUP, usually we snap the "primary" frame (the one clicked)
-            // Or we snap all? Snapping all might distort relative positions.
-            // Better: Snap the delta relative to the primary one?
-            // Simplest: Snap each individually? No, that breaks alignment.
-            // Compromise: Snap the first one frame found, calculate its delta, apply that delta to all.
-            // OR: Just snap individual coordinates. If they were aligned, they stay aligned (if grid is uniform).
-
-            // Let's try snapping each individually for now as it ensures grid integrity.
-
-            const updatedFrames = currentProject.frames.map(f => {
-                const initPos = initialPositions[f.id];
-                if (initPos) {
-                    let newX = initPos.x + worldDx;
-                    let newY = initPos.y + worldDy;
-
-                    if (snapToGrid) {
-                        newX = snap(newX);
-                        newY = snap(newY);
-                    }
-                    return { ...f, x: newX, y: newY };
-                }
-                return f;
-            });
-
-            updateProject(currentProject.id, { frames: updatedFrames });
+            // Just update local state for smooth rendering without hitting DB
+            // We use standard React state which re-renders visual components quickly
+            setDragDelta({ x: worldDx, y: worldDy });
         }
     };
 
@@ -222,12 +215,30 @@ const CanvasWorkspace = () => {
                     selectFrame(frameId, false);
                 }
             }
+        } else if (isDraggingFrame && hasDragged) {
+            // Commit changes
+            const updatedFrames = currentProject.frames.map(f => {
+                const initPos = initialPositions[f.id];
+                if (initPos) {
+                    let newX = initPos.x + dragDelta.x;
+                    let newY = initPos.y + dragDelta.y;
+
+                    if (snapToGrid) {
+                        newX = snap(newX);
+                        newY = snap(newY);
+                    }
+                    return { ...f, x: newX, y: newY };
+                }
+                return f;
+            });
+            updateProject(currentProject.id, { frames: updatedFrames });
         }
 
         setIsPanning(false);
         setIsDraggingFrame(false);
         setInitialPositions({});
         setHasDragged(false);
+        setDragDelta({ x: 0, y: 0 }); // Reset local delta
     };
 
     // --- Drop Handler ---
@@ -342,6 +353,7 @@ const CanvasWorkspace = () => {
                 style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}
             >
                 <div
+                    id="canvas-wall"
                     className={`${styles.wall} ${showGrid ? styles.grid : ''} ${styles[currentProject.wallConfig.type]}`}
                     style={{
                         width: `${currentProject.wallConfig.width * PPI}px`,
@@ -350,24 +362,51 @@ const CanvasWorkspace = () => {
                         '--grid-size': `${GRID_SIZE * PPI}px`
                     }}
                 >
-                    {currentProject.frames.map(frame => (
-                        <div
-                            key={frame.id}
-                            data-frame-id={frame.id}
-                            className={`${styles.frame} ${selectedFrameIds.includes(frame.id) ? styles.selected : ''}`}
-                            onMouseDown={(e) => handleFrameMouseDown(e, frame)}
-                            style={{
-                                left: `${frame.x}px`,
-                                top: `${frame.y}px`,
-                                width: `${frame.width * PPI}px`,
-                                height: `${frame.height * PPI}px`,
-                                transform: `rotate(${frame.rotation}deg)`,
-                                zIndex: frame.zIndex
-                            }}
-                        >
-                            <FrameContent frame={frame} ppi={PPI} />
-                        </div>
-                    ))}
+                    {currentProject.frames.map(frame => {
+                        const isDraggingThis = selectedFrameIds.includes(frame.id) && isDraggingFrame && hasDragged;
+                        let displayX = frame.x;
+                        let displayY = frame.y;
+
+                        if (isDraggingThis) {
+                            // Calculate display position based on local dragDelta + initial pos
+                            const initPos = initialPositions[frame.id];
+                            if (initPos) {
+                                let newX = initPos.x + dragDelta.x;
+                                let newY = initPos.y + dragDelta.y;
+                                if (snapToGrid) {
+                                    newX = snap(newX);
+                                    newY = snap(newY);
+                                }
+                                displayX = newX;
+                                displayY = newY;
+                            }
+                        }
+
+                        return (
+                            <div
+                                key={frame.id}
+                                data-frame-id={frame.id}
+                                className={`${styles.frame} ${selectedFrameIds.includes(frame.id) ? styles.selected : ''}`}
+                                onMouseDown={(e) => handleFrameMouseDown(e, frame)}
+                                onDragStart={(e) => e.preventDefault()}
+                                style={{
+                                    left: `${displayX}px`,
+                                    top: `${displayY}px`,
+                                    width: `${frame.width * PPI}px`,
+                                    height: `${frame.height * PPI}px`,
+                                    transform: `rotate(${frame.rotation}deg)`,
+                                    zIndex: frame.zIndex,
+                                    userSelect: 'none',
+                                    // Frame Thickness logic
+                                    borderWidth: frame.borderWidth !== undefined ? `${frame.borderWidth * PPI}px` : undefined,
+                                    borderStyle: 'solid',
+                                    boxSizing: 'border-box'
+                                }}
+                            >
+                                <FrameContent frame={frame} ppi={PPI} />
+                            </div>
+                        )
+                    })}
                 </div>
             </div>
 

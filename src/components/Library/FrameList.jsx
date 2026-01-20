@@ -3,11 +3,24 @@ import { useProject } from '../../context/ProjectContext';
 import styles from './FrameList.module.css';
 
 const FrameList = () => {
-    const { currentProject } = useProject();
+    const { currentProject, setSelection } = useProject();
 
     if (!currentProject) {
         return <div className={styles.empty}>Select or create a project to view frames.</div>;
     }
+
+    const handleFrameClick = (templateId) => {
+        // Find all frames on the canvas that use this template
+        const instances = currentProject.frames
+            .filter(f => f.templateId === templateId)
+            .map(f => f.id);
+
+        if (instances.length > 0) {
+            setSelection(instances);
+            // Optional: Scroll canvas to first instance? 
+            // For now just selecting is a huge help.
+        }
+    };
 
     const frames = currentProject.library || [];
 
@@ -19,10 +32,6 @@ const FrameList = () => {
         );
     }
 
-    // Grouping? The requirements say "Visual frame list with dimensions displayed".
-    // Also "Duplicate frames (for multiple frames of same size)".
-    // If I parsed "5x7" twice, do I show it twice? Yes, per requirements "Duplicate frames".
-
     return (
         <div className={styles.list}>
             {frames.map((frame, index) => {
@@ -33,6 +42,7 @@ const FrameList = () => {
                         key={frame.id || index}
                         className={`${styles.frameItem} ${isUsed ? styles.used : ''}`}
                         draggable={!isUsed}
+                        onClick={() => handleFrameClick(frame.id)}
                         onDragStart={(e) => {
                             if (isUsed) {
                                 e.preventDefault();

@@ -67,15 +67,8 @@ export const ProjectProvider = ({ children }) => {
         });
     };
 
-    const updateProject = (id, updates) => {
-        setData(prev => ({
-            ...prev,
-            projects: {
-                ...prev.projects,
-                [id]: { ...prev.projects[id], ...updates, updatedAt: Date.now() }
-            }
-        }));
-    };
+    // updateProject is now defined below with history logic
+    // const updateProject = ... (removed)
 
     const deleteProject = (id) => {
         setData(prev => {
@@ -166,6 +159,105 @@ export const ProjectProvider = ({ children }) => {
         setData(prev => ({ ...prev, selectedFrameIds: ids }));
     };
 
+    // --- History State ---
+    const [history, setHistory] = useState({
+        past: [],
+        future: []
+    });
+
+    // Helper to push state to history
+    // We only track PROJECT SPECIFIC changes, not global app state like currentProjectId?
+    // Actually, if we undo a frame move, we need the previous state of that project.
+    // So we push the COPY of the current project to past.
+
+    const pushToHistory = (projectId) => {
+        const currentMementro = data.projects[projectId];
+        if (!currentMementro) return;
+
+        setHistory(prev => ({
+            past: [...prev.past, { projectId, data: JSON.parse(JSON.stringify(currentMementro)) }],
+            future: [] // Clear future on new action
+        }));
+    };
+
+    const undo = () => {
+        setHistory(prev => {
+            if (prev.past.length === 0) return prev;
+
+            const newPast = [...prev.past];
+            const previousState = newPast.pop();
+            const { projectId, data: oldProjectData } = previousState;
+
+            const currentProjectData = data.projects[projectId];
+
+            // Push current to future
+            const newFuture = [...prev.future, { projectId, data: JSON.parse(JSON.stringify(currentProjectData)) }];
+
+            // Restore
+            setData(d => ({
+                ...d,
+                projects: {
+                    ...d.projects,
+                    [projectId]: oldProjectData
+                }
+            }));
+
+            return {
+                past: newPast,
+                future: newFuture
+            };
+        });
+    };
+
+    const redo = () => {
+        setHistory(prev => {
+            if (prev.future.length === 0) return prev;
+
+            const newFuture = [...prev.future];
+            const nextState = newFuture.pop();
+            const { projectId, data: nextProjectData } = nextState;
+
+            const currentProjectData = data.projects[projectId];
+
+            // Push current to past
+            const newPast = [...prev.past, { projectId, data: JSON.parse(JSON.stringify(currentProjectData)) }];
+
+            // Restore
+            setData(d => ({
+                ...d,
+                projects: {
+                    ...d.projects,
+                    [projectId]: nextProjectData
+                }
+            }));
+
+            return {
+                past: newPast,
+                future: newFuture
+            };
+        });
+    };
+
+    const updateProject = (id, updates, skipHistory = false) => {
+        if (!skipHistory) {
+            pushToHistory(id);
+        }
+        setData(prev => ({
+            ...prev,
+            projects: {
+                ...prev.projects,
+                [id]: { ...prev.projects[id], ...updates, updatedAt: Date.now() } // Do not merge updates deep?
+                // Logic: updateProject(id, { frames: newFrames })
+                // We want to replace frames array, not merge.
+                // Spread ...updates usually replaces keys. Correct.
+            }
+        }));
+    };
+
+    // ... existing delete/add logic ...
+    // Note: deleteProject might need history? For now let's scope undo to "Project Modifications".
+
+    // Expose undo/redo to context
     return (
         <ProjectContext.Provider value={{
             projects: data.projects,
@@ -179,7 +271,11 @@ export const ProjectProvider = ({ children }) => {
             addToLibrary,
             addImageToLibrary,
             selectFrame,
-            setSelection
+            setSelection,
+            undo,
+            redo,
+            canUndo: history.past.length > 0,
+            canRedo: history.future.length > 0
         }}>
             {children}
         </ProjectContext.Provider>

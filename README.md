@@ -14,6 +14,7 @@ A powerful, interactive web application for planning gallery walls. Visualize yo
 ### 📸 Photo Library
 -   **Batch Upload**: Add multiple photos at once.
 -   **Masonry Layout**: View your photos in a beautiful, full-view masonry grid (vertical scrolling).
+-   **Selection & Deletion**: Select photos (Ctrl/Cmd + Click) and delete them from your library.
 -   **Drag & Drop**: Drag photos from the library directly onto frames on the canvas.
 -   **OS Integration**: Drag files from your computer directly onto a frame to place them *and* auto-save them to your library.
 -   **Usage Indicators**: Photos currently on the wall are marked with a "Use Again" label.
@@ -21,13 +22,16 @@ A powerful, interactive web application for planning gallery walls. Visualize yo
 ### 🎨 Infinite Canvas Workspace
 -   **Pan & Zoom**: Navigate a limitless workspace with familiar controls (Space+Drag or Middle-Click to pan, Ctrl+Scroll to zoom).
 -   **Grid & Snapping**: Toggle a background grid (`#`) and enable snap-to-grid (`S`) for perfect alignment.
+-   **Undo / Redo**: Full history support with `Ctrl+Z` and `Ctrl+Y`.
 -   **Multi-Select**: Shift-click to select multiple frames, or `Ctrl+A` to select all.
+-   **Alignment Tools**: Align selected frames (Left, Center, Right, Top, Middle, Bottom) with one click.
 -   **Group Dragging**: Move entire clusters of frames together while maintaining their relative positions.
 -   **Wall Templates**: Switch between Flat, Staircase, or Corner wall configurations.
 
 ### 🛠️ Image & Frame Controls
 -   **Smart Panning**: Adjust the X/Y position of an image *within* its frame to reveal hidden areas (no cropping!).
 -   **Precise Positioning**: Use sliders or text inputs for pixel-perfect placement.
+-   **Frame Styling**: Adjust frame border thickness globally for selected frames.
 -   **Rotation**: Rotate both frames and images independently.
 -   **Accurate Matting**: Mats are rendered with real-world dimensions (e.g., a 2-inch mat looks like 2 inches relative to the frame).
 
@@ -35,6 +39,7 @@ A powerful, interactive web application for planning gallery walls. Visualize yo
 -   **Multiple Projects**: Create and switch between different distinct layouts.
 -   **Auto-Save**: Progress is automatically saved to your browser's local storage.
 -   **Export Tools**:
+    -   **🖼️ Save Image**: Export your beautiful layout as a high-resolution PNG.
     -   **Backup**: Export your project data to JSON.
     -   **Shopping List**: Generate a text file list of all frames used in the current design.
 
@@ -42,6 +47,7 @@ A powerful, interactive web application for planning gallery walls. Visualize yo
 -   **React** (Vite)
 -   **CSS Modules** (custom responsive design)
 -   **IndexedDB** (for efficient local image storage)
+-   **html-to-image** (for canvas exports)
 -   **UUID** (for unique entity tracking)
 
 ## Getting Started
@@ -61,9 +67,12 @@ A powerful, interactive web application for planning gallery walls. Visualize yo
 
 ## Usage Tips
 
+-   **Find Lost Frames**: Click any frame in the Left Sidebar to instantly select all its placed instances on the canvas.
 -   **Resize Sidebar**: Drag the right edge of the left sidebar to make your photo thumbnails larger.
 -   **Keyboard Shortcuts**:
     -   `S`: Toggle Grid Snapping
     -   `#`: Toggle Grid Visual
+    -   `Ctrl + Z`: Undo
+    -   `Ctrl + Y`: Redo
     -   `Ctrl + A`: Select All Frames
-    -   `Backspace` / `Delete`: Remove selected frames
+    -   `Backspace` / `Delete`: Remove selected frames (or photos if library is focused)

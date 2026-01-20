@@ -8,8 +8,14 @@ const FrameContent = ({ frame, ppi }) => {
     // Default PPI if not provided (fallback)
     const PPI = ppi || 10;
 
+    // Border Width correction (defaults to 0 if not set in style, but CSS has 1px... 
+    // We should probably treat 'undefined' as 'small' or handle it.
+    // If we use PPI calculation, we need inches. 1px is approx 0.01 inch? Negligible?
+    // Let's use the explicit value or 0.
+    const borderThickness = frame.borderWidth || 0;
+
     return (
-        <div className={styles.frameContent}>
+        <div className={styles.frameContent} style={{ userSelect: 'none' }}>
             {/* ... image ... */}
 
             {/* Empty State Label */}
@@ -21,7 +27,8 @@ const FrameContent = ({ frame, ppi }) => {
                         transform: 'translate(-50%, -50%)',
                         fontSize: '10px',
                         color: '#999',
-                        pointerEvents: 'none'
+                        pointerEvents: 'none',
+                        userSelect: 'none'
                     }}
                 >
                     {frame.width}" x {frame.height}"
@@ -33,6 +40,7 @@ const FrameContent = ({ frame, ppi }) => {
                 <img
                     src={imageUrl}
                     alt=""
+                    draggable="false"
                     style={{
                         width: '100%',
                         height: '100%',
@@ -42,6 +50,8 @@ const FrameContent = ({ frame, ppi }) => {
                         top: 0,
                         left: 0,
                         zIndex: 1,
+                        pointerEvents: 'none',
+                        userSelect: 'none',
                         // Image Transforms
                         transform: `
                             scale(${frame.imageState?.scale || 1}) 
@@ -61,10 +71,10 @@ const FrameContent = ({ frame, ppi }) => {
                         // border-width does NOT support percentages.
                         // We use PPI passed from parent to convert inches to px.
 
-                        borderLeftWidth: `${(frame.width - frame.matted.width) / 2 * PPI}px`,
-                        borderRightWidth: `${(frame.width - frame.matted.width) / 2 * PPI}px`,
-                        borderTopWidth: `${(frame.height - frame.matted.height) / 2 * PPI}px`,
-                        borderBottomWidth: `${(frame.height - frame.matted.height) / 2 * PPI}px`,
+                        borderLeftWidth: `${Math.max(0, (frame.width - frame.matted.width) / 2 - borderThickness) * PPI}px`,
+                        borderRightWidth: `${Math.max(0, (frame.width - frame.matted.width) / 2 - borderThickness) * PPI}px`,
+                        borderTopWidth: `${Math.max(0, (frame.height - frame.matted.height) / 2 - borderThickness) * PPI}px`,
+                        borderBottomWidth: `${Math.max(0, (frame.height - frame.matted.height) / 2 - borderThickness) * PPI}px`,
 
                         borderStyle: 'solid',
                         borderColor: '#fff', // Mat color
