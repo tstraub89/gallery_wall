@@ -107,18 +107,12 @@ export const ProjectProvider = ({ children }) => {
     // --- Frame / Library Operations ---
 
     const addToLibrary = (projectId, frameDimensions) => {
-        // frameDimensions: { width, height, matting: { ... } }
         const libraryItem = {
             id: uuidv4(),
             ...frameDimensions,
-            count: 1, // How many of this specific frame type? Or just templates? 
-            // Req: "Per-project frame inventory showing all available frames"
-            // Req: "Frame counter showing used vs. available frames"
-            // So we probably want "Inventory Items" vs "Placed Frames".
-            // logic: User imports "5x7". We add 1 5x7 to inventory.
+            count: 1
         };
 
-        // For now, let's treat library as a list of distinct physical frames the user has.
         setData(prev => {
             const project = prev.projects[projectId];
             if (!project) return prev;
@@ -130,6 +124,32 @@ export const ProjectProvider = ({ children }) => {
                     [projectId]: {
                         ...project,
                         library: [...project.library, libraryItem]
+                    }
+                }
+            };
+        });
+    };
+
+    const removeFromLibrary = (projectId, templateId) => {
+        setData(prev => {
+            const project = prev.projects[projectId];
+            if (!project) return prev;
+
+            // Optional: prevent if used? 
+            // Better to let the UI handle the check, but safety here is good
+            const isUsed = project.frames.some(f => f.templateId === templateId);
+            if (isUsed) {
+                console.warn("Attempted to remove a template that is in use.");
+                return prev;
+            }
+
+            return {
+                ...prev,
+                projects: {
+                    ...prev.projects,
+                    [projectId]: {
+                        ...project,
+                        library: project.library.filter(t => t.id !== templateId)
                     }
                 }
             };
@@ -286,6 +306,7 @@ export const ProjectProvider = ({ children }) => {
             deleteProject,
             updateProject,
             addToLibrary,
+            removeFromLibrary,
             addImageToLibrary,
             selectFrame,
             setSelection,

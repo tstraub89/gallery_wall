@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useProject } from '../../context/ProjectContext';
 import styles from './PropertiesPanel.module.css';
 import { PPI } from '../../constants';
@@ -32,9 +32,18 @@ const PropertiesPanel = () => {
 
 // --- Frame Properties Component ---
 const FrameProps = ({ currentProject, selectedFrameIds, updateProject }) => {
-    const selectedFrames = currentProject.frames.filter(f => selectedFrameIds.includes(f.id));
+    // Memoize selected frames to ensure stability
+    const selectedFrames = useMemo(() =>
+        currentProject.frames.filter(f => selectedFrameIds.includes(f.id)),
+        [currentProject.frames, selectedFrameIds]);
+
+    // CRITICAL SAFETY: If we have IDs but no matching frames found (e.g. just deleted)
+    if (selectedFrames.length === 0) {
+        return <div className={styles.empty}>No frames selected</div>;
+    }
 
     const getValue = (key) => {
+        if (selectedFrames.length === 0) return '';
         const first = selectedFrames[0][key];
         const allSame = selectedFrames.every(f => Math.abs(f[key] - (first || 0)) < 0.01);
         return allSame ? first : '';
@@ -109,7 +118,7 @@ const FrameProps = ({ currentProject, selectedFrameIds, updateProject }) => {
     return (
         <>
             <div className={styles.header}>
-                <h3>Properties ({selectedFrameIds.length})</h3>
+                <h3>Properties ({selectedFrames.length})</h3>
             </div>
             <div className={styles.content}>
                 <div className={styles.propGroup}>
@@ -159,12 +168,12 @@ const FrameProps = ({ currentProject, selectedFrameIds, updateProject }) => {
                     </div>
                 </div>
 
-                {selectedFrameIds.length === 1 && (
+                {selectedFrames.length === 1 && (
                     <>
                         <hr className={styles.divider} />
-                        {currentProject.frames.find(f => f.id === selectedFrameIds[0])?.imageId && (
+                        {selectedFrames[0].imageId && (
                             <SingleImageControls
-                                frame={currentProject.frames.find(f => f.id === selectedFrameIds[0])}
+                                frame={selectedFrames[0]}
                                 updateProject={updateProject}
                                 currentProject={currentProject}
                             />
@@ -175,7 +184,7 @@ const FrameProps = ({ currentProject, selectedFrameIds, updateProject }) => {
                 <button className={styles.deleteBtn} onClick={() => {
                     const updated = currentProject.frames.filter(f => !selectedFrameIds.includes(f.id));
                     updateProject(currentProject.id, { frames: updated });
-                }}>Delete {selectedFrameIds.length > 1 ? 'Frames' : 'Frame'}</button>
+                }}>Remove {selectedFrames.length > 1 ? 'Frames' : 'Frame'} from Canvas</button>
             </div>
         </>
     );

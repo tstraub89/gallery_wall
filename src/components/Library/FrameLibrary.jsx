@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ImportFile from './ImportFile';
+import ManualEntryForm from './ManualEntryForm';
 import FrameList from './FrameList';
 import PhotoLibrary from './PhotoLibrary';
 import styles from './FrameLibrary.module.css';
@@ -29,7 +30,10 @@ const FrameLibrary = () => {
                 </div>
                 {openSection === 'frames' && (
                     <div className={styles.sectionContent}>
+                        <div className={styles.subHeader}>Import File</div>
                         <ImportFile />
+                        <div className={styles.subHeader}>Add Manually</div>
+                        <ManualEntryForm />
                         <div className={styles.scrollArea}>
                             <FrameList />
                         </div>
