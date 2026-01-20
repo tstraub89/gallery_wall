@@ -51,7 +51,6 @@ const GlobalActions = () => {
         const originalSources = new Map();
 
         try {
-            console.log("Preparing images for export...");
             for (const img of imgElements) {
                 if (img.src && (img.src.startsWith('blob:') || img.src.startsWith('http'))) {
                     originalSources.set(img, img.src);
@@ -59,7 +58,7 @@ const GlobalActions = () => {
                         const b64 = await blobToBase64(img.src);
                         img.src = b64;
                     } catch (e) {
-                        console.warn("Failed to convert image to base64", img.src, e);
+                        // Silently handle base64 conversion errors during export
                     }
                 }
             }
@@ -147,6 +146,38 @@ const GlobalActions = () => {
         reader.readAsText(file);
     };
 
+    const handleShoppingListExport = () => {
+        if (!currentProject.frames.length) {
+            alert("No frames on the canvas yet.");
+            return;
+        }
+
+        const list = currentProject.frames.map((f, i) => {
+            const hasImage = !!f.imageId;
+            let line = `Frame ${i + 1}: ${f.width}" x ${f.height}"`;
+            if (f.matted) {
+                line += ` (Matted to ${f.matted.width}" x ${f.matted.height}")`;
+            }
+            line += ` - Status: ${hasImage ? 'Filled' : 'Empty'}`;
+            return line;
+        }).join('\n');
+
+        const header = `GALLERY WALL SHOPPING LIST\nProject: ${currentProject.name}\nTotal Frames: ${currentProject.frames.length}\n----------------------------\n\n`;
+        const blob = new Blob([header + list], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `${currentProject.name || 'project'}_shopping_list.txt`;
+        link.href = url;
+        link.click();
+        URL.revokeObjectURL(url);
+    };
+
+    const handleClearCanvas = () => {
+        if (confirm("Are you sure you want to remove ALL frames from the canvas? This cannot be undone (without Ctrl+Z).")) {
+            updateProject(currentProject.id, { frames: [] });
+        }
+    };
+
     if (!currentProject) return null;
 
     return (
@@ -160,6 +191,8 @@ const GlobalActions = () => {
                 Import Project
                 <input type="file" accept=".json" onChange={handleJSONImport} style={{ display: 'none' }} />
             </label>
+            <button className={styles.secondaryBtn} onClick={handleShoppingListExport}>Shopping List</button>
+            <button className={`${styles.secondaryBtn} ${styles.removeAction}`} onClick={handleClearCanvas}>Reset Project</button>
 
             {isExporting && (
                 <div className={styles.exportOverlay}>
