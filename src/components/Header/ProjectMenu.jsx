@@ -52,17 +52,15 @@ const ProjectMenu = () => {
                                 }}
                             >
                                 <span className={styles.itemName}>{p.name}</span>
-                                {projectList.length > 1 && (
-                                    <button
-                                        className={styles.deleteBtn}
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            if (confirm('Delete project?')) deleteProject(p.id);
-                                        }}
-                                    >
-                                        ×
-                                    </button>
-                                )}
+                                <button
+                                    className={styles.deleteBtn}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (confirm(`Delete project "${p.name}"?`)) deleteProject(p.id);
+                                    }}
+                                >
+                                    ×
+                                </button>
                             </div>
                         ))}
                     </div>

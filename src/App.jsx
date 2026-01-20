@@ -5,6 +5,7 @@ import FrameLibrary from './components/Library/FrameLibrary';
 import CanvasWorkspace from './components/Canvas/CanvasWorkspace';
 import PropertiesPanel from './components/Properties/PropertiesPanel';
 import ProjectMenu from './components/Header/ProjectMenu';
+import GlobalActions from './components/Header/GlobalActions';
 
 function App() {
   return (
@@ -12,7 +13,10 @@ function App() {
       <AppLayout>
         <Header>
           <h1>Gallery Planner</h1>
-          <ProjectMenu />
+          <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+            <ProjectMenu />
+            <GlobalActions />
+          </div>
         </Header>
         <LeftSidebar>
           <FrameLibrary />

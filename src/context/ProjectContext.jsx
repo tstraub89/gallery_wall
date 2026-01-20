@@ -74,15 +74,32 @@ export const ProjectProvider = ({ children }) => {
         setData(prev => {
             const newProjects = { ...prev.projects };
             delete newProjects[id];
-            let newCurrentId = prev.currentProjectId;
-            if (prev.currentProjectId === id) {
-                const ids = Object.keys(newProjects);
-                newCurrentId = ids.length > 0 ? ids[0] : null;
+
+            const remainingIds = Object.keys(newProjects);
+            let newCurrentId = null;
+
+            if (remainingIds.length === 0) {
+                // If it was the last project, create a new one immediately
+                const fresh = createNewProject('Untitled Project');
+                return {
+                    ...prev,
+                    projects: { [fresh.id]: fresh },
+                    currentProjectId: fresh.id,
+                    selectedFrameIds: []
+                };
             }
+
+            if (prev.currentProjectId === id) {
+                newCurrentId = remainingIds[0];
+            } else {
+                newCurrentId = prev.currentProjectId;
+            }
+
             return {
                 ...prev,
                 projects: newProjects,
-                currentProjectId: newCurrentId
+                currentProjectId: newCurrentId,
+                selectedFrameIds: []
             };
         });
     };
