@@ -1,0 +1,43 @@
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-right: 24px;
+    user-select: none;
+    cursor: default;
+}
+
+.icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent-color);
+    background: var(--accent-soft);
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.text {
+    display: flex;
+    align-items: center;
+    font-size: 20px;
+    letter-spacing: -0.02em;
+}
+
+.bold {
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.light {
+    font-weight: 300;
+    color: var(--text-secondary);
+    margin-left: 2px;
+}

@@ -7,12 +7,14 @@ import PropertiesPanel from './components/Properties/PropertiesPanel';
 import ProjectMenu from './components/Header/ProjectMenu';
 import GlobalActions from './components/Header/GlobalActions';
 
+import Logo from './components/Header/Logo';
+
 function App() {
   return (
     <ProjectProvider>
       <AppLayout>
         <Header>
-          <h1>Gallery Planner</h1>
+          <Logo />
           <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
             <ProjectMenu />
             <GlobalActions />
