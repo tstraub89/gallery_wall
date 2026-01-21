@@ -11,13 +11,15 @@ const FrameList = () => {
         return <div className={styles.empty}>Select or create a project to view frames.</div>;
     }
 
-    const handleFrameClick = (templateId) => {
-        const instances = currentProject.frames
-            .filter(f => f.templateId === templateId)
-            .map(f => f.id);
+    const templates = currentProject.library || [];
+    const instances = currentProject.frames || [];
 
-        if (instances.length > 0) {
-            setSelection(instances);
+    const handleFrameClick = (id, isInstance = false) => {
+        if (isInstance) {
+            setSelection([id]);
+        } else {
+            // It's a template that's not on the wall yet
+            setSelection([]);
         }
     };
 
@@ -26,69 +28,54 @@ const FrameList = () => {
         setFrameToRemove(templateId);
     };
 
-    const frames = currentProject.library || [];
-
-    if (frames.length === 0) {
-        return (
-            <div className={styles.empty}>
-                No frames in library.<br />Import a file or add manually above.
-            </div>
-        );
-    }
+    // Filter templates to only show those NOT currently on the wall
+    const unplacedTemplates = templates.filter(t => !instances.some(inst => inst.templateId === t.id));
 
     return (
         <>
             <div className={styles.list}>
-                {frames.map((frame, index) => {
-                    const isUsed = currentProject.frames.some(f => f.templateId === frame.id);
+                {templates.map((template) => {
+                    const instance = instances.find(f => f.templateId === template.id);
+                    const isPlaced = !!instance;
 
                     return (
                         <div
-                            key={frame.id || index}
-                            className={`${styles.frameItem} ${isUsed ? styles.used : ''}`}
-                            draggable={true}
-                            onClick={() => handleFrameClick(frame.id)}
+                            key={template.id}
+                            className={`${styles.frameItem} ${isPlaced ? styles.placedItem : ''}`}
+                            draggable={!isPlaced}
+                            onClick={() => handleFrameClick(instance?.id || template.id, isPlaced)}
                             onDragStart={(e) => {
+                                if (isPlaced) return;
                                 e.dataTransfer.setData('application/json', JSON.stringify({
                                     type: 'FRAME_LIBRARY_ITEM',
-                                    frame
+                                    frame: template
                                 }));
                             }}
                         >
-                            <div
-                                className={styles.framePreview}
-                                style={{
-                                    aspectRatio: `${frame.width}/${frame.height}`
-                                }}
-                            >
-                                {frame.matted && (
-                                    <div className={styles.mattedInner} />
-                                )}
-                                {isUsed && <div className={styles.usedLabel}>Placed</div>}
-
-                                {!isUsed && (
-                                    <button
-                                        className={styles.removeBtn}
-                                        onClick={(e) => handleDeleteTemplate(e, frame.id)}
-                                        title="Remove from library"
-                                    >
-                                        ×
-                                    </button>
+                            <div className={styles.framePreview} style={{ aspectRatio: `${template.width}/${template.height}` }}>
+                                {template.matted && <div className={styles.mattedInner} />}
+                                {!isPlaced && (
+                                    <button className={styles.removeBtn} onClick={(e) => handleDeleteTemplate(e, template.id)} title="Remove from library">×</button>
                                 )}
                             </div>
                             <div className={styles.frameInfo}>
-                                <div className={styles.dims}>
-                                    {frame.width}" x {frame.height}"
+                                <div className={styles.topInfo}>
+                                    <div className={styles.dims}>{template.width}" x {template.height}"</div>
+                                    {isPlaced && <span className={styles.placedPill}>Placed</span>}
                                 </div>
-                                {frame.matted && (
-                                    <div className={styles.mattedInfo}>
-                                        Matted: {frame.matted.width}" x {frame.matted.height}"
-                                    </div>
-                                )}
+                                <div className={styles.subInfo}>
+                                    {template.isDuplicate ? '(Duplicated)' : 'Original Library Item'}
+                                </div>
                             </div>
                         </div>
                     );
                 })}
+
+                {templates.length === 0 && (
+                    <div className={styles.empty}>
+                        No frames yet.<br />Import a file or add manually above.
+                    </div>
+                )}
             </div>
             {frameToRemove && (
                 <ConfirmDialog

@@ -32,7 +32,27 @@ const createNewProject = (name) => ({
 export const ProjectProvider = ({ children }) => {
     const [data, setData] = useState(() => {
         const saved = localStorage.getItem(STORAGE_KEY);
-        return saved ? JSON.parse(saved) : initialData;
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            // Ensure at least one project exists
+            if (Object.keys(parsed.projects).length === 0) {
+                const fresh = createNewProject('Untitled Project');
+                return {
+                    ...parsed,
+                    projects: { [fresh.id]: fresh },
+                    currentProjectId: fresh.id
+                };
+            }
+            return parsed;
+        }
+
+        // Initial Startup
+        const fresh = createNewProject('Untitled Project');
+        return {
+            ...initialData,
+            projects: { [fresh.id]: fresh },
+            currentProjectId: fresh.id
+        };
     });
 
     // Auto-save to localStorage

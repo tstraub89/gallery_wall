@@ -80,6 +80,33 @@
     font-size: 14px;
 }
 
+.placedItem {
+    border-left: 4px solid var(--accent-color);
+    background: rgba(0, 122, 255, 0.03);
+}
+
+.topInfo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.placedPill {
+    font-size: 10px;
+    font-weight: 700;
+    color: white;
+    background: var(--accent-color);
+    padding: 2px 6px;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+
+.subInfo {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
 .mattedInfo {
     font-size: 12px;
     color: var(--text-secondary);

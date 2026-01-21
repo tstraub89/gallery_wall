@@ -4,6 +4,7 @@ import styles from './CanvasWorkspace.module.css';
 import { v4 as uuidv4 } from 'uuid';
 import { saveImage } from '../../utils/imageStore';
 import FrameContent from './FrameContent';
+import ContextMenu from './ContextMenu';
 
 import { PPI, GRID_SIZE } from '../../constants';
 
@@ -20,58 +21,132 @@ const CanvasWorkspace = () => {
     const [isPanning, setIsPanning] = useState(false);
     const [isDraggingFrame, setIsDraggingFrame] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-    // Map of frameId -> {x, y}
     const [initialPositions, setInitialPositions] = useState({});
     const [hasDragged, setHasDragged] = useState(false);
-
     const [lastMouse, setLastMouse] = useState({ x: 0, y: 0 });
 
     // Grid State
     const [showGrid, setShowGrid] = useState(true);
     const [snapToGrid, setSnapToGrid] = useState(true);
 
+    // Marquee State
+    const [isMarquee, setIsMarquee] = useState(false);
+    const [marqueeRect, setMarqueeRect] = useState(null); // { x1, y1, x2, y2 } in screen space
+
+    // Context Menu State
+    const [contextMenu, setContextMenu] = useState(null); // { x, y, frameId }
+
+    // --- Helpers ---
+    const snap = (val) => {
+        if (!snapToGrid) return val;
+        const snapPx = GRID_SIZE * PPI;
+        return Math.round(val / snapPx) * snapPx;
+    };
+
+    const duplicateSelected = () => {
+        if (selectedFrameIds.length === 0) return;
+        const newFrames = [];
+        const newLibraryItems = [];
+        const newSelectedIds = [];
+
+        currentProject.frames.forEach(f => {
+            if (selectedFrameIds.includes(f.id)) {
+                const newId = uuidv4();
+                const newTemplateId = uuidv4();
+
+                // Find original template info
+                const originalTemplate = currentProject.library.find(t => t.id === f.templateId) || {};
+
+                newLibraryItems.push({
+                    ...originalTemplate,
+                    id: newTemplateId,
+                    isDuplicate: true,
+                    count: 1
+                });
+
+                newFrames.push({
+                    ...f,
+                    id: newId,
+                    templateId: newTemplateId,
+                    x: f.x + 10,
+                    y: f.y + 10,
+                    zIndex: Math.max(0, ...currentProject.frames.map(fr => fr.zIndex || 0)) + newFrames.length + 1
+                });
+                newSelectedIds.push(newId);
+            }
+        });
+
+        if (newFrames.length > 0) {
+            updateProject(currentProject.id, {
+                frames: [...currentProject.frames, ...newFrames],
+                library: [...currentProject.library, ...newLibraryItems]
+            });
+            setSelection(newSelectedIds);
+        }
+    };
+
+    const handleBringToFront = (frameId) => {
+        const ids = selectedFrameIds.includes(frameId) ? selectedFrameIds : [frameId];
+        const maxZ = Math.max(0, ...currentProject.frames.map(f => f.zIndex || 0));
+        const updatedFrames = currentProject.frames.map(f => ids.includes(f.id) ? { ...f, zIndex: maxZ + 1 } : f);
+        updateProject(currentProject.id, { frames: updatedFrames });
+    };
+
+    const handleSendToBack = (frameId) => {
+        const ids = selectedFrameIds.includes(frameId) ? selectedFrameIds : [frameId];
+        const minZ = Math.min(1000, ...currentProject.frames.map(f => f.zIndex || 0));
+        const updatedFrames = currentProject.frames.map(f => ids.includes(f.id) ? { ...f, zIndex: Math.max(0, minZ - 1) } : f);
+        updateProject(currentProject.id, { frames: updatedFrames });
+    };
+
+    const handleRemovePhoto = (frameId) => {
+        const ids = selectedFrameIds.includes(frameId) ? selectedFrameIds : [frameId];
+        const updatedFrames = currentProject.frames.map(f => ids.includes(f.id) ? { ...f, imageId: null } : f);
+        updateProject(currentProject.id, { frames: updatedFrames });
+    };
+
+    const handleDeleteFrame = (frameId) => {
+        const ids = selectedFrameIds.includes(frameId) ? selectedFrameIds : [frameId];
+        const updatedFrames = currentProject.frames.filter(f => !ids.includes(f.id));
+        updateProject(currentProject.id, { frames: updatedFrames });
+        setSelection([]);
+    };
 
     // Keyboard Shortcuts
     useEffect(() => {
         if (!currentProject) return;
-
         const handleKeyDown = (e) => {
-            // Ignore if input is active
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-            // Select All (Ctrl/Cmd + A)
+            // Select All
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
                 e.preventDefault();
                 if (focusedArea === 'library' && currentProject.images?.length > 0) {
-                    // Select all photos
                     setSelectedImages([...currentProject.images]);
                 } else {
-                    // Default: select all frames
                     setSelection(currentProject.frames.map(f => f.id));
                 }
             }
 
-            // Delete / Backspace
+            // Delete
             if (e.key === 'Backspace' || e.key === 'Delete') {
-                if (selectedFrameIds.length > 0) {
+                if (focusedArea === 'canvas' && selectedFrameIds.length > 0) {
                     e.preventDefault();
-                    const updatedFrames = currentProject.frames.filter(f => !selectedFrameIds.includes(f.id));
-                    updateProject(currentProject.id, { frames: updatedFrames });
-                    setSelection([]);
+                    handleDeleteFrame(selectedFrameIds[0]);
                 }
             }
+
+            // Duplicate (Ctrl+D)
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'd') {
+                e.preventDefault();
+                duplicateSelected();
+            }
+
             // Undo / Redo
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
                 e.preventDefault();
-                if (e.shiftKey) {
-                    // Redo
-                    redo();
-                } else {
-                    // Undo
-                    undo();
-                }
+                if (e.shiftKey) redo(); else undo();
             }
-            // Redo standard (Ctrl+Y)
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
                 e.preventDefault();
                 redo();
@@ -82,9 +157,7 @@ const CanvasWorkspace = () => {
             if (isArrowKey && focusedArea === 'canvas' && selectedFrameIds.length > 0) {
                 e.preventDefault();
                 const distance = e.shiftKey ? 10 : 1;
-                let dx = 0;
-                let dy = 0;
-
+                let dx = 0, dy = 0;
                 if (e.key === 'ArrowUp') dy = -distance;
                 if (e.key === 'ArrowDown') dy = distance;
                 if (e.key === 'ArrowLeft') dx = -distance;
@@ -108,12 +181,6 @@ const CanvasWorkspace = () => {
         return <div className={styles.empty}>Select a project to start planning.</div>;
     }
 
-    const snap = (val) => {
-        if (!snapToGrid) return val;
-        const snapPx = GRID_SIZE * PPI;
-        return Math.round(val / snapPx) * snapPx;
-    };
-
     // --- Handlers ---
     const handleWheel = (e) => {
         if (e.ctrlKey || e.metaKey) {
@@ -130,42 +197,21 @@ const CanvasWorkspace = () => {
 
     const handleMouseDown = (e) => {
         const { clientX, clientY } = e;
+        setContextMenu(null);
 
-        // Check for Middle Click (Pan) OR Left Click on Background (Pan)
-        // If clicking on a frame, we let handleFrameMouseDown handle it.
-        const isFrame = e.target.closest(`.${styles.frame}`);
-
-        if (e.button === 1 || (e.button === 0 && !isFrame)) {
+        if (e.button === 2 || e.button === 1) {
             setIsPanning(true);
             setLastMouse({ x: clientX, y: clientY });
-            // If Left Click on background, also deselect
-            if (e.button === 0) {
-                selectFrame(null);
-                setFocusedArea('canvas');
-            }
-            // e.preventDefault(); // Prevents text selection etc.
             return;
         }
 
-        // Frame logic is handled by stopPropagation in handleFrameMouseDown, 
-        // but if we are here, e.target IS a frame? 
-        // No, we check !isFrame above.
-        // If isFrame is true:
-        //  e.button === 1 -> enters if.
-        //  e.button === 0 -> does NOT enter if.
-        // So if Left Click on Frame, we fall through.
-
-        // Actually handleFrameMouseDown calls stopPropagation, so we shouldn't even reach here for Frame Clicks!
-        // handleFrameMouseDown is on the Frame element.
-        // handleMouseDown is on the Container.
-
-        // So we can assume if we are here, IT IS BACKGROUND.
-
-        if (e.button === 0 || e.button === 1) {
-            setIsPanning(true);
-            setLastMouse({ x: clientX, y: clientY });
-            if (e.button === 0) {
-                selectFrame(null);
+        if (e.button === 0) {
+            const isFrame = e.target.closest(`.${styles.frame}`);
+            if (!isFrame) {
+                setIsMarquee(true);
+                setDragStart({ x: clientX, y: clientY });
+                setMarqueeRect({ x1: clientX, y1: clientY, x2: clientX, y2: clientY });
+                if (!e.shiftKey && !e.ctrlKey && !e.metaKey) selectFrame(null);
                 setFocusedArea('canvas');
             }
         }
@@ -173,13 +219,13 @@ const CanvasWorkspace = () => {
 
     const handleFrameMouseDown = (e, frame) => {
         e.stopPropagation();
+        setContextMenu(null);
         if (e.button !== 0) return;
 
         const isSelected = selectedFrameIds.includes(frame.id);
         let nextSelectedIds = [...selectedFrameIds];
 
-        // Multi-select with Shift OR Ctrl/Cmd
-        if (e.shiftKey || e.ctrlKey || e.metaKey) {
+        if (e.shiftKey) {
             if (isSelected) {
                 nextSelectedIds = nextSelectedIds.filter(id => id !== frame.id);
                 selectFrame(frame.id, true);
@@ -192,16 +238,13 @@ const CanvasWorkspace = () => {
                 nextSelectedIds = [frame.id];
                 selectFrame(frame.id, false);
             }
-            // If already selected, do not change selection yet (preserve group)
         }
 
         setFocusedArea('canvas');
-
         setIsDraggingFrame(true);
         setDragStart({ x: e.clientX, y: e.clientY });
         setHasDragged(false);
 
-        // Snapshot positions for ALL selected frames (or future selected)
         const positions = {};
         currentProject.frames.forEach(f => {
             if (nextSelectedIds.includes(f.id)) {
@@ -211,7 +254,6 @@ const CanvasWorkspace = () => {
         setInitialPositions(positions);
     };
 
-
     const handleMouseMove = (e) => {
         const { clientX, clientY } = e;
         if (isPanning) {
@@ -219,50 +261,95 @@ const CanvasWorkspace = () => {
             const dy = clientY - lastMouse.y;
             setPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
             setLastMouse({ x: clientX, y: clientY });
+        } else if (isMarquee) {
+            setMarqueeRect(prev => ({ ...prev, x2: clientX, y2: clientY }));
         } else if (isDraggingFrame) {
             const dx = clientX - dragStart.x;
             const dy = clientY - dragStart.y;
 
-            if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
+            if (!hasDragged && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
                 setHasDragged(true);
+                if (e.ctrlKey || e.metaKey) {
+                    const newFrames = [];
+                    const newLibraryItems = [];
+                    const newSelectedIds = [];
+                    const newInitialPositions = {};
+                    currentProject.frames.forEach(f => {
+                        if (selectedFrameIds.includes(f.id)) {
+                            const newId = uuidv4();
+                            const newTemplateId = uuidv4();
+                            const originalTemplate = currentProject.library.find(t => t.id === f.templateId) || {};
+
+                            newLibraryItems.push({
+                                ...originalTemplate,
+                                id: newTemplateId,
+                                isDuplicate: true,
+                                count: 1
+                            });
+
+                            const newFrame = {
+                                ...f,
+                                id: newId,
+                                templateId: newTemplateId,
+                                zIndex: Math.max(0, ...currentProject.frames.map(fr => fr.zIndex || 0)) + newFrames.length + 1
+                            };
+                            newFrames.push(newFrame);
+                            newSelectedIds.push(newId);
+                            newInitialPositions[newId] = { x: f.x, y: f.y };
+                        }
+                    });
+                    if (newFrames.length > 0) {
+                        updateProject(currentProject.id, {
+                            frames: [...currentProject.frames, ...newFrames],
+                            library: [...currentProject.library, ...newLibraryItems]
+                        });
+                        setSelection(newSelectedIds);
+                        setInitialPositions(newInitialPositions);
+                    }
+                }
             }
 
             const worldDx = dx / scale;
             const worldDy = dy / scale;
-
-            // Just update local state for smooth rendering without hitting DB
-            // We use standard React state which re-renders visual components quickly
             setDragDelta({ x: worldDx, y: worldDy });
         }
     };
 
     const handleMouseUp = (e) => {
-        // Only reset to single selection if no modifier keys held
-        if (isDraggingFrame && !hasDragged && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
-            // Clicked (no drag) on a frame.
-            // If it was a group member, we should now select JUST it.
-            // We can find which frame was under cursor?
-            // Actually relying on e.target.closest should work since we bubble up?
-            // Wait, this handler is on Container.
+        if (isMarquee && marqueeRect) {
+            const { x1, y1, x2, y2 } = marqueeRect;
+            const minX = Math.min(x1, x2), maxX = Math.max(x1, x2);
+            const minY = Math.min(y1, y2), maxY = Math.max(y1, y2);
+            const wallEl = document.getElementById('canvas-wall');
+            if (wallEl) {
+                const wallRect = wallEl.getBoundingClientRect();
+                const selectedIds = currentProject.frames.filter(f => {
+                    const bWidthPx = (f.borderWidth || 0.1) * PPI;
+                    const fx = wallRect.left + (f.x - bWidthPx) * scale;
+                    const fy = wallRect.top + (f.y - bWidthPx) * scale;
+                    const fw = (f.width * PPI + bWidthPx * 2) * scale;
+                    const fh = (f.height * PPI + bWidthPx * 2) * scale;
+                    return fx < maxX && fx + fw > minX && fy < maxY && fy + fh > minY;
+                }).map(f => f.id);
+
+                if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                    setSelection(Array.from(new Set([...selectedFrameIds, ...selectedIds])));
+                } else {
+                    setSelection(selectedIds);
+                }
+            }
+        } else if (isDraggingFrame && !hasDragged && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
             const frameEl = e.target.closest(`.${styles.frame}`);
             if (frameEl) {
                 const frameId = frameEl.getAttribute('data-frame-id');
-                if (frameId) {
-                    selectFrame(frameId, false);
-                }
+                if (frameId) selectFrame(frameId, false);
             }
         } else if (isDraggingFrame && hasDragged) {
-            // Commit changes
             const updatedFrames = currentProject.frames.map(f => {
                 const initPos = initialPositions[f.id];
                 if (initPos) {
-                    let newX = initPos.x + dragDelta.x;
-                    let newY = initPos.y + dragDelta.y;
-
-                    if (snapToGrid) {
-                        newX = snap(newX);
-                        newY = snap(newY);
-                    }
+                    let newX = snap(initPos.x + dragDelta.x);
+                    let newY = snap(initPos.y + dragDelta.y);
                     return { ...f, x: newX, y: newY };
                 }
                 return f;
@@ -272,102 +359,69 @@ const CanvasWorkspace = () => {
 
         setIsPanning(false);
         setIsDraggingFrame(false);
+        setIsMarquee(false);
+        setMarqueeRect(null);
         setInitialPositions({});
         setHasDragged(false);
-        setDragDelta({ x: 0, y: 0 }); // Reset local delta
+        setDragDelta({ x: 0, y: 0 });
     };
 
-    // --- Drop Handler ---
+    const handleContextMenu = (e) => {
+        e.preventDefault();
+        const frameEl = e.target.closest(`.${styles.frame}`);
+        const frameId = frameEl ? frameEl.getAttribute('data-frame-id') : null;
+        if (frameId) {
+            if (!selectedFrameIds.includes(frameId)) selectFrame(frameId, false);
+            setContextMenu({ x: e.clientX, y: e.clientY, frameId });
+        } else {
+            setContextMenu(null);
+        }
+    };
+
     const handleDrop = async (e) => {
         e.preventDefault();
-
-        // 1. Handle File Drops (Images from OS)
-        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        if (e.dataTransfer.files?.length > 0) {
             const file = e.dataTransfer.files[0];
             if (file.type.startsWith('image/')) {
                 try {
-                    // Always save to library first
                     const imageId = uuidv4();
                     await saveImage(imageId, file);
                     addImageToLibrary(currentProject.id, imageId);
-
-                    // If dropped on a frame, apply it
                     const frameEl = e.target.closest(`.${styles.frame}`);
                     if (frameEl) {
                         const frameId = frameEl.getAttribute('data-frame-id');
                         if (frameId) {
-                            const updatedFrames = currentProject.frames.map(f =>
-                                f.id === frameId ? { ...f, imageId } : f
-                            );
+                            const updatedFrames = currentProject.frames.map(f => f.id === frameId ? { ...f, imageId } : f);
                             updateProject(currentProject.id, { frames: updatedFrames });
                         }
                     }
-                } catch (err) {
-                    console.error("Failed to save image", err);
-                }
+                } catch (err) { console.error("Failed to save image", err); }
             }
             return;
         }
-
-        // 2. Handle Application Drops (JSON)
         const dataStr = e.dataTransfer.getData('application/json');
         if (!dataStr) return;
-
         try {
-            const data = JSON.parse(dataStr);
-
-            // A. Frame Template Drop
-            if (data.type === 'FRAME_LIBRARY_ITEM') {
+            const d = JSON.parse(dataStr);
+            if (d.type === 'FRAME_LIBRARY_ITEM') {
                 const rect = containerRef.current.getBoundingClientRect();
-                const mouseX = e.clientX - rect.left;
-                const mouseY = e.clientY - rect.top;
-
-                const frame = data.frame;
-                const widthPx = frame.width * PPI;
-                const heightPx = frame.height * PPI;
-
-                let worldX = (mouseX - pan.x) / scale - (widthPx / 2);
-                let worldY = (mouseY - pan.y) / scale - (heightPx / 2);
-
-                if (snapToGrid) {
-                    worldX = snap(worldX);
-                    worldY = snap(worldY);
-                }
-
-                const newFrame = {
-                    id: uuidv4(),
-                    templateId: frame.id,
-                    width: frame.width,
-                    height: frame.height,
-                    matted: frame.matted,
-                    x: worldX,
-                    y: worldY,
-                    rotation: 0,
-                    zIndex: currentProject.frames.length + 1,
-                    imageId: null
-                };
-
-                updateProject(currentProject.id, {
-                    frames: [...currentProject.frames, newFrame]
-                });
+                const widthPx = d.frame.width * PPI, heightPx = d.frame.height * PPI;
+                let worldX = snap(((e.clientX - rect.left) - pan.x) / scale - (widthPx / 2));
+                let worldY = snap(((e.clientY - rect.top) - pan.y) / scale - (heightPx / 2));
+                const newFrame = { id: uuidv4(), templateId: d.frame.id, width: d.frame.width, height: d.frame.height, matted: d.frame.matted, x: worldX, y: worldY, rotation: 0, zIndex: currentProject.frames.length + 1, imageId: null };
+                updateProject(currentProject.id, { frames: [...currentProject.frames, newFrame] });
             }
-
-            // B. Photo Library Drop
-            if (data.type === 'PHOTO_LIBRARY_ITEM') {
+            if (d.type === 'PHOTO_LIBRARY_ITEM') {
                 const frameEl = e.target.closest(`.${styles.frame}`);
                 if (frameEl) {
                     const frameId = frameEl.getAttribute('data-frame-id');
                     if (frameId) {
-                        const updatedFrames = currentProject.frames.map(f =>
-                            f.id === frameId ? { ...f, imageId: data.imageId } : f
-                        );
+                        const updatedFrames = currentProject.frames.map(f => f.id === frameId ? { ...f, imageId: d.imageId } : f);
                         updateProject(currentProject.id, { frames: updatedFrames });
                     }
                 }
             }
-        } catch (err) {
-            console.error("Drop error", err);
-        }
+        } catch (err) { console.error("Drop error", err); }
     };
 
     const handleDragOver = (e) => e.preventDefault();
@@ -383,87 +437,61 @@ const CanvasWorkspace = () => {
             onMouseLeave={handleMouseUp}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
+            onContextMenu={handleContextMenu}
         >
-            <div
-                className={styles.world}
-                style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}
-            >
-                <div
-                    id="canvas-wall"
-                    className={`${styles.wall} ${showGrid ? styles.grid : ''} ${styles[currentProject.wallConfig.type]}`}
-                    style={{
-                        width: `${currentProject.wallConfig.width * PPI}px`,
-                        height: `${currentProject.wallConfig.height * PPI}px`,
-                        backgroundColor: currentProject.wallConfig.backgroundColor,
-                        '--grid-size': `${GRID_SIZE * PPI}px`
-                    }}
-                >
+            <div className={styles.world} style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${scale})` }}>
+                <div id="canvas-wall" className={`${styles.wall} ${showGrid ? styles.grid : ''} ${styles[currentProject.wallConfig.type]}`} style={{ width: `${currentProject.wallConfig.width * PPI}px`, height: `${currentProject.wallConfig.height * PPI}px`, backgroundColor: currentProject.wallConfig.backgroundColor, '--grid-size': `${GRID_SIZE * PPI}px` }}>
                     {currentProject.frames.map(frame => {
                         const isDraggingThis = selectedFrameIds.includes(frame.id) && isDraggingFrame && hasDragged;
-                        let displayX = frame.x;
-                        let displayY = frame.y;
-
+                        let displayX = frame.x, displayY = frame.y;
                         if (isDraggingThis) {
-                            // Calculate display position based on local dragDelta + initial pos
                             const initPos = initialPositions[frame.id];
                             if (initPos) {
-                                let newX = initPos.x + dragDelta.x;
-                                let newY = initPos.y + dragDelta.y;
-                                if (snapToGrid) {
-                                    newX = snap(newX);
-                                    newY = snap(newY);
-                                }
-                                displayX = newX;
-                                displayY = newY;
+                                displayX = snap(initPos.x + dragDelta.x);
+                                displayY = snap(initPos.y + dragDelta.y);
                             }
                         }
-
-                        const bWidthPx = frame.borderWidth !== undefined ? frame.borderWidth * PPI : 1;
-
+                        const bWidthPx = (frame.borderWidth || 0.1) * PPI;
                         return (
-                            <div
-                                key={frame.id}
-                                data-frame-id={frame.id}
-                                className={`${styles.frame} ${selectedFrameIds.includes(frame.id) ? styles.selected : ''}`}
-                                onMouseDown={(e) => handleFrameMouseDown(e, frame)}
-                                onDragStart={(e) => e.preventDefault()}
-                                style={{
-                                    left: `${displayX - bWidthPx}px`,
-                                    top: `${displayY - bWidthPx}px`,
-                                    width: `${frame.width * PPI}px`,
-                                    height: `${frame.height * PPI}px`,
-                                    transform: `rotate(${frame.rotation}deg)`,
-                                    zIndex: frame.zIndex,
-                                    userSelect: 'none',
-                                    // Frame Thickness logic: Additive
-                                    borderWidth: `${bWidthPx}px`,
-                                    borderStyle: 'solid',
-                                    boxSizing: 'content-box'
-                                }}
-                            >
+                            <div key={frame.id} data-frame-id={frame.id} className={`${styles.frame} ${selectedFrameIds.includes(frame.id) ? styles.selected : ''}`} onMouseDown={(e) => handleFrameMouseDown(e, frame)} onDragStart={(e) => e.preventDefault()} style={{ left: `${displayX - bWidthPx}px`, top: `${displayY - bWidthPx}px`, width: `${frame.width * PPI}px`, height: `${frame.height * PPI}px`, transform: `rotate(${frame.rotation}deg)`, zIndex: frame.zIndex, userSelect: 'none', borderWidth: `${bWidthPx}px`, borderStyle: 'solid', boxSizing: 'content-box' }}>
                                 <FrameContent frame={frame} ppi={PPI} />
                             </div>
-                        )
+                        );
                     })}
                 </div>
             </div>
-
             <div className={styles.hud}>
-                <button onClick={() => setScale(s => s + 0.1)} title="Zoom In">+</button>
+                <button onClick={() => setScale(s => s + 0.1)}>+</button>
                 <span>{Math.round(scale * 100)}%</span>
-                <button onClick={() => setScale(s => Math.max(0.1, s - 0.1))} title="Zoom Out">-</button>
+                <button onClick={() => setScale(s => Math.max(0.1, s - 0.1))}>-</button>
                 <div className={styles.separator} />
-                <button
-                    onClick={() => setShowGrid(s => !s)}
-                    style={{ background: showGrid ? 'rgba(0,122,255,0.6)' : undefined }}
-                    title="Toggle Grid"
-                >#</button>
-                <button
-                    onClick={() => setSnapToGrid(s => !s)}
-                    style={{ background: snapToGrid ? 'rgba(0,122,255,0.6)' : undefined }}
-                    title="Snap to Grid"
-                >S</button>
+                <button onClick={() => setShowGrid(s => !s)} style={{ background: showGrid ? 'rgba(0,122,255,0.6)' : undefined }}>#</button>
+                <button onClick={() => setSnapToGrid(s => !s)} style={{ background: snapToGrid ? 'rgba(0,122,255,0.6)' : undefined }}>S</button>
             </div>
+            {isMarquee && marqueeRect && containerRef.current && (() => {
+                const rect = containerRef.current.getBoundingClientRect();
+                return (
+                    <div
+                        className={styles.marquee}
+                        style={{
+                            left: Math.min(marqueeRect.x1, marqueeRect.x2) - rect.left,
+                            top: Math.min(marqueeRect.y1, marqueeRect.y2) - rect.top,
+                            width: Math.abs(marqueeRect.x2 - marqueeRect.x1),
+                            height: Math.abs(marqueeRect.y2 - marqueeRect.y1)
+                        }}
+                    />
+                );
+            })()}
+            {contextMenu && (
+                <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)} items={[
+                    { label: 'Duplicate', shortcut: 'Ctrl+D', onClick: duplicateSelected },
+                    { label: 'Bring to Front', onClick: () => handleBringToFront(contextMenu.frameId) },
+                    { label: 'Send to Back', onClick: () => handleSendToBack(contextMenu.frameId) },
+                    { separator: true },
+                    { label: 'Remove Photo', onClick: () => handleRemovePhoto(contextMenu.frameId) },
+                    { label: 'Delete Frame', danger: true, onClick: () => handleDeleteFrame(contextMenu.frameId) }
+                ]} />
+            )}
         </div>
     );
 };

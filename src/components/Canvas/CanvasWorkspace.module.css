@@ -10,6 +10,14 @@
     user-select: none;
 }
 
+.marquee {
+    position: absolute;
+    border: 2px solid var(--accent-color);
+    background: rgba(0, 122, 255, 0.15);
+    pointer-events: none;
+    z-index: 10000;
+}
+
 .empty {
     display: flex;
     justify-content: center;

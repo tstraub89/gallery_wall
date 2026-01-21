@@ -1,0 +1,70 @@
+.menu {
+    position: fixed;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05);
+    padding: 8px;
+    z-index: 100000;
+    min-width: 180px;
+    animation: fadeIn 0.1s ease-out;
+}
+
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99990;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.item {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 4px;
+    color: #333;
+    transition: background 0.1s;
+}
+
+.item:hover {
+    background: #f0f0f0;
+}
+
+.item.danger {
+    color: #dc3545;
+}
+
+.item.danger:hover {
+    background: #fff0f0;
+}
+
+.shortcut {
+    font-size: 11px;
+    color: #999;
+    background: #f5f5f7;
+    padding: 2px 4px;
+    border-radius: 3px;
+    margin-left: 8px;
+}
+
+.separator {
+    height: 1px;
+    background: #eee;
+    margin: 6px 4px;
+}
