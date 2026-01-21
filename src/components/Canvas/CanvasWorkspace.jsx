@@ -8,7 +8,7 @@ import FrameContent from './FrameContent';
 import { PPI, GRID_SIZE } from '../../constants';
 
 const CanvasWorkspace = () => {
-    const { currentProject, updateProject, selectFrame, selectedFrameIds, setSelection, addImageToLibrary, undo, redo, canUndo, canRedo } = useProject();
+    const { currentProject, updateProject, selectFrame, selectedFrameIds, setSelection, addImageToLibrary, undo, redo, canUndo, canRedo, focusedArea, setFocusedArea, selectedImageIds, setSelectedImages } = useProject();
 
     // Viewport State
     const [scale, setScale] = useState(1);
@@ -42,7 +42,13 @@ const CanvasWorkspace = () => {
             // Select All (Ctrl/Cmd + A)
             if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a') {
                 e.preventDefault();
-                setSelection(currentProject.frames.map(f => f.id));
+                if (focusedArea === 'library' && currentProject.images?.length > 0) {
+                    // Select all photos
+                    setSelectedImages([...currentProject.images]);
+                } else {
+                    // Default: select all frames
+                    setSelection(currentProject.frames.map(f => f.id));
+                }
             }
 
             // Delete / Backspace
@@ -74,7 +80,7 @@ const CanvasWorkspace = () => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [currentProject, selectedFrameIds, updateProject, setSelection, undo, redo]);
+    }, [currentProject, selectedFrameIds, updateProject, setSelection, undo, redo, focusedArea, setSelectedImages]);
 
     if (!currentProject) {
         return <div className={styles.empty}>Select a project to start planning.</div>;
@@ -113,6 +119,7 @@ const CanvasWorkspace = () => {
             // If Left Click on background, also deselect
             if (e.button === 0) {
                 selectFrame(null);
+                setFocusedArea('canvas');
             }
             // e.preventDefault(); // Prevents text selection etc.
             return;
@@ -135,7 +142,10 @@ const CanvasWorkspace = () => {
         if (e.button === 0 || e.button === 1) {
             setIsPanning(true);
             setLastMouse({ x: clientX, y: clientY });
-            if (e.button === 0) selectFrame(null);
+            if (e.button === 0) {
+                selectFrame(null);
+                setFocusedArea('canvas');
+            }
         }
     };
 
@@ -146,7 +156,8 @@ const CanvasWorkspace = () => {
         const isSelected = selectedFrameIds.includes(frame.id);
         let nextSelectedIds = [...selectedFrameIds];
 
-        if (e.shiftKey) {
+        // Multi-select with Shift OR Ctrl/Cmd
+        if (e.shiftKey || e.ctrlKey || e.metaKey) {
             if (isSelected) {
                 nextSelectedIds = nextSelectedIds.filter(id => id !== frame.id);
                 selectFrame(frame.id, true);
@@ -161,6 +172,8 @@ const CanvasWorkspace = () => {
             }
             // If already selected, do not change selection yet (preserve group)
         }
+
+        setFocusedArea('canvas');
 
         setIsDraggingFrame(true);
         setDragStart({ x: e.clientX, y: e.clientY });
@@ -202,7 +215,8 @@ const CanvasWorkspace = () => {
     };
 
     const handleMouseUp = (e) => {
-        if (isDraggingFrame && !hasDragged && !e.shiftKey) {
+        // Only reset to single selection if no modifier keys held
+        if (isDraggingFrame && !hasDragged && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
             // Clicked (no drag) on a frame.
             // If it was a group member, we should now select JUST it.
             // We can find which frame was under cursor?

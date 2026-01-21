@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react';
 import { getImage } from '../utils/imageStore';
 
+/**
+ * Hook to load an image from IndexedDB.
+ * @param {string} imageId - The ID of the image to load
+ * @returns {{ url: string|null, status: 'loading'|'loaded'|'not-found'|'error' }}
+ */
 export const useImage = (imageId) => {
-    const [imageUrl, setImageUrl] = useState(null);
+    const [state, setState] = useState({ url: null, status: 'loading' });
 
     useEffect(() => {
         let active = true;
@@ -10,18 +15,27 @@ export const useImage = (imageId) => {
 
         const load = async () => {
             if (!imageId) {
-                setImageUrl(null);
+                setState({ url: null, status: 'not-found' });
                 return;
             }
 
+            setState({ url: null, status: 'loading' });
+
             try {
                 const blob = await getImage(imageId);
-                if (blob && active) {
+                if (!active) return;
+
+                if (blob) {
                     objectUrl = URL.createObjectURL(blob);
-                    setImageUrl(objectUrl);
+                    setState({ url: objectUrl, status: 'loaded' });
+                } else {
+                    setState({ url: null, status: 'not-found' });
                 }
             } catch (err) {
                 console.error("Failed to load image", imageId, err);
+                if (active) {
+                    setState({ url: null, status: 'error' });
+                }
             }
         };
 
@@ -33,5 +47,5 @@ export const useImage = (imageId) => {
         };
     }, [imageId]);
 
-    return imageUrl;
+    return state;
 };

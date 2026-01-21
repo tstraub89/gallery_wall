@@ -3,6 +3,7 @@ import { useProject } from '../../context/ProjectContext';
 import styles from './GlobalActions.module.css';
 import { toBlob } from 'html-to-image';
 import { PPI } from '../../constants';
+import ConfirmDialog from '../Common/ConfirmDialog';
 
 // Helper to convert blob URL or external URL to base64
 const blobToBase64 = (url) => new Promise((resolve, reject) => {
@@ -36,6 +37,7 @@ const GlobalActions = () => {
     const { currentProject, updateProject, addProject } = useProject();
     const [isExporting, setIsExporting] = useState(false);
     const [exportError, setExportError] = useState(null);
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
 
     const handleExport = async () => {
         const node = document.getElementById('canvas-wall');
@@ -173,9 +175,12 @@ const GlobalActions = () => {
     };
 
     const handleClearCanvas = () => {
-        if (confirm("Are you sure you want to remove ALL frames from the canvas? This cannot be undone (without Ctrl+Z).")) {
-            updateProject(currentProject.id, { frames: [] });
-        }
+        setShowClearConfirm(true);
+    };
+
+    const confirmClearCanvas = () => {
+        updateProject(currentProject.id, { frames: [] });
+        setShowClearConfirm(false);
     };
 
     if (!currentProject) return null;
@@ -204,6 +209,17 @@ const GlobalActions = () => {
                 <div className={styles.errorBanner} onClick={() => setExportError(null)}>
                     Error: {exportError} (Click to dismiss)
                 </div>
+            )}
+
+            {showClearConfirm && (
+                <ConfirmDialog
+                    title="Reset Project"
+                    message="Are you sure you want to remove ALL frames from the canvas? This cannot be undone (without Ctrl+Z)."
+                    confirmLabel="Reset Canvas"
+                    onConfirm={confirmClearCanvas}
+                    onCancel={() => setShowClearConfirm(false)}
+                    isDanger={true}
+                />
             )}
         </div>
     );

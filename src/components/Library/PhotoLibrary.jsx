@@ -4,14 +4,17 @@ import { saveImage } from '../../utils/imageStore';
 import { useImage } from '../../hooks/useImage';
 import { v4 as uuidv4 } from 'uuid';
 import styles from './PhotoLibrary.module.css';
+import DeleteConfirmDialog from './DeleteConfirmDialog';
 
 const PhotoItem = ({ imageId, isUsed, isSelected, onSelect }) => {
-    const imageUrl = useImage(imageId);
+    const { url, status } = useImage(imageId);
 
     const handleDragStart = (e) => {
-        // We can pass data to drop handler
-        // We want to pass the imageId so the canvas knows what to render
-        // But also we might want to say "This is a library item"
+        // Only allow dragging if image is loaded
+        if (status !== 'loaded') {
+            e.preventDefault();
+            return;
+        }
         e.dataTransfer.setData('application/json', JSON.stringify({
             type: 'PHOTO_LIBRARY_ITEM',
             imageId
@@ -24,7 +27,27 @@ const PhotoItem = ({ imageId, isUsed, isSelected, onSelect }) => {
         onSelect(e);
     };
 
-    if (!imageUrl) return <div className={styles.loading}>Loading...</div>;
+    // Loading state
+    if (status === 'loading') {
+        return <div className={styles.loading}>Loading...</div>;
+    }
+
+    // Not found or error state - still selectable for deletion
+    if (status === 'not-found' || status === 'error') {
+        return (
+            <div
+                className={`${styles.photoItem} ${styles.notFound} ${isSelected ? styles.selected : ''}`}
+                onClick={handleClick}
+                title="Photo not found - click to select for deletion"
+            >
+                <div className={styles.notFoundContent}>
+                    <span className={styles.notFoundIcon}>🖼️</span>
+                    <span className={styles.notFoundText}>Not Found</span>
+                </div>
+                {isSelected && <div className={styles.selectedOverlay}>✓</div>}
+            </div>
+        );
+    }
 
     return (
         <div
@@ -34,7 +57,7 @@ const PhotoItem = ({ imageId, isUsed, isSelected, onSelect }) => {
             onClick={handleClick}
             title={isUsed ? "This photo is already on the wall" : "Drag to add to a frame"}
         >
-            <img src={imageUrl} alt="Library Item" />
+            <img src={url} alt="Library Item" />
             {isUsed && <div className={styles.usedLabel}>Use Again</div>}
             {isSelected && <div className={styles.selectedOverlay}>✓</div>}
         </div>
@@ -42,12 +65,12 @@ const PhotoItem = ({ imageId, isUsed, isSelected, onSelect }) => {
 };
 
 const PhotoLibrary = () => {
-    const { currentProject, addImageToLibrary, updateProject, selectFrame } = useProject();
+    const { currentProject, addImageToLibrary, updateProject, selectFrame, selectedImageIds, setSelectedImages, setFocusedArea } = useProject();
     const fileInputRef = useRef(null);
-    const [selectedImages, setSelectedImages] = React.useState([]);
-
-    // Clear frame selection when selecting photos and vice versa?
-    // Accessing `selectFrame` from context.
+    // Track anchor index for range selection
+    const [anchorIndex, setAnchorIndex] = React.useState(null);
+    // Delete confirmation dialog
+    const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
 
     const handleFileChange = async (e) => {
         const files = Array.from(e.target.files);
@@ -70,51 +93,111 @@ const PhotoLibrary = () => {
     const handleSelect = (imageId, e) => {
         // Deselect frames on canvas
         selectFrame(null);
+        setFocusedArea('library');
+
+        const images = currentProject.images || [];
+        const clickedIndex = images.indexOf(imageId);
 
         if (e.ctrlKey || e.metaKey) {
-            // Toggle
-            setSelectedImages(prev =>
-                prev.includes(imageId)
-                    ? prev.filter(id => id !== imageId)
-                    : [...prev, imageId]
-            );
-        } else if (e.shiftKey) {
-            // Range select logic is hard in masonry, simpler shift logic: add to selection
-            setSelectedImages(prev =>
-                prev.includes(imageId) ? prev : [...prev, imageId]
-            );
+            // Toggle selection
+            if (selectedImageIds.includes(imageId)) {
+                setSelectedImages(selectedImageIds.filter(id => id !== imageId));
+            } else {
+                setSelectedImages([...selectedImageIds, imageId]);
+            }
+            // Update anchor to this item
+            setAnchorIndex(clickedIndex);
+        } else if (e.shiftKey && anchorIndex !== null) {
+            // Range select: select all between anchor and clicked
+            const start = Math.min(anchorIndex, clickedIndex);
+            const end = Math.max(anchorIndex, clickedIndex);
+            const rangeIds = images.slice(start, end + 1);
+            setSelectedImages(rangeIds);
         } else {
-            // Single select
+            // Single select - set as anchor
             setSelectedImages([imageId]);
+            setAnchorIndex(clickedIndex);
         }
     };
 
-    const handleDelete = () => {
-        if (selectedImages.length === 0) return;
-
-        // Remove from project images
-        const updatedImages = currentProject.images.filter(id => !selectedImages.includes(id));
-        updateProject(currentProject.id, { images: updatedImages });
-        setSelectedImages([]);
+    // Determine which photos are in use
+    const getUsedImageIds = () => {
+        return new Set(currentProject.frames.map(f => f.imageId).filter(Boolean));
     };
 
-    // Keyboard support
+    // Count how many selected images are in use
+    const getInUseCount = () => {
+        const usedSet = getUsedImageIds();
+        return selectedImageIds.filter(id => usedSet.has(id)).length;
+    };
+
+    const handleDeleteClick = () => {
+        if (selectedImageIds.length === 0) return;
+        setShowDeleteDialog(true);
+    };
+
+    const handleDeleteUnused = () => {
+        const usedSet = getUsedImageIds();
+        const unusedToDelete = selectedImageIds.filter(id => !usedSet.has(id));
+
+        // Remove only unused from library
+        const updatedImages = currentProject.images.filter(id => !unusedToDelete.includes(id));
+        updateProject(currentProject.id, { images: updatedImages });
+
+        setSelectedImages([]);
+        setAnchorIndex(null);
+        setShowDeleteDialog(false);
+    };
+
+    const handleDeleteAll = () => {
+        // Remove from library
+        const updatedImages = currentProject.images.filter(id => !selectedImageIds.includes(id));
+
+        // Also remove from any frames using these photos
+        const updatedFrames = currentProject.frames.map(frame => {
+            if (selectedImageIds.includes(frame.imageId)) {
+                return { ...frame, imageId: null };
+            }
+            return frame;
+        });
+
+        updateProject(currentProject.id, {
+            images: updatedImages,
+            frames: updatedFrames
+        });
+
+        setSelectedImages([]);
+        setAnchorIndex(null);
+        setShowDeleteDialog(false);
+    };
+
+    const handleCancelDelete = () => {
+        setShowDeleteDialog(false);
+    };
+
+    // Keyboard support for Delete
     useEffect(() => {
         const handleKeyDown = (e) => {
-            if ((e.key === 'Backspace' || e.key === 'Delete') && selectedImages.length > 0) {
+            if ((e.key === 'Backspace' || e.key === 'Delete') && selectedImageIds.length > 0) {
+                // Check if focus is on an input
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
                 e.preventDefault();
-                handleDelete();
+                handleDeleteClick();
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedImages, currentProject, updateProject]);
+    }, [selectedImageIds, currentProject, updateProject]);
 
     // Clear selection on background click
     const handleBackgroundClick = (e) => {
+        // Don't clear if clicking on photos, action buttons, or dialog
         if (e.target.closest(`.${styles.photoItem}`)) return;
+        if (e.target.closest(`.${styles.actions}`)) return;
+        if (e.target.closest('[class*="DeleteConfirmDialog"]')) return;
         setSelectedImages([]);
+        setAnchorIndex(null);
     };
 
     if (!currentProject) return null;
@@ -132,10 +215,10 @@ const PhotoLibrary = () => {
                     >
                         + Add Photos
                     </button>
-                    {selectedImages.length > 0 && (
+                    {selectedImageIds.length > 0 && (
                         <button
                             className={styles.deleteBtn}
-                            onClick={handleDelete}
+                            onClick={handleDeleteClick}
                             title="Delete Selected Photos"
                         >
                             🗑️
@@ -160,7 +243,7 @@ const PhotoLibrary = () => {
                                 key={imageId}
                                 imageId={imageId}
                                 isUsed={usedImageIds.has(imageId)}
-                                isSelected={selectedImages.includes(imageId)}
+                                isSelected={selectedImageIds.includes(imageId)}
                                 onSelect={(e) => handleSelect(imageId, e)}
                             />
                         ))
@@ -171,6 +254,16 @@ const PhotoLibrary = () => {
                     )}
                 </div>
             </div>
+
+            {showDeleteDialog && (
+                <DeleteConfirmDialog
+                    selectedCount={selectedImageIds.length}
+                    inUseCount={getInUseCount()}
+                    onDeleteUnused={handleDeleteUnused}
+                    onDeleteAll={handleDeleteAll}
+                    onCancel={handleCancelDelete}
+                />
+            )}
         </div>
     );
 };
