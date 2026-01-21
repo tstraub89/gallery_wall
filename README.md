@@ -69,4 +69,7 @@ Click the **"?"** button in the header for the in-app **Quick Start Guide**.
 2.  **Dev Server**: `npm run dev`
 3.  **Browse**: Open `http://localhost:5173`.
 
+> [!TIP]
+> Check out [example_frame_template.txt](file:///home/tstraub/projects/gallery_wall/example_frame_template.txt) to see how to format your frame collection for batch importing.
+
 **Tech Stack**: Built with React (Vite), CSS Modules, and IndexedDB for persistent local storage.
