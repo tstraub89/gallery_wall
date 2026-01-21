@@ -243,11 +243,20 @@ const SingleImageControls = ({ frame, updateProject, currentProject }) => {
             <div className={styles.header} style={{ paddingLeft: 0 }}><h3>Image Settings</h3></div>
             <div className={styles.propGroup}>
                 <label>Scale</label>
-                <input
-                    type="range" min="0.1" max="3" step="0.1"
-                    value={frame.imageState?.scale || 1}
-                    onChange={(e) => handleImageChange('scale', parseFloat(e.target.value))}
-                />
+                <div className={styles.row}>
+                    <input
+                        type="range" min="0.1" max="3" step="0.1"
+                        value={frame.imageState?.scale || 1}
+                        onChange={(e) => handleImageChange('scale', parseFloat(e.target.value))}
+                        className={styles.slider}
+                    />
+                    <input
+                        type="number" step="0.1"
+                        value={frame.imageState?.scale || 1}
+                        onChange={(e) => handleImageChange('scale', parseFloat(e.target.value))}
+                        className={styles.numberInput}
+                    />
+                </div>
             </div>
             <div className={styles.propGroup}>
                 <label>Position X</label>
