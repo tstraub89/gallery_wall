@@ -76,6 +76,28 @@ const CanvasWorkspace = () => {
                 e.preventDefault();
                 redo();
             }
+
+            // Nudge (Arrow Keys)
+            const isArrowKey = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key);
+            if (isArrowKey && focusedArea === 'canvas' && selectedFrameIds.length > 0) {
+                e.preventDefault();
+                const distance = e.shiftKey ? 10 : 1;
+                let dx = 0;
+                let dy = 0;
+
+                if (e.key === 'ArrowUp') dy = -distance;
+                if (e.key === 'ArrowDown') dy = distance;
+                if (e.key === 'ArrowLeft') dx = -distance;
+                if (e.key === 'ArrowRight') dx = distance;
+
+                const updatedFrames = currentProject.frames.map(f => {
+                    if (selectedFrameIds.includes(f.id)) {
+                        return { ...f, x: f.x + dx, y: f.y + dy };
+                    }
+                    return f;
+                });
+                updateProject(currentProject.id, { frames: updatedFrames });
+            }
         };
 
         window.addEventListener('keydown', handleKeyDown);
