@@ -127,3 +127,27 @@
 .errorBanner:hover {
     background: #fdd;
 }
+
+.helpBtn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.5px solid var(--accent-color);
+    background: transparent;
+    color: var(--accent-color);
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+.helpBtn:hover {
+    background: var(--accent-color);
+    color: white;
+    transform: scale(1.1);
+}

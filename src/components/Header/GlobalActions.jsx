@@ -4,6 +4,7 @@ import styles from './GlobalActions.module.css';
 import { toBlob } from 'html-to-image';
 import { PPI } from '../../constants';
 import ConfirmDialog from '../Common/ConfirmDialog';
+import HelpModal from '../Common/HelpModal';
 
 // Helper to convert blob URL or external URL to base64
 const blobToBase64 = (url) => new Promise((resolve, reject) => {
@@ -38,6 +39,7 @@ const GlobalActions = () => {
     const [isExporting, setIsExporting] = useState(false);
     const [exportError, setExportError] = useState(null);
     const [showClearConfirm, setShowClearConfirm] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
 
     const handleExport = async () => {
         const node = document.getElementById('canvas-wall');
@@ -221,6 +223,10 @@ const GlobalActions = () => {
                     isDanger={true}
                 />
             )}
+
+            <button className={styles.helpBtn} onClick={() => setShowHelp(true)} title="Show Help Guide">?</button>
+
+            {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
         </div>
     );
 };
