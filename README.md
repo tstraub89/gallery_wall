@@ -4,13 +4,13 @@ A powerful, interactive web application for planning gallery walls. Visualize yo
 
 ## Features
 
-### 🖼️ Frame Library & Management
+### 🖼️ Frame Library & Design Inventory
+-   **1:1 Inventory Manifest**: Every frame on your wall is accounted for individually in the sidebar.
+-   **Persistent Library**: Duplicated frames remain in your library as "Unplaced" items even if removed from the wall.
 -   **Manual Addition**: Quickly add custom frames with specified internal openings (matting) directly in-app.
 -   **Import via Text**: Batch import your collection from a simple text list (e.g., "8x10", "11x14 matted to 8x10").
 -   **Smart Parsing**: Fraction handling (e.g., "11 1/4") and automatic matted opening detection.
--   **HxW Support**: Toggle "Input is Height x Width" to handle different list formats.
--   **Inventory Tracking**: Instantly see which frames have been "Placed" on the wall.
--   **Library Deletion**: Hover to remove unused frame templates from your library.
+-   **Status Indicators**: Sleek "Placed" pills and "(Duplicated)" labels help you manage your physical inventory.
 
 ### 📸 Photo Library
 -   **Batch Upload**: Add multiple photos at once.
@@ -18,61 +18,50 @@ A powerful, interactive web application for planning gallery walls. Visualize yo
 -   **Selection & Management**: Multi-select photos (Ctrl/Cmd + Click) to manage or delete them.
 -   **Drag & Drop**: Drag photos from the library onto frames on the canvas.
 -   **Smart Integration**: Drag files from your computer onto a frame to place them *and* auto-save them to your library.
--   **Usage Indicators**: Photos currently on the wall are marked with a label.
 
 ### 🎨 Infinite Canvas Workspace
--   **Pan & Zoom**: Navigate a limitless workspace with familiar controls (Space-bar or Drag background to pan, Ctrl+Scroll to zoom).
+-   **Marquee Selection**: Left-click and drag on the background to bulk-select frames with a selection box.
+-   **Context Menu**: Right-click any frame to access **Duplicate**, **Bring to Front**, **Send to Back**, and **Remove Photo**.
+-   **Smart Duplication**: Hold `Ctrl / Cmd` while dragging a frame to spawn an instant copy on the wall.
+-   **Pan & Zoom**: Navigate with ease (Right-click/Middle-click to pan, Ctrl+Scroll to zoom). Optimized for Firefox/Chrome to prevent browser zoom conflicts.
 -   **Grid & Snapping**: Toggle a background grid (`#`) and enable snap-to-grid (`S`) for perfect alignment.
 -   **Undo / Redo**: Full history support with `Ctrl+Z` and `Ctrl+Y`.
--   **Multi-Select**: Shift-click to select multiple frames, or `Ctrl+A` to select all.
 -   **Alignment Tools**: Align selected frames (Left, Center, Right, Top, Middle, Bottom) with one click.
--   **Group Dragging**: Move entire clusters of frames together without losing their relative positions.
 -   **Wall Templates**: Switch between Flat, Staircase (Ascending/Descending) configurations.
 
-### 🛠️ Image & Frame Props
--   **Smart Panning**: Adjust the X/Y position, scale, and rotation of an image *within* its frame.
--   **Precise Controls**: Use sliders or numeric inputs for pixel-perfect placement.
--   **Frame Styling**: Adjust frame border thickness globally for any selection.
--   **Accurate Matting**: Mats are rendered with real-world dimensions relative to frame size.
--   **Quick Removal**: Delete frames from the canvas with a single click or the `Delete` key.
-
-### 💾 Project Management
+### 💾 Project & Export
+-   **Shopping List**: Export a text-based manifest of every frame in your design, including dimensions and filled status.
+-   **Reset Project**: Quickly clear your canvas to start a fresh layout.
 -   **Multiple Projects**: Create and switch between distinct gallery wall designs.
--   **Unified Header Actions**: "Save PNG", "Export Project", and "Import Project" are centrally located in the top menu.
+-   **Unfied Actions**: "Save PNG", "Export Project", and "Import Project" are centrally located.
 -   **Auto-Save**: Progress is automatically saved to your browser's local storage.
--   **Robust Export**: High-resolution PNG output with cross-browser stability (Firefox/Chrome optimized).
--   **Safe Deletion**: Delete any project; the app will automatically start a fresh one if you delete your last layout.
 
 ## Tech Stack
 -   **React** (Vite)
 -   **CSS Modules** (custom responsive design)
 -   **IndexedDB** (for efficient local image storage)
 -   **html-to-image** (for high-fidelity canvas exports)
--   **UUID** (for unique entity tracking)
 
 ## Getting Started
 
-1.  **Install Dependencies**
-    ```bash
-    npm install
-    ```
+1.  **Install Dependencies**: `npm install`
+2.  **Run Development Server**: `npm run dev`
+3.  **Open in Browser**: Visit `http://localhost:5173`.
 
-2.  **Run Development Server**
-    ```bash
-    npm run dev
-    ```
+## Usage Tips & Shortcuts
 
-3.  **Open in Browser**
-    Visit the local URL provided by Vite (usually `http://localhost:5173`).
+Click the **"?"** button in the header for the built-in **Quick Start Guide**.
 
-## Usage Tips
-
--   **Find Placed Frames**: Click any frame in the Left Sidebar to instantly select all its instances on the canvas.
--   **Resize Sidebar**: Drag the right edge of the left sidebar to change focus between your library and the canvas.
+-   **Navigation**:
+    -   **Right-Click + Drag**: Pan Workspace
+    -   **Ctrl / Cmd + Scroll**: Zoom In/Out
+-   **Interaction**:
+    -   **Ctrl / Cmd + Drag Frame**: Duplicate and Move
+    -   **Double-Click**: Reset Image Scale/Position within a frame
 -   **Keyboard Shortcuts**:
-    -   `S`: Toggle Grid Snapping
-    -   `#`: Toggle Grid Visual
-    -   `Ctrl + Z` / `Cmd + Z`: Undo
-    -   `Ctrl + Y` / `Cmd + Shift + Z`: Redo
+    -   `Ctrl + D`: Duplicate Selection
+    -   `Ctrl + Z` / `Ctrl + Y`: Undo / Redo
+    -   `S` / `#`: Toggle Snap / Grid
+    -   `Arrows`: Nudge 1px (`Shift` for 10px)
+    -   `Delete` / `Backspace`: Remove Selection
     -   `Ctrl + A`: Select All Frames
-    -   `Backspace` / `Delete`: Remove selected frames from canvas
