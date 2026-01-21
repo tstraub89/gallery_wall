@@ -105,6 +105,13 @@ const CanvasWorkspace = () => {
         updateProject(currentProject.id, { frames: updatedFrames });
     };
 
+    const handleResetImage = (frameId) => {
+        const updatedFrames = currentProject.frames.map(f =>
+            f.id === frameId ? { ...f, imageState: { scale: 1, x: 0, y: 0, rotation: 0 } } : f
+        );
+        updateProject(currentProject.id, { frames: updatedFrames });
+    };
+
     const handleDeleteFrame = (frameId) => {
         const ids = selectedFrameIds.includes(frameId) ? selectedFrameIds : [frameId];
         const updatedFrames = currentProject.frames.filter(f => !ids.includes(f.id));
@@ -472,7 +479,26 @@ const CanvasWorkspace = () => {
                         }
                         const bWidthPx = (frame.borderWidth || 0.1) * PPI;
                         return (
-                            <div key={frame.id} data-frame-id={frame.id} className={`${styles.frame} ${selectedFrameIds.includes(frame.id) ? styles.selected : ''}`} onMouseDown={(e) => handleFrameMouseDown(e, frame)} onDragStart={(e) => e.preventDefault()} style={{ left: `${displayX - bWidthPx}px`, top: `${displayY - bWidthPx}px`, width: `${frame.width * PPI}px`, height: `${frame.height * PPI}px`, transform: `rotate(${frame.rotation}deg)`, zIndex: frame.zIndex, userSelect: 'none', borderWidth: `${bWidthPx}px`, borderStyle: 'solid', boxSizing: 'content-box' }}>
+                            <div
+                                key={frame.id}
+                                data-frame-id={frame.id}
+                                className={`${styles.frame} ${selectedFrameIds.includes(frame.id) ? styles.selected : ''}`}
+                                onMouseDown={(e) => handleFrameMouseDown(e, frame)}
+                                onDoubleClick={() => handleResetImage(frame.id)}
+                                onDragStart={(e) => e.preventDefault()}
+                                style={{
+                                    left: `${displayX - bWidthPx}px`,
+                                    top: `${displayY - bWidthPx}px`,
+                                    width: `${frame.width * PPI}px`,
+                                    height: `${frame.height * PPI}px`,
+                                    transform: `rotate(${frame.rotation}deg)`,
+                                    zIndex: frame.zIndex,
+                                    userSelect: 'none',
+                                    borderWidth: `${bWidthPx}px`,
+                                    borderStyle: 'solid',
+                                    boxSizing: 'content-box'
+                                }}
+                            >
                                 <FrameContent frame={frame} ppi={PPI} />
                             </div>
                         );

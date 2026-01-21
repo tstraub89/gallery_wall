@@ -49,8 +49,10 @@ const HelpModal = ({ onClose }) => {
                     <section>
                         <h3>⌨️ Shortcuts</h3>
                         <div className={styles.shortcutGrid}>
+                            <div className={styles.shortcutItem}><kbd>Ctrl</kbd> + <kbd>A</kbd> <span>Select All</span></div>
                             <div className={styles.shortcutItem}><kbd>Ctrl</kbd> + <kbd>D</kbd> <span>Duplicate Selected</span></div>
                             <div className={styles.shortcutItem}><kbd>Ctrl</kbd> + <kbd>Z</kbd> <span>Undo Action</span></div>
+                            <div className={styles.shortcutItem}><kbd>Ctrl</kbd> + <kbd>Y</kbd> <span>Redo Action</span></div>
                             <div className={styles.shortcutItem}><kbd>Delete</kbd> <span>Remove Frame</span></div>
                             <div className={styles.shortcutItem}><kbd>S</kbd> <span>Toggle Snapping</span></div>
                             <div className={styles.shortcutItem}><kbd>#</kbd> <span>Toggle Grid</span></div>
