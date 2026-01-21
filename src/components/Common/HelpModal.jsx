@@ -52,6 +52,8 @@ const HelpModal = ({ onClose }) => {
                             <div className={styles.shortcutItem}><kbd>Ctrl</kbd> + <kbd>D</kbd> <span>Duplicate Selected</span></div>
                             <div className={styles.shortcutItem}><kbd>Ctrl</kbd> + <kbd>Z</kbd> <span>Undo Action</span></div>
                             <div className={styles.shortcutItem}><kbd>Delete</kbd> <span>Remove Frame</span></div>
+                            <div className={styles.shortcutItem}><kbd>S</kbd> <span>Toggle Snapping</span></div>
+                            <div className={styles.shortcutItem}><kbd>#</kbd> <span>Toggle Grid</span></div>
                             <div className={styles.shortcutItem}><kbd>Arrows</kbd> <span>Nudge 1px</span></div>
                             <div className={styles.shortcutItem}><kbd>Shift</kbd> + <kbd>Arrows</kbd> <span>Nudge 10px</span></div>
                         </div>

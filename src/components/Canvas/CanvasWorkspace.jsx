@@ -171,6 +171,16 @@ const CanvasWorkspace = () => {
                 });
                 updateProject(currentProject.id, { frames: updatedFrames });
             }
+
+            // Toggle Snapping (S)
+            if (e.key.toLowerCase() === 's' && !e.ctrlKey && !e.metaKey) {
+                setSnapToGrid(prev => !prev);
+            }
+
+            // Toggle Grid (#)
+            if (e.key === '#') {
+                setShowGrid(prev => !prev);
+            }
         };
 
         window.addEventListener('keydown', handleKeyDown);
