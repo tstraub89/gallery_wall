@@ -9,6 +9,8 @@ const initialData = {
     projects: {}, // { [id]: Project }
     currentProjectId: null,
     selectedFrameIds: [], // Array of frame IDs
+    selectedImageIds: [], // Array of image IDs (photo library)
+    focusedArea: null, // 'canvas' | 'library' | null
 };
 
 const createNewProject = (name) => ({
@@ -196,6 +198,14 @@ export const ProjectProvider = ({ children }) => {
         setData(prev => ({ ...prev, selectedFrameIds: ids }));
     };
 
+    const setSelectedImages = (ids) => {
+        setData(prev => ({ ...prev, selectedImageIds: ids }));
+    };
+
+    const setFocusedArea = (area) => {
+        setData(prev => ({ ...prev, focusedArea: area }));
+    };
+
     // --- History State ---
     const [history, setHistory] = useState({
         past: [],
@@ -301,6 +311,8 @@ export const ProjectProvider = ({ children }) => {
             currentProject,
             currentProjectId: data.currentProjectId,
             selectedFrameIds: data.selectedFrameIds || [],
+            selectedImageIds: data.selectedImageIds || [],
+            focusedArea: data.focusedArea,
             addProject,
             switchProject,
             deleteProject,
@@ -310,6 +322,8 @@ export const ProjectProvider = ({ children }) => {
             addImageToLibrary,
             selectFrame,
             setSelection,
+            setSelectedImages,
+            setFocusedArea,
             undo,
             redo,
             canUndo: history.past.length > 0,

@@ -3,7 +3,7 @@ import { useImage } from '../../hooks/useImage';
 import styles from './CanvasWorkspace.module.css'; // Reusing styles
 
 const FrameContent = ({ frame, ppi }) => {
-    const imageUrl = useImage(frame.imageId);
+    const { url } = useImage(frame.imageId);
 
     // Default PPI if not provided (fallback)
     const PPI = ppi || 10;
@@ -19,7 +19,7 @@ const FrameContent = ({ frame, ppi }) => {
             {/* ... image ... */}
 
             {/* Empty State Label */}
-            {!imageUrl && (
+            {!url && (
                 <div
                     style={{
                         position: 'absolute',
@@ -36,9 +36,9 @@ const FrameContent = ({ frame, ppi }) => {
             )}
 
             {/* Image Layer */}
-            {imageUrl && (
+            {url && (
                 <img
-                    src={imageUrl}
+                    src={url}
                     alt=""
                     draggable="false"
                     style={{

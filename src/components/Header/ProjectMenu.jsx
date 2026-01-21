@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useProject } from '../../context/ProjectContext';
 import styles from './ProjectMenu.module.css';
+import ConfirmDialog from '../Common/ConfirmDialog';
 
 const ProjectMenu = () => {
     const {
@@ -14,6 +15,7 @@ const ProjectMenu = () => {
     const [isExpanded, setIsExpanded] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const [newName, setNewName] = useState('');
+    const [projectToDelete, setProjectToDelete] = useState(null); // { id, name }
 
     const projectList = Object.values(projects).sort((a, b) => b.updatedAt - a.updatedAt);
     const currentName = projects[currentProjectId]?.name || 'Select Project';
@@ -56,7 +58,7 @@ const ProjectMenu = () => {
                                     className={styles.deleteBtn}
                                     onClick={(e) => {
                                         e.stopPropagation();
-                                        if (confirm(`Delete project "${p.name}"?`)) deleteProject(p.id);
+                                        setProjectToDelete({ id: p.id, name: p.name });
                                     }}
                                 >
                                     ×
@@ -86,6 +88,19 @@ const ProjectMenu = () => {
                         )}
                     </div>
                 </div>
+            )}
+            {projectToDelete && (
+                <ConfirmDialog
+                    title="Delete Project"
+                    message={`Are you sure you want to delete "${projectToDelete.name}"? This action cannot be undone.`}
+                    confirmLabel="Delete"
+                    onConfirm={() => {
+                        deleteProject(projectToDelete.id);
+                        setProjectToDelete(null);
+                    }}
+                    onCancel={() => setProjectToDelete(null)}
+                    isDanger={true}
+                />
             )}
         </div>
     );
