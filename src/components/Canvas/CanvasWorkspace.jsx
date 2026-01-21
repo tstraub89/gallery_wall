@@ -181,20 +181,30 @@ const CanvasWorkspace = () => {
         return <div className={styles.empty}>Select a project to start planning.</div>;
     }
 
-    // --- Handlers ---
-    const handleWheel = (e) => {
-        if (e.ctrlKey || e.metaKey) {
-            e.preventDefault();
-            const zoomSensitivity = 0.001;
-            const delta = -e.deltaY * zoomSensitivity;
-            const newScale = Math.min(Math.max(0.1, scale + delta), 5);
-            setScale(newScale);
-        } else {
-            e.preventDefault();
-            setPan(prev => ({ x: prev.x - e.deltaX, y: prev.y - e.deltaY }));
-        }
-    };
+    // --- Block Browser Zoom (Firefox Fix) ---
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
 
+        const onWheel = (e) => {
+            e.preventDefault();
+            if (e.ctrlKey || e.metaKey) {
+                const zoomSensitivity = 0.001;
+                const delta = -e.deltaY * zoomSensitivity;
+                setScale(s => {
+                    const next = Math.min(Math.max(0.1, s + delta), 5);
+                    return Math.round(next * 100) / 100; // Round to nearest 1%
+                });
+            } else {
+                setPan(prev => ({ x: prev.x - e.deltaX, y: prev.y - e.deltaY }));
+            }
+        };
+
+        container.addEventListener('wheel', onWheel, { passive: false });
+        return () => container.removeEventListener('wheel', onWheel);
+    }, [scale, setScale, setPan]); // Added scale, setScale, setPan to dependencies
+
+    // --- Handlers ---
     const handleMouseDown = (e) => {
         const { clientX, clientY } = e;
         setContextMenu(null);
@@ -430,7 +440,6 @@ const CanvasWorkspace = () => {
         <div
             className={styles.container}
             ref={containerRef}
-            onWheel={handleWheel}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -461,9 +470,9 @@ const CanvasWorkspace = () => {
                 </div>
             </div>
             <div className={styles.hud}>
-                <button onClick={() => setScale(s => s + 0.1)}>+</button>
+                <button onClick={() => setScale(s => Math.max(0.1, Math.round((s - 0.1) * 10) / 10))} title="Zoom Out">-</button>
                 <span>{Math.round(scale * 100)}%</span>
-                <button onClick={() => setScale(s => Math.max(0.1, s - 0.1))}>-</button>
+                <button onClick={() => setScale(s => Math.min(5, Math.round((s + 0.1) * 10) / 10))} title="Zoom In">+</button>
                 <div className={styles.separator} />
                 <button onClick={() => setShowGrid(s => !s)} style={{ background: showGrid ? 'rgba(0,122,255,0.6)' : undefined }}>#</button>
                 <button onClick={() => setSnapToGrid(s => !s)} style={{ background: snapToGrid ? 'rgba(0,122,255,0.6)' : undefined }}>S</button>
