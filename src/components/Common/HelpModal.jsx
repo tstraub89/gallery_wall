@@ -67,9 +67,13 @@ const HelpModal = ({ onClose }) => {
                         href="https://www.buymeacoffee.com/tstraub89"
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: '#666', fontSize: '14px' }}
+                        style={{ marginRight: 'auto' }}
                     >
-                        ☕ Buy me a coffee
+                        <img 
+                            src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+                            alt="Buy Me A Coffee" 
+                            style={{ height: '40px', width: 'auto', display: 'block' }} 
+                        />
                     </a>
                     <button className={styles.primaryBtn} onClick={onClose}>Got it!</button>
                 </footer>
