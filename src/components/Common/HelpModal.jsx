@@ -63,6 +63,14 @@ const HelpModal = ({ onClose }) => {
                 </div>
 
                 <footer className={styles.footer}>
+                    <a
+                        href="https://www.buymeacoffee.com/tstraub89"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: '#666', fontSize: '14px' }}
+                    >
+                        ☕ Buy me a coffee
+                    </a>
                     <button className={styles.primaryBtn} onClick={onClose}>Got it!</button>
                 </footer>
             </div>
