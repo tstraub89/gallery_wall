@@ -354,4 +354,5 @@ export const ProjectProvider = ({ children }) => {
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useProject = () => useContext(ProjectContext);

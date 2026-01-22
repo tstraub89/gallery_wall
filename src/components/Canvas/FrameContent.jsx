@@ -12,7 +12,6 @@ const FrameContent = ({ frame, ppi }) => {
     // We should probably treat 'undefined' as 'small' or handle it.
     // If we use PPI calculation, we need inches. 1px is approx 0.01 inch? Negligible?
     // Let's use the explicit value or 0.
-    const borderThickness = frame.borderWidth || 0;
 
     return (
         <div className={styles.frameContent} style={{ userSelect: 'none' }}>

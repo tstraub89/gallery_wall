@@ -72,7 +72,7 @@ const GlobalActions = () => {
                     try {
                         const b64 = await blobToBase64(img.src);
                         img.src = b64;
-                    } catch (e) {
+                    } catch {
                         // Silently handle base64 conversion errors during export
                     }
                 }

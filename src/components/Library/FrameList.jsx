@@ -28,8 +28,7 @@ const FrameList = () => {
         setFrameToRemove(templateId);
     };
 
-    // Filter templates to only show those NOT currently on the wall
-    const unplacedTemplates = templates.filter(t => !instances.some(inst => inst.templateId === t.id));
+
 
     return (
         <>

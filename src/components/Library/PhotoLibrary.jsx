@@ -131,10 +131,10 @@ const PhotoLibrary = () => {
         return selectedImageIds.filter(id => usedSet.has(id)).length;
     };
 
-    const handleDeleteClick = () => {
+    const handleDeleteClick = React.useCallback(() => {
         if (selectedImageIds.length === 0) return;
         setShowDeleteDialog(true);
-    };
+    }, [selectedImageIds]);
 
     const handleDeleteUnused = () => {
         const usedSet = getUsedImageIds();
@@ -188,7 +188,7 @@ const PhotoLibrary = () => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedImageIds, currentProject, updateProject]);
+    }, [selectedImageIds, currentProject, updateProject, handleDeleteClick]);
 
     // Clear selection on background click
     const handleBackgroundClick = (e) => {

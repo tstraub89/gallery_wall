@@ -18,7 +18,7 @@ const ImportFile = () => {
 
         for (const file of files) {
             const text = await file.text();
-            const { frames, errors } = parseFrameFile(text);
+            const { frames } = parseFrameFile(text);
 
             if (frames.length > 0) {
                 if (!currentProjectId) {

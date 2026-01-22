@@ -9,7 +9,7 @@ import ContextMenu from './ContextMenu';
 import { PPI, GRID_SIZE } from '../../constants';
 
 const CanvasWorkspace = () => {
-    const { currentProject, updateProject, selectFrame, selectedFrameIds, setSelection, addImageToLibrary, undo, redo, canUndo, canRedo, focusedArea, setFocusedArea, selectedImageIds, setSelectedImages } = useProject();
+    const { currentProject, updateProject, selectFrame, selectedFrameIds, setSelection, addImageToLibrary, undo, redo, focusedArea, setFocusedArea, setSelectedImages } = useProject();
 
     // Viewport State
     const [scale, setScale] = useState(1);
@@ -43,7 +43,7 @@ const CanvasWorkspace = () => {
         return Math.round(val / snapPx) * snapPx;
     };
 
-    const duplicateSelected = () => {
+    const duplicateSelected = React.useCallback(() => {
         if (selectedFrameIds.length === 0) return;
         const newFrames = [];
         const newLibraryItems = [];
@@ -83,7 +83,7 @@ const CanvasWorkspace = () => {
             });
             setSelection(newSelectedIds);
         }
-    };
+    }, [currentProject, selectedFrameIds, updateProject, setSelection]);
 
     const handleBringToFront = (frameId) => {
         const ids = selectedFrameIds.includes(frameId) ? selectedFrameIds : [frameId];
@@ -112,12 +112,12 @@ const CanvasWorkspace = () => {
         updateProject(currentProject.id, { frames: updatedFrames });
     };
 
-    const handleDeleteFrame = (frameId) => {
+    const handleDeleteFrame = React.useCallback((frameId) => {
         const ids = selectedFrameIds.includes(frameId) ? selectedFrameIds : [frameId];
         const updatedFrames = currentProject.frames.filter(f => !ids.includes(f.id));
         updateProject(currentProject.id, { frames: updatedFrames });
         setSelection([]);
-    };
+    }, [currentProject, selectedFrameIds, updateProject, setSelection]);
 
     // Keyboard Shortcuts
     useEffect(() => {
@@ -192,11 +192,7 @@ const CanvasWorkspace = () => {
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [currentProject, selectedFrameIds, updateProject, setSelection, undo, redo, focusedArea, setSelectedImages]);
-
-    if (!currentProject) {
-        return <div className={styles.empty}>Select a project to start planning.</div>;
-    }
+    }, [currentProject, selectedFrameIds, updateProject, setSelection, undo, redo, focusedArea, setSelectedImages, duplicateSelected, handleDeleteFrame]);
 
     // --- Block Browser Zoom (Firefox Fix) ---
     useEffect(() => {
@@ -220,6 +216,10 @@ const CanvasWorkspace = () => {
         container.addEventListener('wheel', onWheel, { passive: false });
         return () => container.removeEventListener('wheel', onWheel);
     }, [scale, setScale, setPan]); // Added scale, setScale, setPan to dependencies
+
+    if (!currentProject) {
+        return <div className={styles.empty}>Select a project to start planning.</div>;
+    }
 
     // --- Handlers ---
     const handleMouseDown = (e) => {
@@ -513,20 +513,18 @@ const CanvasWorkspace = () => {
                 <button onClick={() => setShowGrid(s => !s)} style={{ background: showGrid ? 'rgba(0,122,255,0.6)' : undefined }}>#</button>
                 <button onClick={() => setSnapToGrid(s => !s)} style={{ background: snapToGrid ? 'rgba(0,122,255,0.6)' : undefined }}>S</button>
             </div>
-            {isMarquee && marqueeRect && containerRef.current && (() => {
-                const rect = containerRef.current.getBoundingClientRect();
-                return (
-                    <div
-                        className={styles.marquee}
-                        style={{
-                            left: Math.min(marqueeRect.x1, marqueeRect.x2) - rect.left,
-                            top: Math.min(marqueeRect.y1, marqueeRect.y2) - rect.top,
-                            width: Math.abs(marqueeRect.x2 - marqueeRect.x1),
-                            height: Math.abs(marqueeRect.y2 - marqueeRect.y1)
-                        }}
-                    />
-                );
-            })()}
+            {isMarquee && marqueeRect && (
+                <div
+                    className={styles.marquee}
+                    style={{
+                        position: 'fixed',
+                        left: Math.min(marqueeRect.x1, marqueeRect.x2),
+                        top: Math.min(marqueeRect.y1, marqueeRect.y2),
+                        width: Math.abs(marqueeRect.x2 - marqueeRect.x1),
+                        height: Math.abs(marqueeRect.y2 - marqueeRect.y1)
+                    }}
+                />
+            )}
             {contextMenu && (
                 <ContextMenu x={contextMenu.x} y={contextMenu.y} onClose={() => setContextMenu(null)} items={[
                     { label: 'Duplicate', shortcut: 'Ctrl+D', onClick: duplicateSelected },

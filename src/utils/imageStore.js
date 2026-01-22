@@ -6,7 +6,7 @@ export const initDB = () => {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-        request.onerror = (event) => reject('IndexedDB error');
+        request.onerror = () => reject('IndexedDB error');
 
         request.onupgradeneeded = (event) => {
             const db = event.target.result;
@@ -15,7 +15,7 @@ export const initDB = () => {
             }
         };
 
-        request.onsuccess = (event) => resolve(event.target.result);
+        request.onsuccess = () => resolve(request.result);
     });
 };
 
