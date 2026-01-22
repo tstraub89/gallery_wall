@@ -59,6 +59,11 @@
     flex-shrink: 0;
 }
 
+.fluidInput {
+    flex: 1;
+    min-width: 0;
+}
+
 .info {
     font-size: 14px;
     color: var(--text-primary);

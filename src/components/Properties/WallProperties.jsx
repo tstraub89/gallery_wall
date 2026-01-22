@@ -18,8 +18,8 @@ const WallProperties = ({ currentProject, updateProject }) => {
                 <div className={styles.propGroup}>
                     <label>Dimensions (WxH)</label>
                     <div className={styles.row}>
-                        <input type="number" value={wall.width} onChange={(e) => handleWallChange('width', parseFloat(e.target.value))} />
-                        <input type="number" value={wall.height} onChange={(e) => handleWallChange('height', parseFloat(e.target.value))} />
+                        <input className={styles.fluidInput} type="number" value={wall.width} onChange={(e) => handleWallChange('width', parseFloat(e.target.value))} />
+                        <input className={styles.fluidInput} type="number" value={wall.height} onChange={(e) => handleWallChange('height', parseFloat(e.target.value))} />
                     </div>
                 </div>
                 <div className={styles.propGroup}>
