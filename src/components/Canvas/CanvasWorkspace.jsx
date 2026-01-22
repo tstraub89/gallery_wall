@@ -110,6 +110,7 @@ const CanvasWorkspace = () => {
     const {
         isMarquee,
         marqueeRect,
+        candidateFrameIds,
         contextMenu,
         setContextMenu,
         isDraggingFrame,
@@ -183,11 +184,12 @@ const CanvasWorkspace = () => {
                             }
                         }
                         const bWidthPx = (frame.borderWidth || 0.1) * PPI;
+                        const isCandidate = candidateFrameIds.includes(frame.id) && !selectedFrameIds.includes(frame.id);
                         return (
                             <div
                                 key={frame.id}
                                 data-frame-id={frame.id}
-                                className={`${styles.frame} ${selectedFrameIds.includes(frame.id) ? styles.selected : ''}`}
+                                className={`${styles.frame} ${selectedFrameIds.includes(frame.id) ? styles.selected : ''} ${isCandidate ? styles.candidate : ''}`}
                                 onMouseDown={(e) => handleFrameMouseDown(e, frame)}
                                 onDoubleClick={() => handleResetImage(frame.id)}
                                 onDragStart={(e) => e.preventDefault()}

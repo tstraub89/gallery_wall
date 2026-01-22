@@ -30,6 +30,7 @@ export const useCanvasInteraction = ({
     // Marquee State
     const [isMarquee, setIsMarquee] = useState(false);
     const [marqueeRect, setMarqueeRect] = useState(null);
+    const [candidateFrameIds, setCandidateFrameIds] = useState([]);
 
     // Context Menu State
     const [contextMenu, setContextMenu] = useState(null);
@@ -58,6 +59,7 @@ export const useCanvasInteraction = ({
                 setIsMarquee(true);
                 setDragStart({ x: clientX, y: clientY });
                 setMarqueeRect({ x1: clientX, y1: clientY, x2: clientX, y2: clientY });
+                setCandidateFrameIds([]); // Reset candidates
                 if (!e.shiftKey && !e.ctrlKey && !e.metaKey) selectFrame(null);
                 setFocusedArea('canvas');
             }
@@ -109,7 +111,43 @@ export const useCanvasInteraction = ({
             setPan(prev => ({ x: prev.x + dx, y: prev.y + dy }));
             setLastMouse({ x: clientX, y: clientY });
         } else if (isMarquee) {
-            setMarqueeRect(prev => ({ ...prev, x2: clientX, y2: clientY }));
+            const newMarqueeRect = { ...marqueeRect, x2: clientX, y2: clientY };
+            setMarqueeRect(newMarqueeRect);
+
+            // Calculate candidates
+            if (containerRef.current) {
+                const rect = containerRef.current.getBoundingClientRect();
+                const minX = Math.min(newMarqueeRect.x1, newMarqueeRect.x2);
+                const maxX = Math.max(newMarqueeRect.x1, newMarqueeRect.x2);
+                const minY = Math.min(newMarqueeRect.y1, newMarqueeRect.y2);
+                const maxY = Math.max(newMarqueeRect.y1, newMarqueeRect.y2);
+
+                // Convert marquee bounds to Wall Space
+                // FrameScreenX = ContainerX + PanX + (50+FrameWallX)*Scale
+                // FrameWallX = ((FrameScreenX - ContainerX - PanX) / Scale) - 50
+
+                const wallX1 = ((minX - rect.left - pan.x) / scale) - 50;
+                const wallX2 = ((maxX - rect.left - pan.x) / scale) - 50;
+                const wallY1 = ((minY - rect.top - pan.y) / scale) - 50;
+                const wallY2 = ((maxY - rect.top - pan.y) / scale) - 50;
+
+                const candidates = currentProject.frames.filter(f => {
+                    const bWidthPx = (f.borderWidth || 0.1) * PPI;
+
+                    // Wait, rendering adds border width outside?
+                    // CanvasWorkspace: left: `${displayX - bWidthPx}px`
+                    // So frame.x is the content left. Visual left is frame.x - border.
+
+                    return (
+                        (f.x - bWidthPx) < wallX2 &&
+                        (f.x + f.width * PPI + bWidthPx) > wallX1 &&
+                        (f.y - bWidthPx) < wallY2 &&
+                        (f.y + f.height * PPI + bWidthPx) > wallY1
+                    );
+                }).map(f => f.id);
+                setCandidateFrameIds(candidates);
+            }
+
         } else if (isDraggingFrame) {
             const dx = clientX - dragStart.x;
             const dy = clientY - dragStart.y;
@@ -117,10 +155,6 @@ export const useCanvasInteraction = ({
             if (!hasDragged && (Math.abs(dx) > 3 || Math.abs(dy) > 3)) {
                 setHasDragged(true);
                 if (e.ctrlKey || e.metaKey) {
-                    // Logic to duplicate on drag moved to hook consumer or we implement full duplication logic here?
-                    // CanvasWorkspace had duplicate logic inline inside mouse move... 
-                    // Refactoring: The original code duplicated on drag start if Ctrl held.
-                    // We need to replicate that.
                     const newFrames = [];
                     const newLibraryItems = [];
                     const newSelectedIds = [];
@@ -168,27 +202,11 @@ export const useCanvasInteraction = ({
 
     const handleMouseUp = (e) => {
         if (isMarquee && marqueeRect) {
-            const { x1, y1, x2, y2 } = marqueeRect;
-            const minX = Math.min(x1, x2), maxX = Math.max(x1, x2);
-            const minY = Math.min(y1, y2), maxY = Math.max(y1, y2);
-            // We need to access wall rect. In component it was by ID.
-            const wallEl = document.getElementById('canvas-wall');
-            if (wallEl) {
-                const wallRect = wallEl.getBoundingClientRect();
-                const selectedIds = currentProject.frames.filter(f => {
-                    const bWidthPx = (f.borderWidth || 0.1) * PPI;
-                    const fx = wallRect.left + (f.x - bWidthPx) * scale;
-                    const fy = wallRect.top + (f.y - bWidthPx) * scale;
-                    const fw = (f.width * PPI + bWidthPx * 2) * scale;
-                    const fh = (f.height * PPI + bWidthPx * 2) * scale;
-                    return fx < maxX && fx + fw > minX && fy < maxY && fy + fh > minY;
-                }).map(f => f.id);
-
-                if (e.shiftKey || e.ctrlKey || e.metaKey) {
-                    setSelection(Array.from(new Set([...selectedFrameIds, ...selectedIds])));
-                } else {
-                    setSelection(selectedIds);
-                }
+            // Commit candidates
+            if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                setSelection(Array.from(new Set([...selectedFrameIds, ...candidateFrameIds])));
+            } else {
+                setSelection(candidateFrameIds);
             }
         } else if (isDraggingFrame && !hasDragged && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
             const frameEl = e.target.closest(`.${styles.frame}`);
@@ -213,6 +231,7 @@ export const useCanvasInteraction = ({
         setIsDraggingFrame(false);
         setIsMarquee(false);
         setMarqueeRect(null);
+        setCandidateFrameIds([]); // Check reset
         setInitialPositions({});
         setHasDragged(false);
         setDragDelta({ x: 0, y: 0 });
@@ -281,6 +300,7 @@ export const useCanvasInteraction = ({
     return {
         isMarquee,
         marqueeRect,
+        candidateFrameIds, // Exposed
         contextMenu,
         setContextMenu,
         isDraggingFrame,
