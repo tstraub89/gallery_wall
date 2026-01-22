@@ -97,11 +97,13 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                     <label>Position (X / Y)</label>
                     <div className={styles.row}>
                         <input
+                            className={styles.fluidInput}
                             type="number" step="0.1"
                             value={(minX / PPI).toFixed(2)}
                             onChange={(e) => updateRelative('x', parseFloat(e.target.value) * PPI)}
                         />
                         <input
+                            className={styles.fluidInput}
                             type="number" step="0.1"
                             value={(minY / PPI).toFixed(2)}
                             onChange={(e) => updateRelative('y', parseFloat(e.target.value) * PPI)}
