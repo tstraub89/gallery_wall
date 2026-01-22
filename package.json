@@ -17,7 +17,6 @@
     "file-saver": "^2.0.5",
     "html-to-image": "^1.11.13",
     "jszip": "^3.10.1",
-    "jzip": "^1.0.0",
     "lucide-react": "^0.562.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
