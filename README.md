@@ -36,8 +36,9 @@ A powerful, interactive web application designed to help you plan complex galler
 
 ### 💾 Project Controls
 *   **Shopping List**: Export a text manifest of all frames in your design for easy shopping or assembly.
+*   **Photo Export**: Generate a ZIP file of all your photos, cropped to their exact visible area (with 1/8" bleed) for high-quality printing.
 *   **Multi-Project Support**: Create and switch between distinct gallery wall designs.
-*   **High-Res Export**: Save your layout as a PNG to share or use as a reference.
+*   **Canvas Snapshot**: Save your layout as a PNG to share or use as a reference.
 
 ---
 

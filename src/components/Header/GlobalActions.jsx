@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useProject } from '../../context/ProjectContext';
 import styles from './GlobalActions.module.css';
 import { toBlob } from 'html-to-image';
 import { PPI } from '../../constants';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import HelpModal from '../Common/HelpModal';
+import { generateProjectZip } from '../../utils/exportUtils';
 
 // Helper to convert blob URL or external URL to base64
 const blobToBase64 = (url) => new Promise((resolve, reject) => {
@@ -32,6 +34,15 @@ const waitForImages = (node) => {
             img.onerror = resolve;
         });
     }));
+};
+
+const FullScreenOverlay = ({ children }) => {
+    return createPortal(
+        <div className={styles.exportOverlay}>
+            {children}
+        </div>,
+        document.body
+    );
 };
 
 const GlobalActions = () => {
@@ -176,6 +187,20 @@ const GlobalActions = () => {
         URL.revokeObjectURL(url);
     };
 
+    const handlePhotoExport = async () => {
+        setIsExporting(true);
+        try {
+            const result = await generateProjectZip(currentProject);
+            if (result.errorCount > 0) {
+                alert(`Export completed with ${result.errorCount} warning(s). Check console for details.`);
+            }
+        } catch (err) {
+            alert(`Photo export failed: ${err.message}`);
+        } finally {
+            setIsExporting(false);
+        }
+    };
+
     const handleClearCanvas = () => {
         setShowClearConfirm(true);
     };
@@ -189,23 +214,40 @@ const GlobalActions = () => {
 
     return (
         <div className={styles.container}>
-            <button className={styles.btn} onClick={handleExport} disabled={isExporting}>
-                {isExporting ? 'Saving PNG...' : 'Save PNG'}
-            </button>
-            <div className={styles.divider} />
-            <button className={styles.secondaryBtn} onClick={handleJSONExport}>Export Project</button>
-            <label className={styles.secondaryBtn}>
+            {/* Project Management */}
+            <label className={styles.secondaryBtn} title="Import a previously saved project JSON file">
                 Import Project
                 <input type="file" accept=".json" onChange={handleJSONImport} style={{ display: 'none' }} />
             </label>
-            <button className={styles.secondaryBtn} onClick={handleShoppingListExport}>Shopping List</button>
-            <button className={`${styles.secondaryBtn} ${styles.removeAction}`} onClick={handleClearCanvas}>Reset Project</button>
+            <button className={styles.secondaryBtn} onClick={handleJSONExport} title="Save project structure as JSON backup">
+                Export Project
+            </button>
+
+            <div className={styles.divider} />
+
+            {/* RESET */}
+            <button className={`${styles.secondaryBtn} ${styles.removeAction}`} onClick={handleClearCanvas} title="Remove all frames from the canvas">
+                Reset Project
+            </button>
+
+            <div className={styles.divider} />
+
+            {/* Outputs */}
+            <button className={styles.btn} onClick={handleExport} disabled={isExporting} title="Download a PNG image of your gallery wall">
+                {isExporting ? 'Saving PNG...' : 'Save PNG'}
+            </button>
+            <button className={styles.secondaryBtn} onClick={handleShoppingListExport} title="Download a text list of frames and sizes">
+                Shopping List
+            </button>
+            <button className={styles.secondaryBtn} onClick={handlePhotoExport} disabled={isExporting} title="Export high-res cropped photos for printing">
+                Export Photos
+            </button>
 
             {isExporting && (
-                <div className={styles.exportOverlay}>
+                <FullScreenOverlay>
                     <div className={styles.spinner}></div>
-                    <p>Generating project image...</p>
-                </div>
+                    <p>Processing...</p>
+                </FullScreenOverlay>
             )}
             {exportError && (
                 <div className={styles.errorBanner} onClick={() => setExportError(null)}>

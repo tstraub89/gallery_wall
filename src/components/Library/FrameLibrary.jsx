@@ -16,7 +16,9 @@ const Section = ({ title, isOpen, onToggle, children }) => (
 );
 
 const FrameLibrary = () => {
-    const [openSection, setOpenSection] = useState('frames'); // 'frames', 'photos'
+    const [openSection, setOpenSection] = useState('frames');
+    const [isImportOpen, setImportOpen] = useState(false);
+    const [isManualOpen, setManualOpen] = useState(false);
 
     return (
         <div className={styles.container}>
@@ -30,10 +32,25 @@ const FrameLibrary = () => {
                 </div>
                 {openSection === 'frames' && (
                     <div className={styles.sectionContent}>
-                        <div className={styles.subHeader}>Import File</div>
-                        <ImportFile />
-                        <div className={styles.subHeader}>Add Manually</div>
-                        <ManualEntryForm />
+                        <div
+                            className={styles.subHeader}
+                            onClick={() => setImportOpen(!isImportOpen)}
+                            style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', paddingRight: '12px' }}
+                        >
+                            <span>Import File</span>
+                            <span>{isImportOpen ? '▼' : '▶'}</span>
+                        </div>
+                        {isImportOpen && <ImportFile />}
+
+                        <div
+                            className={styles.subHeader}
+                            onClick={() => setManualOpen(!isManualOpen)}
+                            style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', paddingRight: '12px' }}
+                        >
+                            <span>Add Manually</span>
+                            <span>{isManualOpen ? '▼' : '▶'}</span>
+                        </div>
+                        {isManualOpen && <ManualEntryForm />}
                         <div className={styles.scrollArea}>
                             <FrameList />
                         </div>
