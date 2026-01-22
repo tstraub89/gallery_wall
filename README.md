@@ -72,6 +72,6 @@ Click the **"?"** button in the header for the in-app **Quick Start Guide**.
 3.  **Browse**: Open `http://localhost:5173`.
 
 > [!TIP]
-> You can load [example_project.json](file:///home/tstraub/projects/gallery_wall/example_project.json) to try out the tool with a preconfigured gallery wall layout. You can also check [example_frame_template.txt](file:///home/tstraub/projects/gallery_wall/example_frame_template.txt) to see how to format your own frame collection for batch importing.
+> You can load [example staircase.gwall](file:///home/tstraub/projects/gallery_wall/example%20staircase.gwall) to try out the tool with a preconfigured gallery wall layout. You can also check [example_frame_template.txt](file:///home/tstraub/projects/gallery_wall/example_frame_template.txt) to see how to format your own frame collection for batch importing.
 
 **Tech Stack**: Built with React (Vite), CSS Modules, and IndexedDB for persistent local storage.

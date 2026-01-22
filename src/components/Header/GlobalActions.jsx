@@ -6,7 +6,9 @@ import { toBlob } from 'html-to-image';
 import { PPI } from '../../constants';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import HelpModal from '../Common/HelpModal';
-import { generateProjectZip } from '../../utils/exportUtils';
+import { generateProjectZip, exportProjectBundle, importProjectBundle } from '../../utils/exportUtils';
+import { saveImage } from '../../utils/imageStore';
+import { v4 as uuidv4 } from 'uuid';
 
 // Helper to convert blob URL or external URL to base64
 const blobToBase64 = (url) => new Promise((resolve, reject) => {
@@ -44,6 +46,7 @@ const FullScreenOverlay = ({ children }) => {
         document.body
     );
 };
+
 
 const GlobalActions = () => {
     const { currentProject, updateProject, addProject } = useProject();
@@ -129,39 +132,70 @@ const GlobalActions = () => {
         }
     };
 
-    const handleJSONExport = () => {
-        const data = JSON.stringify(currentProject, null, 2);
-        const blob = new Blob([data], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = `${currentProject.name || 'project'}_backup.json`;
-        link.href = url;
-        link.click();
-        URL.revokeObjectURL(url);
+    const handleProjectExport = async () => {
+        setIsExportingPhotos(true); // Using same spinner for bundle export
+        try {
+            const result = await exportProjectBundle(currentProject);
+            if (result.errorCount > 0) {
+                alert(`Export completed with ${result.errorCount} warning(s). Check console for details.`);
+            }
+        } catch (err) {
+            alert(`Project export failed: ${err.message}`);
+        } finally {
+            setIsExportingPhotos(false);
+        }
     };
 
-    const handleJSONImport = (e) => {
+    const handleProjectImport = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            try {
-                const project = JSON.parse(event.target.result);
-                if (!project.frames || !project.wallConfig) throw new Error('Invalid project file');
-                const newId = addProject(project.name + ' (Imported)');
-                updateProject(newId, {
-                    frames: project.frames,
-                    wallConfig: project.wallConfig,
-                    library: project.library || [],
-                    images: project.images || []
-                });
-                alert('Project imported successfully!');
-            } catch (err) {
-                alert('Failed to import: ' + err.message);
+        setIsExportingPhotos(true);
+        try {
+            const { project, images } = await importProjectBundle(file);
+
+            // 1. Remap IDs to ensure no clashes with existing local projects
+            const idMap = new Map();
+            const remappedImages = [];
+
+            for (const img of images) {
+                const newId = uuidv4();
+                idMap.set(img.id, newId);
+                remappedImages.push({ id: newId, blob: img.blob });
             }
-        };
-        reader.readAsText(file);
+
+            // Update frame references
+            const updatedFrames = project.frames.map(f => ({
+                ...f,
+                imageId: f.imageId ? (idMap.get(f.imageId) || null) : null
+            }));
+
+            // Prune library to only include successfully remapped/found images
+            const updatedImagesArray = project.images ? project.images
+                .filter(id => idMap.has(id))
+                .map(id => idMap.get(id)) : [];
+
+            // 2. Save images to IndexedDB
+            for (const img of remappedImages) {
+                await saveImage(img.id, img.blob);
+            }
+
+            // 3. Add Project
+            const newId = addProject(project.name + ' (Imported)');
+            updateProject(newId, {
+                frames: updatedFrames,
+                wallConfig: project.wallConfig,
+                library: project.library || [],
+                images: updatedImagesArray
+            });
+
+            alert('Project imported successfully!');
+        } catch (err) {
+            alert('Failed to import: ' + err.message);
+        } finally {
+            setIsExportingPhotos(false);
+            e.target.value = null;
+        }
     };
 
     const handleShoppingListExport = () => {
@@ -218,11 +252,11 @@ const GlobalActions = () => {
     return (
         <div className={styles.container}>
             {/* Project Management */}
-            <label className={styles.secondaryBtn} title="Import a previously saved project JSON file">
+            <label className={styles.secondaryBtn} title="Import a previously saved project .gwall file">
                 Import Project
-                <input type="file" accept=".json" onChange={handleJSONImport} style={{ display: 'none' }} />
+                <input type="file" accept=".gwall" onChange={handleProjectImport} style={{ display: 'none' }} />
             </label>
-            <button className={styles.secondaryBtn} onClick={handleJSONExport} title="Save project structure as JSON backup">
+            <button className={styles.secondaryBtn} onClick={handleProjectExport} title="Save project bundle (.gwall) including photos">
                 Export Project
             </button>
 

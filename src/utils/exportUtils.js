@@ -54,8 +54,31 @@ export const generateProjectZip = async (project) => {
             // Image State (x, y are in screen pixels based on screen PPI)
             const { scale = 1, x = 0, y = 0, rotation = 0 } = frame.imageState || {};
 
-            const TARGET_PPI = 300;
             const BLEED_IN = 0.125; // 1/8th inch bleed
+
+            // --- Smart DPI Capping ---
+            // Calculate the native PPI of the source image relative to the frame size
+            const imgAspect = sourceImage.width / sourceImage.height;
+            const frameAspect = frameW_in / frameH_in;
+            const nativePPI = imgAspect > frameAspect
+                ? sourceImage.height / frameH_in
+                : sourceImage.width / frameW_in;
+
+            // Bleed Correction for Unmatted Frames
+            // If !matted, Frame == Visible. 
+            // The calculated drawW/drawH covers Frame, but Canvas is Frame + Bleed.
+            // We need to scale up slightly to cover the bleed (Zoom-to-Bleed).
+            // If matted, Frame usually >> Mat + Bleed, so no correction needed.
+            let bleedScale = 1;
+            if (!frame.matted) {
+                const bleedX = (visibleW_in + (BLEED_IN * 2)) / visibleW_in;
+                const bleedY = (visibleH_in + (BLEED_IN * 2)) / visibleH_in;
+                bleedScale = Math.max(bleedX, bleedY) * 1.005; // tiny safety buffer
+            }
+
+            // Effective PPI is native / total zoom (user scale * bleed correction)
+            const effectivePPI = nativePPI / (scale * bleedScale);
+            const TARGET_PPI = Math.min(300, effectivePPI);
 
             // Output Canvas Size (Visible Area + Bleed)
             const outputW_px = Math.ceil((visibleW_in + (BLEED_IN * 2)) * TARGET_PPI);
@@ -74,45 +97,19 @@ export const generateProjectZip = async (project) => {
             ctx.translate(outputW_px / 2, outputH_px / 2);
 
             // --- Image Drawing Math ---
-
-            // 1. Calculate Base Size: "object-fit: cover" against the FRAME.
-            // (The UI fits image to Frame, Mat hides edges).
-            // Logic: standard object-fit: cover on frameW/frameH
-            const imgAspect = sourceImage.width / sourceImage.height;
-            const frameAspect = frameW_in / frameH_in;
-
             let drawW, drawH;
             if (imgAspect > frameAspect) {
-                // Image wider -> Height determines scale
                 drawH = frameH_in * TARGET_PPI;
                 drawW = drawH * imgAspect;
             } else {
-                // Image taller -> Width determines scale
                 drawW = frameW_in * TARGET_PPI;
                 drawH = drawW / imgAspect;
             }
 
-            // 2. Bleed Correction for Unmatted Frames
-            // If !matted, Frame == Visible. 
-            // The calculated drawW/drawH covers Frame, but Canvas is Frame + Bleed.
-            // We need to scale up slightly to cover the bleed (Zoom-to-Bleed).
-            // If matted, Frame usually >> Mat + Bleed, so no correction needed.
-            let bleedScale = 1;
-            if (!frame.matted) {
-                // Calculate ratio needed to cover the bleed area
-                const bleedX = (visibleW_in + (BLEED_IN * 2)) / visibleW_in;
-                const bleedY = (visibleH_in + (BLEED_IN * 2)) / visibleH_in;
-                bleedScale = Math.max(bleedX, bleedY);
-                // Apply a tiny safety buffer (e.g. 1.02 -> 1.025) to avoid rounding gaps
-                bleedScale *= 1.005;
-            }
-
-            // 3. Apply Transforms
-            // Rotation
+            // Apply Transforms
             ctx.rotate((rotation * Math.PI) / 180);
 
             // Scale (User Scale * Bleed Correction)
-            // Note: User scale applies to the "base" fit.
             ctx.scale(scale * bleedScale, scale * bleedScale);
 
             // Pan
@@ -157,4 +154,85 @@ export const generateProjectZip = async (project) => {
     saveAs(content, `${project.name || 'Gallery'}_Photos_Export.zip`);
 
     return { success: true, errorCount: errors.length };
+};
+
+/**
+ * Generates a .gwall file (ZIP) containing the project metadata and all images used in frames.
+ * @param {Object} project - The current project object.
+ */
+export const exportProjectBundle = async (project) => {
+    const zip = new JSZip();
+
+    // 1. Gather used image IDs
+    const usedImageIds = [...new Set(project.frames.filter(f => f.imageId).map(f => f.imageId))];
+
+    // 2. Add Project JSON (Pruned to bundled images)
+    const exportProject = {
+        ...project,
+        images: (project.images || []).filter(id => usedImageIds.includes(id))
+    };
+    const projectData = JSON.stringify(exportProject, null, 2);
+    zip.file('project.json', projectData);
+
+    // 3. Add Images
+    const imageFolder = zip.folder('images');
+    const errors = [];
+
+    for (const imageId of usedImageIds) {
+        try {
+            const blob = await getImage(imageId);
+            if (!blob) throw new Error(`Missing in database`);
+
+            // We use the imageId as the filename
+            imageFolder.file(imageId, blob);
+        } catch (err) {
+            console.warn(`Could not bundle image ${imageId}:`, err);
+            errors.push(`${imageId}: ${err.message || err}`);
+        }
+    }
+
+    // 4. Generate and Save ZIP
+    const content = await zip.generateAsync({ type: "blob" });
+    saveAs(content, `${project.name || 'project'}.gwall`);
+
+    return {
+        success: true,
+        errorCount: errors.length,
+        warnings: errors
+    };
+};
+
+/**
+ * Processes a .gwall file and returns the project metadata and image blobs.
+ * @param {File|Blob} file - The .gwall ZIP file.
+ */
+export const importProjectBundle = async (file) => {
+    const zip = await JSZip.loadAsync(file);
+    const projectJsonFile = zip.file('project.json');
+    if (!projectJsonFile) throw new Error('Invalid .gwall file: missing project.json');
+
+    const project = JSON.parse(await projectJsonFile.async('text'));
+    const images = [];
+
+    // Extract images from the 'images/' folder
+    const imageFolder = zip.folder('images');
+    const imageFiles = [];
+
+    if (imageFolder) {
+        imageFolder.forEach((relativePath, file) => {
+            if (!file.dir) {
+                imageFiles.push({
+                    id: relativePath, // relativePath is the filename within the folder
+                    file
+                });
+            }
+        });
+
+        for (const item of imageFiles) {
+            const blob = await item.file.async('blob');
+            images.push({ id: item.id, blob });
+        }
+    }
+
+    return { project, images };
 };
