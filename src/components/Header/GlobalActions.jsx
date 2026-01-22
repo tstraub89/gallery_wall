@@ -9,6 +9,7 @@ import HelpModal from '../Common/HelpModal';
 import { generateProjectZip, exportProjectBundle, importProjectBundle } from '../../utils/exportUtils';
 import { saveImage } from '../../utils/imageStore';
 import { v4 as uuidv4 } from 'uuid';
+import { Github } from 'lucide-react';
 
 // Helper to convert blob URL or external URL to base64
 const blobToBase64 = (url) => new Promise((resolve, reject) => {
@@ -302,6 +303,16 @@ const GlobalActions = () => {
                     isDanger={true}
                 />
             )}
+
+            <a
+                href="https://github.com/tstraub89/gallery_wall"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.helpBtn}
+                title="View Source on GitHub"
+            >
+                <Github size={14} strokeWidth={2.5} />
+            </a>
 
             <button className={styles.helpBtn} onClick={() => setShowHelp(true)} title="Show Help Guide">?</button>
 
