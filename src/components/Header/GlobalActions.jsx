@@ -47,10 +47,13 @@ const FullScreenOverlay = ({ children }) => {
 
 const GlobalActions = () => {
     const { currentProject, updateProject, addProject } = useProject();
-    const [isExporting, setIsExporting] = useState(false);
+    const [isExportingPNG, setIsExportingPNG] = useState(false);
+    const [isExportingPhotos, setIsExportingPhotos] = useState(false);
     const [exportError, setExportError] = useState(null);
     const [showClearConfirm, setShowClearConfirm] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
+
+    const isBusy = isExportingPNG || isExportingPhotos;
 
     const handleExport = async () => {
         const node = document.getElementById('canvas-wall');
@@ -59,7 +62,7 @@ const GlobalActions = () => {
             return;
         }
 
-        setIsExporting(true);
+        setIsExportingPNG(true);
         setExportError(null);
 
         const imgElements = Array.from(node.querySelectorAll('img'));
@@ -122,7 +125,7 @@ const GlobalActions = () => {
             setExportError(err instanceof Event ? 'Browser Error (Images fail to load)' : (err.message || String(err)));
         } finally {
             for (const [img, src] of originalSources.entries()) img.src = src;
-            setIsExporting(false);
+            setIsExportingPNG(false);
         }
     };
 
@@ -188,7 +191,7 @@ const GlobalActions = () => {
     };
 
     const handlePhotoExport = async () => {
-        setIsExporting(true);
+        setIsExportingPhotos(true);
         try {
             const result = await generateProjectZip(currentProject);
             if (result.errorCount > 0) {
@@ -197,7 +200,7 @@ const GlobalActions = () => {
         } catch (err) {
             alert(`Photo export failed: ${err.message}`);
         } finally {
-            setIsExporting(false);
+            setIsExportingPhotos(false);
         }
     };
 
@@ -233,17 +236,17 @@ const GlobalActions = () => {
             <div className={styles.divider} />
 
             {/* Outputs */}
-            <button className={styles.btn} onClick={handleExport} disabled={isExporting} title="Download a PNG image of your gallery wall">
-                {isExporting ? 'Saving PNG...' : 'Save PNG'}
+            <button className={styles.btn} onClick={handleExport} disabled={isBusy} title="Download a PNG image of your gallery wall">
+                {isExportingPNG ? 'Saving PNG...' : 'Save PNG'}
             </button>
             <button className={styles.secondaryBtn} onClick={handleShoppingListExport} title="Download a text list of frames and sizes">
                 Shopping List
             </button>
-            <button className={styles.secondaryBtn} onClick={handlePhotoExport} disabled={isExporting} title="Export high-res cropped photos for printing">
-                Export Photos
+            <button className={styles.secondaryBtn} onClick={handlePhotoExport} disabled={isBusy} title="Export high-res cropped photos for printing">
+                {isExportingPhotos ? 'Exporting...' : 'Export Photos'}
             </button>
 
-            {isExporting && (
+            {isBusy && (
                 <FullScreenOverlay>
                     <div className={styles.spinner}></div>
                     <p>Processing...</p>
