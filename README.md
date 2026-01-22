@@ -12,6 +12,7 @@ A powerful, interactive web application designed to help you plan complex galler
 *   **Inventory First Workflow**: Keep track of your physical frames. Even if you remove a frame from the wall, it stays in your "Unplaced" library for later use.
 *   **Instant Visualization**: Drag and drop photos from your computer directly onto frames to see your memories in situ.
 *   **Intelligent Import**: Quickly build your library by pasting a list of dimensions (e.g., "8x10", "11 1/4 x 14"). The app handles fractions and matting automatically.
+*   **Print-Ready Photo Export**: preparing your gallery for reality? Export all your cropped, high-resolution photos in a single ZIP, ready for printing.
 *   **Template Support**: Switch between standard flat walls and specialized staircase configurations (ascending/descending).
 
 ---
