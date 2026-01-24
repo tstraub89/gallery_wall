@@ -72,7 +72,9 @@ const ImageProperties = ({ frame, updateProject, currentProject }) => {
             </div>
             <div className={styles.propGroup}>
                 <button className={styles.secondaryBtn} onClick={() => {
-                    const updated = currentProject.frames.map(f => f.id === frame.id ? { ...f, imageId: null } : f);
+                    const updated = currentProject.frames.map(f =>
+                        f.id === frame.id ? { ...f, imageId: null, imageState: null } : f
+                    );
                     updateProject(currentProject.id, { frames: updated });
                 }}>Remove Image</button>
             </div>

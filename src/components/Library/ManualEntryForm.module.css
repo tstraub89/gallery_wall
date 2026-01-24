@@ -26,7 +26,8 @@
     font-weight: 600;
 }
 
-.field input, .field select {
+.field input,
+.field select {
     padding: 6px;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -62,4 +63,10 @@
 
 .addBtn:hover {
     background: #0063cc;
+}
+
+.colorPicker {
+    height: 29px;
+    padding: 2px !important;
+    cursor: pointer;
 }

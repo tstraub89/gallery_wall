@@ -61,8 +61,22 @@
 
 .fluidInput {
     flex: 1;
-    min-width: 0;
-    width: 0;
+    min-width: 50px;
+    width: 100%;
+}
+
+.inputStack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.inputStack label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    opacity: 0.8;
 }
 
 .info {
@@ -110,4 +124,41 @@
 
 .actionBtn:hover {
     border-color: var(--accent-color);
+}
+
+.colorRow {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.colorSwatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: transform 0.1s, border-color 0.1s;
+    padding: 0;
+}
+
+.colorSwatch:hover {
+    transform: scale(1.1);
+    border-color: var(--text-secondary);
+}
+
+.activeSwatch {
+    border: 2px solid var(--accent-color);
+    box-shadow: 0 0 4px rgba(0, 122, 255, 0.3);
+}
+
+.colorPicker {
+    width: 32px;
+    height: 32px;
+    padding: 2px !important;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    background: none;
 }

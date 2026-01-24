@@ -55,7 +55,8 @@ const FrameList = () => {
                                 className={styles.framePreview}
                                 style={{
                                     aspectRatio: `${template.width}/${template.height}`,
-                                    borderRadius: template.shape === 'round' ? '50%' : '0'
+                                    borderRadius: template.shape === 'round' ? '50%' : '0',
+                                    borderColor: template.frameColor || '#111111'
                                 }}
                             >
                                 {template.matted && (

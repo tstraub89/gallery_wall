@@ -10,6 +10,16 @@ import GlobalActions from './components/Header/GlobalActions';
 import Logo from './components/Header/Logo';
 
 function App() {
+  React.useEffect(() => {
+    const preventDefault = (e) => e.preventDefault();
+    window.addEventListener('dragover', preventDefault);
+    window.addEventListener('drop', preventDefault);
+    return () => {
+      window.removeEventListener('dragover', preventDefault);
+      window.removeEventListener('drop', preventDefault);
+    };
+  }, []);
+
   return (
     <ProjectProvider>
       <AppLayout>

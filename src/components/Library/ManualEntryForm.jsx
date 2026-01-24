@@ -10,6 +10,7 @@ const ManualEntryForm = () => {
     const [matWidth, setMatWidth] = useState('5');
     const [matHeight, setMatHeight] = useState('7');
     const [shape, setShape] = useState('rect');
+    const [frameColor, setFrameColor] = useState('#111111');
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -19,6 +20,7 @@ const ManualEntryForm = () => {
             width: parseFloat(width),
             height: parseFloat(height),
             shape: shape,
+            frameColor: frameColor,
             matted: isMatted ? { width: parseFloat(matWidth), height: parseFloat(matHeight) } : null
         };
 
@@ -52,6 +54,15 @@ const ManualEntryForm = () => {
                         <option value="rect">Rectangular</option>
                         <option value="round">Round / Oval</option>
                     </select>
+                </div>
+                <div className={styles.field}>
+                    <label>Color</label>
+                    <input
+                        type="color"
+                        value={frameColor}
+                        onChange={e => setFrameColor(e.target.value)}
+                        className={styles.colorPicker}
+                    />
                 </div>
             </div>
 

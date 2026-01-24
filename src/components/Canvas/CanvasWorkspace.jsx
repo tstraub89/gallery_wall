@@ -203,6 +203,7 @@ const CanvasWorkspace = () => {
                                     userSelect: 'none',
                                     borderWidth: `${bWidthPx}px`,
                                     borderStyle: 'solid',
+                                    borderColor: frame.frameColor || '#111111',
                                     boxSizing: 'content-box',
                                     borderRadius: frame.shape === 'round' ? '50%' : '0',
                                     overflow: 'hidden'

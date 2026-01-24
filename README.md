@@ -17,6 +17,7 @@ A powerful, interactive web application designed to help you plan complex galler
 *   **Print-Ready Photo Export**: preparing your gallery for reality? Export all your cropped, high-resolution photos in a single ZIP, ready for printing.
 *   **Template Support**: Switch between standard flat walls and specialized staircase configurations (ascending/descending).
 *   **Circular & Oval Shapes**: Design beyond rectangles with full support for round frames and matted cutouts.
+*   **Frame Color Customization**: Visualize different finishes with preset colors (Wood, Gold, Silver, etc.) or a custom color picker.
 
 ---
 
@@ -28,11 +29,14 @@ A powerful, interactive web application designed to help you plan complex galler
 *   **Smart Parsing**: Comprehensive handling of fractions (e.g., "11 1/4"), automatic detection of matted openings, and keyword support for "round" or "oval" frames.
 *   **Intelligent Default Matting**: Automatically adds a 1-inch mat border when the "matted" keyword is present without specific dimensions.
 *   **Geometric Variety**: Choose between traditional rectangular frames and modern round/oval shapes with automatic proportional scaling.
+*   **Color & Aesthetics**: Set frame colors using presets or a color picker; changes sync automatically back to your library.
+*   **Dynamic Matting**: Toggle and adjust matting openings on the fly for any frame in your design.
 
 ### 📸 Photo Management
 *   **Batch Upload**: Add multiple photos at once and view them in a beautiful masonry grid.
 *   **Multi-Select**: Manage your library efficiently with `Ctrl / Cmd + Click` selection.
 *   **Smart Integration**: Drag files directly from your computer onto a canvas frame to place them and auto-save them to your library simultaneously.
+*   **Robust Drag-and-Drop**: Global safeguards prevent accidental browser navigations when dropping photos.
 
 ### 🎨 Workspace Interaction
 *   **Marquee Selection**: Bulk-select frames by dragging on the background.

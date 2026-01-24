@@ -200,13 +200,43 @@ const PhotoLibrary = () => {
         setAnchorIndex(null);
     };
 
+    const handleDrop = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const files = Array.from(e.dataTransfer.files);
+        if (files.length === 0) return;
+
+        for (const file of files) {
+            if (!file.type.startsWith('image/')) continue;
+            try {
+                const imageId = uuidv4();
+                await saveImage(imageId, file);
+                addImageToLibrary(currentProject.id, imageId);
+            } catch (err) {
+                console.error("Failed to add dropped image to library", err);
+            }
+        }
+    };
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        e.dataTransfer.dropEffect = 'copy';
+    };
+
     if (!currentProject) return null;
 
     // Determine usage
     const usedImageIds = new Set(currentProject.frames.map(f => f.imageId).filter(Boolean));
 
     return (
-        <div className={styles.container} onClick={handleBackgroundClick}>
+        <div
+            className={styles.container}
+            onClick={handleBackgroundClick}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+        >
             <div className={styles.actions}>
                 <div className={styles.btnRow}>
                     <button

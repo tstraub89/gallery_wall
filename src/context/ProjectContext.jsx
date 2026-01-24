@@ -27,6 +27,7 @@ const createNewProject = (name) => ({
     },
     frames: [], // Array of Frame objects
     library: [], // Array of available Frame templates
+    images: [], // Array of image IDs
 });
 
 export const ProjectProvider = ({ children }) => {

@@ -27,13 +27,27 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
     };
 
     const updateAll = (key, value) => {
+        const affectedTemplateIds = new Set();
         const updatedFrames = currentProject.frames.map(f => {
             if (selectedFrameIds.includes(f.id)) {
+                if (f.templateId) affectedTemplateIds.add(f.templateId);
                 return { ...f, [key]: value };
             }
             return f;
         });
-        updateProject(currentProject.id, { frames: updatedFrames });
+
+        // Sync back to library templates
+        const updatedLibrary = currentProject.library.map(t => {
+            if (affectedTemplateIds.has(t.id)) {
+                return { ...t, [key]: value };
+            }
+            return t;
+        });
+
+        updateProject(currentProject.id, {
+            frames: updatedFrames,
+            library: updatedLibrary
+        });
     };
 
     const minX = Math.min(...selectedFrames.map(f => f.x));
@@ -90,6 +104,29 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
             return { ...f, x: newX, y: newY };
         });
         updateProject(currentProject.id, { frames: updatedFrames });
+    };
+
+    // Helper for complex matting updates
+    const isMatted = !!getValue('matted');
+    const matDims = getValue('matted');
+
+    const handleToggleMatted = (e) => {
+        const checked = e.target.checked;
+        if (checked) {
+            // Default 1-inch mat
+            const first = selectedFrames[0];
+            updateAll('matted', {
+                width: Math.max(0.5, first.width - 2),
+                height: Math.max(0.5, first.height - 2)
+            });
+        } else {
+            updateAll('matted', null);
+        }
+    };
+
+    const handleMatDimChange = (field, val) => {
+        const currentMat = matDims || { width: 0, height: 0 };
+        updateAll('matted', { ...currentMat, [field]: val });
     };
 
     return (
@@ -161,6 +198,67 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                     </div>
                 </div>
 
+                <div className={styles.propGroup}>
+                    <label>Frame Color</label>
+                    <div className={styles.colorRow}>
+                        {[
+                            { color: '#111111', title: 'Black' },
+                            { color: '#ffffff', title: 'White' },
+                            { color: '#5d4037', title: 'Wood' },
+                            { color: '#d4af37', title: 'Gold' },
+                            { color: '#9e9e9e', title: 'Silver' },
+                        ].map((preset) => (
+                            <button
+                                key={preset.color}
+                                className={`${styles.colorSwatch} ${getValue('frameColor') === preset.color ? styles.activeSwatch : ''}`}
+                                style={{ backgroundColor: preset.color }}
+                                onClick={() => updateAll('frameColor', preset.color)}
+                                title={preset.title}
+                            />
+                        ))}
+                        <input
+                            type="color"
+                            value={getValue('frameColor') || '#111111'}
+                            onChange={(e) => updateAll('frameColor', e.target.value)}
+                            className={styles.colorPicker}
+                        />
+                    </div>
+                </div>
+
+                <div className={styles.propGroup}>
+                    <div className={styles.row} style={{ justifyContent: 'flex-start', gap: '8px' }}>
+                        <input
+                            type="checkbox"
+                            id="matted-toggle"
+                            checked={isMatted}
+                            onChange={handleToggleMatted}
+                        />
+                        <label htmlFor="matted-toggle">Matted?</label>
+                    </div>
+                    {isMatted && matDims && (
+                        <div className={styles.row} style={{ marginTop: '4px', gap: '12px' }}>
+                            <div className={styles.inputStack}>
+                                <label>Opening W</label>
+                                <input
+                                    className={styles.fluidInput}
+                                    type="number" step="0.1"
+                                    value={matDims.width}
+                                    onChange={(e) => handleMatDimChange('width', parseFloat(e.target.value))}
+                                />
+                            </div>
+                            <div className={styles.inputStack}>
+                                <label>Opening H</label>
+                                <input
+                                    className={styles.fluidInput}
+                                    type="number" step="0.1"
+                                    value={matDims.height}
+                                    onChange={(e) => handleMatDimChange('height', parseFloat(e.target.value))}
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+
                 {selectedFrames.length === 1 && (
                     <>
                         <hr className={styles.divider} />
@@ -178,7 +276,7 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                     const updated = currentProject.frames.filter(f => !selectedFrameIds.includes(f.id));
                     updateProject(currentProject.id, { frames: updated });
                 }}>Remove {selectedFrames.length > 1 ? 'Frames' : 'Frame'} from Canvas</button>
-            </div>
+            </div >
         </>
     );
 };

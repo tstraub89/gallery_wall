@@ -262,7 +262,7 @@ export const useCanvasInteraction = ({
                     if (frameEl) {
                         const frameId = frameEl.getAttribute('data-frame-id');
                         if (frameId) {
-                            const updatedFrames = currentProject.frames.map(f => f.id === frameId ? { ...f, imageId } : f);
+                            const updatedFrames = currentProject.frames.map(f => f.id === frameId ? { ...f, imageId, imageState: null } : f);
                             updateProject(currentProject.id, { frames: updatedFrames });
                         }
                     }
@@ -289,7 +289,8 @@ export const useCanvasInteraction = ({
                     x: worldX, y: worldY,
                     rotation: 0,
                     zIndex: currentProject.frames.length + 1,
-                    imageId: null
+                    imageId: null,
+                    imageState: null
                 };
                 updateProject(currentProject.id, { frames: [...currentProject.frames, newFrame] });
             }
@@ -298,7 +299,7 @@ export const useCanvasInteraction = ({
                 if (frameEl) {
                     const frameId = frameEl.getAttribute('data-frame-id');
                     if (frameId) {
-                        const updatedFrames = currentProject.frames.map(f => f.id === frameId ? { ...f, imageId: d.imageId } : f);
+                        const updatedFrames = currentProject.frames.map(f => f.id === frameId ? { ...f, imageId: d.imageId, imageState: null } : f);
                         updateProject(currentProject.id, { frames: updatedFrames });
                     }
                 }
