@@ -43,40 +43,27 @@ const parseDimensionValue = (dimStr) => {
  */
 export const parseFrameLine = (line) => {
     if (!line || !line.trim()) return null;
+    const lowerLine = line.toLowerCase();
     const cleanLine = line.trim();
 
-    // Check for "matted to"
-    const mattedSplit = cleanLine.split(/matted to/i);
+    // Check for "round", "oval", and "matted" keywords
+    const isRound = lowerLine.includes('round') || lowerLine.includes('oval');
+    const isMatted = lowerLine.includes('matted');
+
+    // Split by "matted" to separate main dimensions from potential opening dimensions
+    const mattedSplit = lowerLine.split(/matted/i);
     const mainPart = mattedSplit[0];
-    const mattedPart = mattedSplit.length > 1 ? mattedSplit[1] : null;
+    const mattedPartRaw = mattedSplit.length > 1 ? mattedSplit[1] : null;
 
     const extractDims = (str) => {
-        // defined broadly as:  (numberlike) [xX by space] (numberlike)
-        // numberlike can be "16 1/4" or "5.5" or "10"
-
-        // This regex attempts to split by 'x' or 'X', allowing surrounding spaces.
-        // But "16 1/4" contains spaces. So we need to be careful.
-        // Usually the format is Width X Height
-
-        // Let's try matching the delimiter "x" or "X" surrounded by optional spaces, 
-        // but ensure we don't break " 1/4 ". 
-        // A simple split by "x" or "X" might work if we re-join widely.
-
-        // Better strategy: Find the X that separates two numbers.
-        // regex: /^(.*?)[\sxX]+(.*?)$/ might be too greedy.
-
-        // Let's assume the separator is an x/X.
-        // If there is no x/X, maybe it's invalid? The prompt says "Spaces or 'x'". 
-        // "8 10" might be ambiguous with "8 1/2".
-        // Let's assume 'x' is present for now based on examples, or standard space separation if no fraction mechanism interferes.
-        // Prompt examples: "5 x 7", "12 x 16", "8x10". All have x.
-
+        // Find the separator (x or X)
         const parts = str.split(/[xX]/);
         if (parts.length === 2) {
-            return {
-                w: parseDimensionValue(parts[0]),
-                h: parseDimensionValue(parts[1])
-            };
+            // Sanitize: keep only numbers, spaces, dots, and slashes for dimension values
+            const clean = (s) => s.replace(/[^0-9\s./]/g, '').trim();
+            const w = parseDimensionValue(clean(parts[0]));
+            const h = parseDimensionValue(clean(parts[1]));
+            return { w, h };
         }
         return null;
     };
@@ -87,18 +74,27 @@ export const parseFrameLine = (line) => {
     let result = {
         width: mainDims.w,
         height: mainDims.h,
+        shape: isRound ? 'round' : 'rect',
         displayString: cleanLine, // Keep original for reference
         matted: null
     };
 
-    if (mattedPart) {
-        const mattedDims = extractDims(mattedPart);
+    if (mattedPartRaw) {
+        const mattedDims = extractDims(mattedPartRaw);
         if (mattedDims && mattedDims.w !== null && mattedDims.h !== null) {
             result.matted = {
                 width: mattedDims.w,
                 height: mattedDims.h
             };
         }
+    }
+
+    // Default if keyword present but no dims found (1 inch border)
+    if (isMatted && !result.matted) {
+        result.matted = {
+            width: Math.max(0.5, result.width - 2),
+            height: Math.max(0.5, result.height - 2)
+        };
     }
 
     return result;

@@ -25,7 +25,8 @@ A powerful, interactive web application designed to help you plan complex galler
 ### 🖼️ Inventory & Frame Management
 *   **1:1 Inventory Manifest**: Every frame is accounted for individually in the sidebar with "Placed" and "(Duplicated)" status indicators.
 *   **Manual & Batch Addition**: Add custom frames with specific internal openings (matting) or import an entire collection via text.
-*   **Smart Parsing**: Comprehensive handling of fractions (e.g., "11 1/4") and automatic detection of matted openings.
+*   **Smart Parsing**: Comprehensive handling of fractions (e.g., "11 1/4"), automatic detection of matted openings, and keyword support for "round" or "oval" frames.
+*   **Intelligent Default Matting**: Automatically adds a 1-inch mat border when the "matted" keyword is present without specific dimensions.
 *   **Geometric Variety**: Choose between traditional rectangular frames and modern round/oval shapes with automatic proportional scaling.
 
 ### 📸 Photo Management
