@@ -16,6 +16,7 @@ A powerful, interactive web application designed to help you plan complex galler
 *   **Intelligent Import**: Quickly build your library by pasting a list of dimensions (e.g., "8x10", "11 1/4 x 14"). The app handles fractions and matting automatically.
 *   **Print-Ready Photo Export**: preparing your gallery for reality? Export all your cropped, high-resolution photos in a single ZIP, ready for printing.
 *   **Template Support**: Switch between standard flat walls and specialized staircase configurations (ascending/descending).
+*   **Circular & Oval Shapes**: Design beyond rectangles with full support for round frames and matted cutouts.
 
 ---
 
@@ -25,6 +26,7 @@ A powerful, interactive web application designed to help you plan complex galler
 *   **1:1 Inventory Manifest**: Every frame is accounted for individually in the sidebar with "Placed" and "(Duplicated)" status indicators.
 *   **Manual & Batch Addition**: Add custom frames with specific internal openings (matting) or import an entire collection via text.
 *   **Smart Parsing**: Comprehensive handling of fractions (e.g., "11 1/4") and automatic detection of matted openings.
+*   **Geometric Variety**: Choose between traditional rectangular frames and modern round/oval shapes with automatic proportional scaling.
 
 ### 📸 Photo Management
 *   **Batch Upload**: Add multiple photos at once and view them in a beautiful masonry grid.

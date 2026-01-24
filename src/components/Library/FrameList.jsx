@@ -51,8 +51,19 @@ const FrameList = () => {
                                 }));
                             }}
                         >
-                            <div className={styles.framePreview} style={{ aspectRatio: `${template.width}/${template.height}` }}>
-                                {template.matted && <div className={styles.mattedInner} />}
+                            <div
+                                className={styles.framePreview}
+                                style={{
+                                    aspectRatio: `${template.width}/${template.height}`,
+                                    borderRadius: template.shape === 'round' ? '50%' : '0'
+                                }}
+                            >
+                                {template.matted && (
+                                    <div
+                                        className={styles.mattedInner}
+                                        style={{ borderRadius: template.shape === 'round' ? '50%' : '0' }}
+                                    />
+                                )}
                                 {!isPlaced && (
                                     <button className={styles.removeBtn} onClick={(e) => handleDeleteTemplate(e, template.id)} title="Remove from library">×</button>
                                 )}

@@ -9,6 +9,7 @@ const ManualEntryForm = () => {
     const [isMatted, setIsMatted] = useState(false);
     const [matWidth, setMatWidth] = useState('5');
     const [matHeight, setMatHeight] = useState('7');
+    const [shape, setShape] = useState('rect');
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -17,6 +18,7 @@ const ManualEntryForm = () => {
         const frameDims = {
             width: parseFloat(width),
             height: parseFloat(height),
+            shape: shape,
             matted: isMatted ? { width: parseFloat(matWidth), height: parseFloat(matHeight) } : null
         };
 
@@ -40,6 +42,16 @@ const ManualEntryForm = () => {
                 <div className={styles.field}>
                     <label>Height</label>
                     <input type="number" step="0.1" value={height} onChange={e => setHeight(e.target.value)} />
+                </div>
+            </div>
+
+            <div className={styles.row}>
+                <div className={styles.field}>
+                    <label>Shape</label>
+                    <select value={shape} onChange={e => setShape(e.target.value)} className={styles.select}>
+                        <option value="rect">Rectangular</option>
+                        <option value="round">Round / Oval</option>
+                    </select>
                 </div>
             </div>
 

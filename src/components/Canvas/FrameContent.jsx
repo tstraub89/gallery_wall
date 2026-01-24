@@ -14,7 +14,13 @@ const FrameContent = ({ frame, ppi }) => {
     // Let's use the explicit value or 0.
 
     return (
-        <div className={styles.frameContent} style={{ userSelect: 'none' }}>
+        <div
+            className={styles.frameContent}
+            style={{
+                userSelect: 'none',
+                borderRadius: frame.shape === 'round' ? '50%' : '0'
+            }}
+        >
             {/* ... image ... */}
 
             {/* Empty State Label */}
@@ -55,7 +61,8 @@ const FrameContent = ({ frame, ppi }) => {
                         transform: `
                             scale(${frame.imageState?.scale || 1}) 
                             rotate(${frame.imageState?.rotation || 0}deg)
-                        `
+                        `,
+                        borderRadius: frame.shape === 'round' ? '50%' : '0'
                     }}
                 />
             )}
@@ -82,13 +89,16 @@ const FrameContent = ({ frame, ppi }) => {
                         position: 'absolute',
                         top: 0,
                         left: 0,
-                        boxSizing: 'border-box'
+                        boxSizing: 'border-box',
+                        borderRadius: frame.shape === 'round' ? '50%' : '0',
+                        overflow: 'hidden'
                     }}
                 >
                     {/* Inner bevel shadow */}
                     <div style={{
                         width: '100%', height: '100%',
-                        boxShadow: 'inset 1px 1px 3px rgba(0,0,0,0.3)'
+                        boxShadow: 'inset 1px 1px 3px rgba(0,0,0,0.3)',
+                        borderRadius: frame.shape === 'round' ? '50%' : '0'
                     }} />
                 </div>
             )}

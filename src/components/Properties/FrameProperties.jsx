@@ -17,7 +17,12 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
     const getValue = (key) => {
         if (selectedFrames.length === 0) return '';
         const first = selectedFrames[0][key];
-        const allSame = selectedFrames.every(f => Math.abs(f[key] - (first || 0)) < 0.01);
+        const allSame = selectedFrames.every(f => {
+            if (typeof first === 'number') {
+                return Math.abs(f[key] - (first || 0)) < 0.01;
+            }
+            return f[key] === first;
+        });
         return allSame ? first : '';
     };
 
@@ -139,6 +144,20 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                             onChange={(e) => updateAll('borderWidth', parseFloat(e.target.value))}
                             className={styles.numberInput}
                         />
+                    </div>
+                </div>
+
+                <div className={styles.propGroup}>
+                    <label>Shape</label>
+                    <div className={styles.row}>
+                        <select
+                            value={getValue('shape') || 'rect'}
+                            onChange={(e) => updateAll('shape', e.target.value)}
+                            className={styles.fluidInput}
+                        >
+                            <option value="rect">Rectangular</option>
+                            <option value="round">Round / Oval</option>
+                        </select>
                     </div>
                 </div>
 

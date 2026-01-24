@@ -279,7 +279,18 @@ export const useCanvasInteraction = ({
                 const widthPx = d.frame.width * PPI, heightPx = d.frame.height * PPI;
                 let worldX = snap(((e.clientX - rect.left) - pan.x) / scale - (widthPx / 2));
                 let worldY = snap(((e.clientY - rect.top) - pan.y) / scale - (heightPx / 2));
-                const newFrame = { id: uuidv4(), templateId: d.frame.id, width: d.frame.width, height: d.frame.height, matted: d.frame.matted, x: worldX, y: worldY, rotation: 0, zIndex: currentProject.frames.length + 1, imageId: null };
+                const newFrame = {
+                    id: uuidv4(),
+                    templateId: d.frame.id,
+                    width: d.frame.width,
+                    height: d.frame.height,
+                    shape: d.frame.shape || 'rect',
+                    matted: d.frame.matted,
+                    x: worldX, y: worldY,
+                    rotation: 0,
+                    zIndex: currentProject.frames.length + 1,
+                    imageId: null
+                };
                 updateProject(currentProject.id, { frames: [...currentProject.frames, newFrame] });
             }
             if (d.type === 'PHOTO_LIBRARY_ITEM') {
