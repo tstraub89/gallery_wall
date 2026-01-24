@@ -3,6 +3,7 @@ import ImportFile from './ImportFile';
 import ManualEntryForm from './ManualEntryForm';
 import FrameList from './FrameList';
 import PhotoLibrary from './PhotoLibrary';
+import pkg from '../../../package.json';
 import styles from './FrameLibrary.module.css';
 
 const Section = ({ title, isOpen, onToggle, children }) => (
@@ -71,6 +72,10 @@ const FrameLibrary = () => {
                         <PhotoLibrary />
                     </div>
                 )}
+            </div>
+
+            <div className={styles.footer}>
+                <span>Gallery Planner v{pkg.version}</span>
             </div>
         </div>
     );

@@ -9,18 +9,12 @@
     flex-direction: column;
     border-bottom: 1px solid var(--border-color);
     overflow: hidden;
-    /* Prevent spill */
 }
 
-/* Allow the open section to expand and take available space */
 .section:has(.sectionContent) {
     flex: 1;
     min-height: 0;
-    /* Required for flex scrolling */
 }
-
-/* If multiple are open (not current logic but good practice), or just to handle transitions */
-/* With current logic (accordion), only one is flex: 1 */
 
 .sectionHeader {
     padding: var(--spacing-md);
@@ -64,4 +58,20 @@
     color: #888;
     margin: 12px 0 8px 4px;
     letter-spacing: 0.5px;
+}
+
+.footer {
+    padding: var(--spacing-sm);
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.footer span {
+    font-size: 10px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    opacity: 0.6;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
