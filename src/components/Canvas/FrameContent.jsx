@@ -30,13 +30,21 @@ const FrameContent = ({ frame, ppi }) => {
                         position: 'absolute',
                         top: '50%', left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        fontSize: '10px',
+                        fontSize: `${Math.max(6, Math.min(12, frame.width * PPI * 0.15))}px`,
                         color: '#999',
                         pointerEvents: 'none',
-                        userSelect: 'none'
+                        userSelect: 'none',
+                        textAlign: 'center',
+                        width: '100%',
+                        padding: '0 2px',
+                        lineHeight: 1.2
                     }}
                 >
-                    {frame.width}" x {frame.height}"
+                    {frame.label ? (
+                        <span style={{ fontWeight: 600, color: '#555' }}>{frame.label}</span>
+                    ) : (
+                        <span>{frame.width}" x {frame.height}"</span>
+                    )}
                 </div>
             )}
 

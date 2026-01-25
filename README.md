@@ -17,7 +17,8 @@ A powerful, interactive web application designed to help you plan complex galler
 *   **Print-Ready Photo Export**: preparing your gallery for reality? Export all your cropped, high-resolution photos in a single ZIP, ready for printing.
 *   **Template Support**: Switch between standard flat walls and specialized staircase configurations (ascending/descending).
 *   **Circular & Oval Shapes**: Design beyond rectangles with full support for round frames and matted cutouts.
-*   **Frame Color Customization**: Visualize different finishes with preset colors (Wood, Gold, Silver, etc.) or a custom color picker.
+*   **Frame Color & Content**: Personalize frames with custom colors (presets or picker) and add labels (e.g., "Light Switch") for easy identification.
+*   **Direct Dimension Control**: Resize frames directly on the canvas using editable width/height inputs, automatically updating your library inventory.
 
 ---
 

@@ -2,7 +2,7 @@
   "name": "gallery_wall",
   "homepage": "http://tstraub89.github.io/gallery_wall",
   "private": true,
-  "version": "1.4.3",
+  "version": "1.5.0",
   "type": "module",
   "scripts": {
     "dev": "vite",

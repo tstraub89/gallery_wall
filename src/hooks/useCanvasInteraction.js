@@ -284,6 +284,7 @@ export const useCanvasInteraction = ({
                     templateId: d.frame.id,
                     width: d.frame.width,
                     height: d.frame.height,
+                    label: d.frame.label,
                     shape: d.frame.shape || 'rect',
                     frameColor: d.frame.frameColor || '#111111',
                     matted: d.frame.matted,

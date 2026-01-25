@@ -4,6 +4,7 @@ import styles from './ManualEntryForm.module.css';
 
 const ManualEntryForm = () => {
     const { currentProject, addToLibrary } = useProject();
+    const [label, setLabel] = useState('');
     const [width, setWidth] = useState('8');
     const [height, setHeight] = useState('10');
     const [isMatted, setIsMatted] = useState(false);
@@ -19,6 +20,7 @@ const ManualEntryForm = () => {
         const frameDims = {
             width: parseFloat(width),
             height: parseFloat(height),
+            label: label,
             shape: shape,
             frameColor: frameColor,
             matted: isMatted ? { width: parseFloat(matWidth), height: parseFloat(matHeight) } : null
@@ -32,10 +34,18 @@ const ManualEntryForm = () => {
         addToLibrary(currentProject.id, frameDims);
         // Keep inputs but maybe reset matting flag?
         // setIsMatted(false);
+        setLabel(''); // Reset label after add
     };
 
     return (
         <form className={styles.container} onSubmit={handleSubmit}>
+            <div className={styles.row}>
+                <div className={styles.field} style={{ flex: 2 }}>
+                    <label>Label (opt)</label>
+                    <input type="text" value={label} onChange={e => setLabel(e.target.value)} placeholder="e.g. Light Switch" />
+                </div>
+            </div>
+
             <div className={styles.row}>
                 <div className={styles.field}>
                     <label>Width</label>

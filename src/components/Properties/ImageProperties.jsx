@@ -66,7 +66,10 @@ const ImageProperties = ({ frame, updateProject, currentProject }) => {
             </div>
             <div className={styles.propGroup}>
                 <label>Image Rotation</label>
-                <button onClick={() => handleImageChange('rotation', ((frame.imageState?.rotation || 0) + 90) % 360)}>
+                <button
+                    className={styles.secondaryBtn}
+                    onClick={() => handleImageChange('rotation', ((frame.imageState?.rotation || 0) + 90) % 360)}
+                >
                     Rotate Image 90°
                 </button>
             </div>

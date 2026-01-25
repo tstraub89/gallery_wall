@@ -181,6 +181,17 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
             </div>
             <div className={styles.content}>
                 <div className={styles.propGroup}>
+                    <label>Label (Optional)</label>
+                    <input
+                        type="text"
+                        value={getValue('label') || ''}
+                        onChange={(e) => updateAll('label', e.target.value)}
+                        placeholder={(selectedFrames.length === 1 && !selectedFrames[0].label) ? "e.g. 'Light Switch'" : ""}
+                        className={styles.fluidInput}
+                    />
+                </div>
+
+                <div className={styles.propGroup}>
                     <label>Position (X / Y)</label>
                     <div className={styles.row}>
                         <input
@@ -199,19 +210,33 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                 </div>
 
                 <div className={styles.propGroup}>
-                    <label>Dimensions</label>
+                    <label>Dimensions (W x H)</label>
                     <div className={styles.row}>
-                        <div className={styles.info}>
-                            {selectedFrames.length === 1
-                                ? `${selectedFrames[0].width}" x ${selectedFrames[0].height}"`
-                                : 'Multiple Selected'}
+                        <div className={styles.inputStack} style={{ flex: 1 }}>
+                            <input
+                                className={styles.fluidInput}
+                                type="number" step="0.1"
+                                value={getValue('width') || ''}
+                                onChange={(e) => updateAll('width', parseFloat(e.target.value))}
+                                placeholder={selectedFrames.length > 1 ? "-" : ""}
+                            />
+                        </div>
+                        <div className={styles.inputStack} style={{ flex: 1 }}>
+                            <input
+                                className={styles.fluidInput}
+                                type="number" step="0.1"
+                                value={getValue('height') || ''}
+                                onChange={(e) => updateAll('height', parseFloat(e.target.value))}
+                                placeholder={selectedFrames.length > 1 ? "-" : ""}
+                            />
                         </div>
                         <button
                             className={styles.secondaryBtn}
                             onClick={rotateFrame}
                             title="Swap Width and Height"
+                            style={{ flex: 0, padding: '0 8px', minWidth: 'auto' }}
                         >
-                            Rotate 90°
+                            <span style={{ fontSize: '1.2em' }}>↻</span>
                         </button>
                     </div>
                 </div>
