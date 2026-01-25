@@ -285,6 +285,7 @@ export const useCanvasInteraction = ({
                     width: d.frame.width,
                     height: d.frame.height,
                     shape: d.frame.shape || 'rect',
+                    frameColor: d.frame.frameColor || '#111111',
                     matted: d.frame.matted,
                     x: worldX, y: worldY,
                     rotation: 0,

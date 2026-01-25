@@ -42,6 +42,7 @@ A powerful, interactive web application designed to help you plan complex galler
 *   **Marquee Selection**: Bulk-select frames by dragging on the background.
 *   **Context Menu**: Right-click for quick access to Layering (Bring to Front), Duplication, and Photo removal.
 *   **Advanced Alignment**: One-click tools to align selected frames by edges or centers.
+*   **Frame Rotation**: Instantly rotate any frame 90° (swapping width/height) with a single click. Smart matting adjustments included.
 *   **Undo / Redo**: Full history support with `Ctrl+Z` / `Ctrl+Y`.
 
 ### 💾 Project Controls

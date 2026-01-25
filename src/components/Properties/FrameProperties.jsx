@@ -129,6 +129,51 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
         updateAll('matted', { ...currentMat, [field]: val });
     };
 
+    const rotateFrame = () => {
+        const affectedTemplateIds = new Set();
+        const updatedFrames = currentProject.frames.map(f => {
+            if (selectedFrameIds.includes(f.id)) {
+                if (f.templateId) affectedTemplateIds.add(f.templateId);
+
+                const newMatted = f.matted ? {
+                    width: f.matted.height,
+                    height: f.matted.width
+                } : null;
+
+                return {
+                    ...f,
+                    width: f.height,
+                    height: f.width,
+                    matted: newMatted || f.matted // Keep null if was null
+                };
+            }
+            return f;
+        });
+
+        // Sync back to library templates
+        const updatedLibrary = currentProject.library.map(t => {
+            if (affectedTemplateIds.has(t.id)) {
+                const newMatted = t.matted ? {
+                    width: t.matted.height,
+                    height: t.matted.width
+                } : null;
+
+                return {
+                    ...t,
+                    width: t.height,
+                    height: t.width,
+                    matted: newMatted || t.matted
+                };
+            }
+            return t;
+        });
+
+        updateProject(currentProject.id, {
+            frames: updatedFrames,
+            library: updatedLibrary
+        });
+    };
+
     return (
         <>
             <div className={styles.header}>
@@ -150,6 +195,24 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                             value={(minY / PPI).toFixed(2)}
                             onChange={(e) => updateRelative('y', parseFloat(e.target.value) * PPI)}
                         />
+                    </div>
+                </div>
+
+                <div className={styles.propGroup}>
+                    <label>Dimensions</label>
+                    <div className={styles.row}>
+                        <div className={styles.info}>
+                            {selectedFrames.length === 1
+                                ? `${selectedFrames[0].width}" x ${selectedFrames[0].height}"`
+                                : 'Multiple Selected'}
+                        </div>
+                        <button
+                            className={styles.secondaryBtn}
+                            onClick={rotateFrame}
+                            title="Swap Width and Height"
+                        >
+                            Rotate 90°
+                        </button>
                     </div>
                 </div>
 
