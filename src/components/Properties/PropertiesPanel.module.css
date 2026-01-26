@@ -29,6 +29,47 @@
     gap: var(--spacing-xs);
 }
 
+.tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: var(--spacing-md);
+    padding: 0 var(--spacing-md);
+}
+
+.tab {
+    flex: 1;
+    padding: 10px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+}
+
+.tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-app);
+}
+
+.activeTab {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+    font-weight: 600;
+}
+
+.disabledTab {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.disabledTab:hover {
+    background: none;
+    color: var(--text-secondary);
+}
+
 .propGroup label {
     font-size: 12px;
     color: var(--text-secondary);

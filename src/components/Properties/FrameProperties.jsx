@@ -178,203 +178,239 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
         });
     };
 
+    const [activeTab, setActiveTab] = React.useState('frame');
+
+    // Force switch to frame tab if multiple selection (since we don't support multi-photo edit yet)
+    React.useEffect(() => {
+        if (selectedFrames.length > 1) {
+            setActiveTab('frame');
+        }
+    }, [selectedFrames.length]);
+
+    const isPhotoTabDisabled = selectedFrames.length > 1;
+
     return (
         <>
             <div className={styles.header}>
                 <h3>Properties ({selectedFrames.length})</h3>
             </div>
+
+            <div className={styles.tabs}>
+                <button
+                    className={`${styles.tab} ${activeTab === 'frame' ? styles.activeTab : ''}`}
+                    onClick={() => setActiveTab('frame')}
+                >
+                    Frame
+                </button>
+                <button
+                    className={`${styles.tab} ${activeTab === 'photo' ? styles.activeTab : ''} ${isPhotoTabDisabled ? styles.disabledTab : ''}`}
+                    onClick={() => !isPhotoTabDisabled && setActiveTab('photo')}
+                    title={isPhotoTabDisabled ? "Select a single frame to edit photo" : "Photo Settings"}
+                >
+                    Photo
+                </button>
+            </div>
+
             <div className={styles.content}>
-                <div className={styles.propGroup}>
-                    <label>Label (Optional)</label>
-                    <input
-                        type="text"
-                        value={getValue('label') || ''}
-                        onChange={(e) => updateAll('label', e.target.value)}
-                        placeholder={(selectedFrames.length === 1 && !selectedFrames[0].label) ? "e.g. 'Light Switch'" : ""}
-                        className={styles.fluidInput}
-                    />
-                </div>
-
-                <div className={styles.propGroup}>
-                    <label>Position (X / Y)</label>
-                    <div className={styles.row}>
-                        <input
-                            className={styles.fluidInput}
-                            type="number" step="0.1"
-                            value={(minX / PPI).toFixed(2)}
-                            onChange={(e) => updateRelative('x', parseFloat(e.target.value) * PPI)}
-                        />
-                        <input
-                            className={styles.fluidInput}
-                            type="number" step="0.1"
-                            value={(minY / PPI).toFixed(2)}
-                            onChange={(e) => updateRelative('y', parseFloat(e.target.value) * PPI)}
-                        />
-                    </div>
-                </div>
-
-                <div className={styles.propGroup}>
-                    <label>Dimensions (W x H)</label>
-                    <div className={styles.row}>
-                        <div className={styles.inputStack} style={{ flex: 1 }}>
-                            <input
-                                className={styles.fluidInput}
-                                type="number" step="0.1"
-                                value={getValue('width') || ''}
-                                onChange={(e) => updateAll('width', parseFloat(e.target.value))}
-                                placeholder={selectedFrames.length > 1 ? "-" : ""}
-                            />
-                        </div>
-                        <div className={styles.inputStack} style={{ flex: 1 }}>
-                            <input
-                                className={styles.fluidInput}
-                                type="number" step="0.1"
-                                value={getValue('height') || ''}
-                                onChange={(e) => updateAll('height', parseFloat(e.target.value))}
-                                placeholder={selectedFrames.length > 1 ? "-" : ""}
-                            />
-                        </div>
-                        <button
-                            className={styles.secondaryBtn}
-                            onClick={rotateFrame}
-                            title="Swap Width and Height"
-                            style={{ flex: 0, padding: '0 8px', minWidth: 'auto' }}
-                        >
-                            <span style={{ fontSize: '1.2em' }}>↻</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div className={styles.propGroup}>
-                    <label>Alignment</label>
-                    <div className={styles.row}>
-                        <div className={styles.alignGroup}>
-                            <button className={styles.alignBtn} onClick={() => align('left')} title="Align Left">
-                                <AlignHorizontalJustifyStart size={16} />
-                            </button>
-                            <button className={styles.alignBtn} onClick={() => align('center')} title="Align Horizontal Center">
-                                <AlignHorizontalJustifyCenter size={16} />
-                            </button>
-                            <button className={styles.alignBtn} onClick={() => align('right')} title="Align Right">
-                                <AlignHorizontalJustifyEnd size={16} />
-                            </button>
-                        </div>
-                        <div className={styles.alignGroup}>
-                            <button className={styles.alignBtn} onClick={() => align('top')} title="Align Top">
-                                <AlignVerticalJustifyStart size={16} />
-                            </button>
-                            <button className={styles.alignBtn} onClick={() => align('middle')} title="Align Vertical Middle">
-                                <AlignVerticalJustifyCenter size={16} />
-                            </button>
-                            <button className={styles.alignBtn} onClick={() => align('bottom')} title="Align Bottom">
-                                <AlignVerticalJustifyEnd size={16} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div className={styles.propGroup}>
-                    <label>Frame Thickness</label>
-                    <div className={styles.row}>
-                        <input
-                            type="range" min="0" max="2" step="0.1"
-                            value={getValue('borderWidth') || 0.1}
-                            onChange={(e) => updateAll('borderWidth', parseFloat(e.target.value))}
-                            className={styles.slider}
-                        />
-                        <input
-                            type="number" step="0.1"
-                            value={getValue('borderWidth') || 0.1}
-                            onChange={(e) => updateAll('borderWidth', parseFloat(e.target.value))}
-                            className={styles.numberInput}
-                        />
-                    </div>
-                </div>
-
-                <div className={styles.propGroup}>
-                    <label>Shape</label>
-                    <div className={styles.row}>
-                        <select
-                            value={getValue('shape') || 'rect'}
-                            onChange={(e) => updateAll('shape', e.target.value)}
-                            className={styles.fluidInput}
-                        >
-                            <option value="rect">Rectangular</option>
-                            <option value="round">Round / Oval</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div className={styles.propGroup}>
-                    <label>Frame Color</label>
-                    <div className={styles.colorRow}>
-                        {[
-                            { color: '#111111', title: 'Black' },
-                            { color: '#ffffff', title: 'White' },
-                            { color: '#5d4037', title: 'Wood' },
-                            { color: '#d4af37', title: 'Gold' },
-                            { color: '#9e9e9e', title: 'Silver' },
-                        ].map((preset) => (
-                            <button
-                                key={preset.color}
-                                className={`${styles.colorSwatch} ${getValue('frameColor') === preset.color ? styles.activeSwatch : ''} `}
-                                style={{ backgroundColor: preset.color }}
-                                onClick={() => updateAll('frameColor', preset.color)}
-                                title={preset.title}
-                            />
-                        ))}
-                        <input
-                            type="color"
-                            value={getValue('frameColor') || '#111111'}
-                            onChange={(e) => updateAll('frameColor', e.target.value)}
-                            className={styles.colorPicker}
-                        />
-                    </div>
-                </div>
-
-                <div className={styles.propGroup}>
-                    <div className={styles.row} style={{ justifyContent: 'flex-start', gap: '8px' }}>
-                        <input
-                            type="checkbox"
-                            id="matted-toggle"
-                            checked={isMatted}
-                            onChange={handleToggleMatted}
-                        />
-                        <label htmlFor="matted-toggle">Matted?</label>
-                    </div>
-                    {isMatted && matDims && (
-                        <div className={styles.row} style={{ marginTop: '4px', gap: '12px' }}>
-                            <div className={styles.inputStack}>
-                                <label>Opening W</label>
-                                <input
-                                    className={styles.fluidInput}
-                                    type="number" step="0.1"
-                                    value={matDims.width}
-                                    onChange={(e) => handleMatDimChange('width', parseFloat(e.target.value))}
-                                />
-                            </div>
-                            <div className={styles.inputStack}>
-                                <label>Opening H</label>
-                                <input
-                                    className={styles.fluidInput}
-                                    type="number" step="0.1"
-                                    value={matDims.height}
-                                    onChange={(e) => handleMatDimChange('height', parseFloat(e.target.value))}
-                                />
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                {selectedFrames.length === 1 && (
+                {activeTab === 'frame' && (
                     <>
-                        <hr className={styles.divider} />
-                        {selectedFrames[0].imageId && (
+                        <div className={styles.propGroup}>
+                            <label>Label (Optional)</label>
+                            <input
+                                type="text"
+                                value={getValue('label') || ''}
+                                onChange={(e) => updateAll('label', e.target.value)}
+                                placeholder={(selectedFrames.length === 1 && !selectedFrames[0].label) ? "e.g. 'Light Switch'" : ""}
+                                className={styles.fluidInput}
+                            />
+                        </div>
+
+                        <div className={styles.propGroup}>
+                            <label>Position (X / Y)</label>
+                            <div className={styles.row}>
+                                <input
+                                    className={styles.fluidInput}
+                                    type="number" step="0.1"
+                                    value={(minX / PPI).toFixed(2)}
+                                    onChange={(e) => updateRelative('x', parseFloat(e.target.value) * PPI)}
+                                />
+                                <input
+                                    className={styles.fluidInput}
+                                    type="number" step="0.1"
+                                    value={(minY / PPI).toFixed(2)}
+                                    onChange={(e) => updateRelative('y', parseFloat(e.target.value) * PPI)}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.propGroup}>
+                            <label>Dimensions (W x H)</label>
+                            <div className={styles.row}>
+                                <div className={styles.inputStack} style={{ flex: 1 }}>
+                                    <input
+                                        className={styles.fluidInput}
+                                        type="number" step="0.1"
+                                        value={getValue('width') || ''}
+                                        onChange={(e) => updateAll('width', parseFloat(e.target.value))}
+                                        placeholder={selectedFrames.length > 1 ? "-" : ""}
+                                    />
+                                </div>
+                                <div className={styles.inputStack} style={{ flex: 1 }}>
+                                    <input
+                                        className={styles.fluidInput}
+                                        type="number" step="0.1"
+                                        value={getValue('height') || ''}
+                                        onChange={(e) => updateAll('height', parseFloat(e.target.value))}
+                                        placeholder={selectedFrames.length > 1 ? "-" : ""}
+                                    />
+                                </div>
+                                <button
+                                    className={styles.secondaryBtn}
+                                    onClick={rotateFrame}
+                                    title="Swap Width and Height"
+                                    style={{ flex: 0, padding: '0 8px', minWidth: 'auto' }}
+                                >
+                                    <span style={{ fontSize: '1.2em' }}>↻</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className={styles.propGroup}>
+                            <label>Alignment</label>
+                            <div className={styles.row}>
+                                <div className={styles.alignGroup}>
+                                    <button className={styles.alignBtn} onClick={() => align('left')} title="Align Left">
+                                        <AlignHorizontalJustifyStart size={16} />
+                                    </button>
+                                    <button className={styles.alignBtn} onClick={() => align('center')} title="Align Horizontal Center">
+                                        <AlignHorizontalJustifyCenter size={16} />
+                                    </button>
+                                    <button className={styles.alignBtn} onClick={() => align('right')} title="Align Right">
+                                        <AlignHorizontalJustifyEnd size={16} />
+                                    </button>
+                                </div>
+                                <div className={styles.alignGroup}>
+                                    <button className={styles.alignBtn} onClick={() => align('top')} title="Align Top">
+                                        <AlignVerticalJustifyStart size={16} />
+                                    </button>
+                                    <button className={styles.alignBtn} onClick={() => align('middle')} title="Align Vertical Middle">
+                                        <AlignVerticalJustifyCenter size={16} />
+                                    </button>
+                                    <button className={styles.alignBtn} onClick={() => align('bottom')} title="Align Bottom">
+                                        <AlignVerticalJustifyEnd size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={styles.propGroup}>
+                            <label>Frame Thickness</label>
+                            <div className={styles.row}>
+                                <input
+                                    type="range" min="0" max="2" step="0.1"
+                                    value={getValue('borderWidth') || 0.1}
+                                    onChange={(e) => updateAll('borderWidth', parseFloat(e.target.value))}
+                                    className={styles.slider}
+                                />
+                                <input
+                                    type="number" step="0.1"
+                                    value={getValue('borderWidth') || 0.1}
+                                    onChange={(e) => updateAll('borderWidth', parseFloat(e.target.value))}
+                                    className={styles.numberInput}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.propGroup}>
+                            <label>Shape</label>
+                            <div className={styles.row}>
+                                <select
+                                    value={getValue('shape') || 'rect'}
+                                    onChange={(e) => updateAll('shape', e.target.value)}
+                                    className={styles.fluidInput}
+                                >
+                                    <option value="rect">Rectangular</option>
+                                    <option value="round">Round / Oval</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className={styles.propGroup}>
+                            <label>Frame Color</label>
+                            <div className={styles.colorRow}>
+                                {[
+                                    { color: '#111111', title: 'Black' },
+                                    { color: '#ffffff', title: 'White' },
+                                    { color: '#5d4037', title: 'Wood' },
+                                    { color: '#d4af37', title: 'Gold' },
+                                    { color: '#9e9e9e', title: 'Silver' },
+                                ].map((preset) => (
+                                    <button
+                                        key={preset.color}
+                                        className={`${styles.colorSwatch} ${getValue('frameColor') === preset.color ? styles.activeSwatch : ''} `}
+                                        style={{ backgroundColor: preset.color }}
+                                        onClick={() => updateAll('frameColor', preset.color)}
+                                        title={preset.title}
+                                    />
+                                ))}
+                                <input
+                                    type="color"
+                                    value={getValue('frameColor') || '#111111'}
+                                    onChange={(e) => updateAll('frameColor', e.target.value)}
+                                    className={styles.colorPicker}
+                                />
+                            </div>
+                        </div>
+
+                        <div className={styles.propGroup}>
+                            <div className={styles.row} style={{ justifyContent: 'flex-start', gap: '8px' }}>
+                                <input
+                                    type="checkbox"
+                                    id="matted-toggle"
+                                    checked={isMatted}
+                                    onChange={handleToggleMatted}
+                                />
+                                <label htmlFor="matted-toggle">Matted?</label>
+                            </div>
+                            {isMatted && matDims && (
+                                <div className={styles.row} style={{ marginTop: '4px', gap: '12px' }}>
+                                    <div className={styles.inputStack}>
+                                        <label>Opening W</label>
+                                        <input
+                                            className={styles.fluidInput}
+                                            type="number" step="0.1"
+                                            value={matDims.width}
+                                            onChange={(e) => handleMatDimChange('width', parseFloat(e.target.value))}
+                                        />
+                                    </div>
+                                    <div className={styles.inputStack}>
+                                        <label>Opening H</label>
+                                        <input
+                                            className={styles.fluidInput}
+                                            type="number" step="0.1"
+                                            value={matDims.height}
+                                            onChange={(e) => handleMatDimChange('height', parseFloat(e.target.value))}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
+
+                {activeTab === 'photo' && (
+                    <>
+                        {selectedFrames[0].imageId ? (
                             <ImageProperties
                                 frame={selectedFrames[0]}
                                 updateProject={updateProject}
                                 currentProject={currentProject}
                             />
+                        ) : (
+                            <div className={styles.info} style={{ textAlign: 'center', padding: '20px', color: '#888' }}>
+                                No photo selected.<br />
+                                Drag a photo from the library to this frame to edit it.
+                            </div>
                         )}
                     </>
                 )}
