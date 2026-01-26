@@ -2,6 +2,10 @@ import React, { useMemo } from 'react';
 import styles from './PropertiesPanel.module.css';
 import { PPI } from '../../constants';
 import ImageProperties from './ImageProperties';
+import {
+    AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd,
+    AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd
+} from 'lucide-react';
 
 const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) => {
     // Memoize selected frames to ensure stability
@@ -244,13 +248,28 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                 <div className={styles.propGroup}>
                     <label>Alignment</label>
                     <div className={styles.row}>
-                        <button onClick={() => align('left')} title="Align Left">L</button>
-                        <button onClick={() => align('center')} title="Align Center">C</button>
-                        <button onClick={() => align('right')} title="Align Right">R</button>
-                        <span style={{ width: 8 }} />
-                        <button onClick={() => align('top')} title="Align Top">T</button>
-                        <button onClick={() => align('middle')} title="Align Middle">M</button>
-                        <button onClick={() => align('bottom')} title="Align Bottom">B</button>
+                        <div className={styles.alignGroup}>
+                            <button className={styles.alignBtn} onClick={() => align('left')} title="Align Left">
+                                <AlignHorizontalJustifyStart size={16} />
+                            </button>
+                            <button className={styles.alignBtn} onClick={() => align('center')} title="Align Horizontal Center">
+                                <AlignHorizontalJustifyCenter size={16} />
+                            </button>
+                            <button className={styles.alignBtn} onClick={() => align('right')} title="Align Right">
+                                <AlignHorizontalJustifyEnd size={16} />
+                            </button>
+                        </div>
+                        <div className={styles.alignGroup}>
+                            <button className={styles.alignBtn} onClick={() => align('top')} title="Align Top">
+                                <AlignVerticalJustifyStart size={16} />
+                            </button>
+                            <button className={styles.alignBtn} onClick={() => align('middle')} title="Align Vertical Middle">
+                                <AlignVerticalJustifyCenter size={16} />
+                            </button>
+                            <button className={styles.alignBtn} onClick={() => align('bottom')} title="Align Bottom">
+                                <AlignVerticalJustifyEnd size={16} />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -298,7 +317,7 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                         ].map((preset) => (
                             <button
                                 key={preset.color}
-                                className={`${styles.colorSwatch} ${getValue('frameColor') === preset.color ? styles.activeSwatch : ''}`}
+                                className={`${styles.colorSwatch} ${getValue('frameColor') === preset.color ? styles.activeSwatch : ''} `}
                                 style={{ backgroundColor: preset.color }}
                                 onClick={() => updateAll('frameColor', preset.color)}
                                 title={preset.title}

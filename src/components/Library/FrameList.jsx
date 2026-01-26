@@ -187,28 +187,24 @@ const FrameList = () => {
                                         style={{ borderRadius: template.shape === 'round' ? '50%' : '0' }}
                                     />
                                 )}
+                                {isPlaced && (
+                                    <div className={styles.placedOverlay}>PLACED</div>
+                                )}
                                 {!isPlaced && (
                                     <button className={styles.removeBtn} onClick={(e) => handleDeleteTemplate(e, template.id)} title="Remove from library">×</button>
                                 )}
                             </div>
                             <div className={styles.frameInfo}>
-                                <div className={styles.topInfo}>
-                                    <div className={styles.dims}>
-                                        {template.label ? (
-                                            <>
-                                                <span style={{ fontWeight: 700, marginRight: '6px' }}>{template.label}</span>
-                                                <span style={{ fontWeight: 400, color: '#666', fontSize: '0.9em' }}>
-                                                    ({template.width}" x {template.height}")
-                                                </span>
-                                            </>
-                                        ) : (
-                                            `${template.width}" x ${template.height}"`
-                                        )}
-                                    </div>
-                                    {isPlaced && <span className={styles.placedPill}>Placed</span>}
-                                </div>
+                                {template.label ? (
+                                    <>
+                                        <div className={styles.label} title={template.label}>{template.label}</div>
+                                        <div className={styles.dims}>{template.width}" x {template.height}"</div>
+                                    </>
+                                ) : (
+                                    <div className={styles.dims}>{template.width}" x {template.height}"</div>
+                                )}
                                 <div className={styles.subInfo}>
-                                    {template.isDuplicate ? '(Duplicated)' : 'Original Library Item'}
+                                    {template.isDuplicate && '(Duplicated)'}
                                 </div>
                             </div>
                         </div>

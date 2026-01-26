@@ -6,10 +6,12 @@ import { toBlob } from 'html-to-image';
 import { PPI } from '../../constants';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import HelpModal from '../Common/HelpModal';
+import DropdownMenu from '../Common/DropdownMenu';
 import { generateProjectZip, exportProjectBundle, importProjectBundle } from '../../utils/exportUtils';
 import { saveImage } from '../../utils/imageStore';
 import { v4 as uuidv4 } from 'uuid';
-import { Github } from 'lucide-react';
+import { Github, PanelRightOpen, PanelRightClose, FolderOpen, Download } from 'lucide-react';
+import { useLayout } from '../../context/LayoutContext';
 
 // Helper to convert blob URL or external URL to base64
 const blobToBase64 = (url) => new Promise((resolve, reject) => {
@@ -51,6 +53,7 @@ const FullScreenOverlay = ({ children }) => {
 
 const GlobalActions = () => {
     const { currentProject, updateProject, addProject } = useProject();
+    const { isRightSidebarOpen, toggleRightSidebar } = useLayout();
     const [isExportingPNG, setIsExportingPNG] = useState(false);
     const [isExportingPhotos, setIsExportingPhotos] = useState(false);
     const [exportError, setExportError] = useState(null);
@@ -248,38 +251,46 @@ const GlobalActions = () => {
         setShowClearConfirm(false);
     };
 
+    // Hidden file input ref
+    const fileInputRef = React.useRef(null);
+    const triggerImport = () => fileInputRef.current?.click();
+
     if (!currentProject) return null;
 
     return (
         <div className={styles.container}>
-            {/* Project Management */}
-            <label className={styles.secondaryBtn} title="Import a previously saved project .gwall file">
-                Import Project
-                <input type="file" accept=".gwall" onChange={handleProjectImport} style={{ display: 'none' }} />
-            </label>
-            <button className={styles.secondaryBtn} onClick={handleProjectExport} title="Save project bundle (.gwall) including photos">
-                Export Project
-            </button>
+            {/* Project Menu */}
+            <DropdownMenu
+                label="Project"
+                icon={<FolderOpen size={16} />}
+                items={[
+                    { label: 'Import Project (.gwall)', onClick: triggerImport },
+                    { label: 'Export Project (.gwall)', onClick: handleProjectExport },
+                    { separator: true },
+                    { label: 'Reset / Clear Canvas', onClick: handleClearCanvas, danger: true }
+                ]}
+            />
+            {/* Hidden Input for Import */}
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept=".gwall"
+                onChange={handleProjectImport}
+                style={{ display: 'none' }}
+            />
 
-            <div className={styles.divider} />
+            {/* Export Menu */}
+            <DropdownMenu
+                label="Export"
+                icon={<Download size={16} />}
+                items={[
+                    { label: 'Save Image (PNG)', onClick: handleExport },
+                    { label: 'Shopping List (.txt)', onClick: handleShoppingListExport },
+                    { label: 'Export Photos (.zip)', onClick: handlePhotoExport }
+                ]}
+            />
 
-            {/* RESET */}
-            <button className={`${styles.secondaryBtn} ${styles.removeAction}`} onClick={handleClearCanvas} title="Remove all frames from the canvas">
-                Reset Project
-            </button>
-
-            <div className={styles.divider} />
-
-            {/* Outputs */}
-            <button className={styles.btn} onClick={handleExport} disabled={isBusy} title="Download a PNG image of your gallery wall">
-                {isExportingPNG ? 'Saving PNG...' : 'Save PNG'}
-            </button>
-            <button className={styles.secondaryBtn} onClick={handleShoppingListExport} title="Download a text list of frames and sizes">
-                Shopping List
-            </button>
-            <button className={styles.secondaryBtn} onClick={handlePhotoExport} disabled={isBusy} title="Export high-res cropped photos for printing">
-                {isExportingPhotos ? 'Exporting...' : 'Export Photos'}
-            </button>
+            <div style={{ flex: 1 }} />
 
             {isBusy && (
                 <FullScreenOverlay>
@@ -316,7 +327,15 @@ const GlobalActions = () => {
 
             <button className={styles.helpBtn} onClick={() => setShowHelp(true)} title="Show Help Guide">?</button>
 
-            {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+            <div className={styles.divider} />
+
+            <button
+                onClick={toggleRightSidebar}
+                className={styles.iconBtn}
+                title={isRightSidebarOpen ? "Collapse Properties Panel" : "Expand Properties Panel"}
+            >
+                {isRightSidebarOpen ? <PanelRightClose size={20} /> : <PanelRightOpen size={20} />}
+            </button>
         </div>
     );
 };

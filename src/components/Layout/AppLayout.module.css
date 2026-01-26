@@ -30,6 +30,7 @@
     background-color: var(--bg-panel);
     border-right: 1px solid var(--border-color);
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 5;
     position: relative;
     padding: var(--spacing-md) 0;
@@ -37,25 +38,15 @@
 
 .resizeHandle {
     grid-area: left;
-    /* Overlay on right edge of left area? Or act as separator? */
-    /* Actually, easier to just position: absolute relative to container based on width? */
-    /* Or we can make it a grid item if we change template? No. */
-
-    /* Best approach: Position absolute on the right edge of the sidebar column */
     position: absolute;
     top: var(--header-height);
     bottom: 0;
-    left: var(--sidebar-width, 250px);
+    left: var(--sidebar-width);
     width: 8px;
-    /* Slightly wider */
     background-color: transparent;
-    /* Invisible until hover usually, but let's make it hinty? */
     border-right: 1px solid transparent;
-    /* Or make it sit on the line */
-    /* Hit area */
     cursor: col-resize;
     z-index: 20;
-    /* Visual indicator on hover */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -64,7 +55,6 @@
 .resizeHandle:hover {
     background-color: rgba(0, 122, 255, 0.1);
     box-shadow: inset 1px 0 0 0 rgba(0, 122, 255, 0.5);
-    /* Line */
 }
 
 .resizeHandle:active {
@@ -76,7 +66,6 @@
     background-color: var(--bg-canvas);
     position: relative;
     overflow: hidden;
-    /* Canvas handles its own pan/zoom */
 }
 
 .rightSidebar {
@@ -84,6 +73,7 @@
     background-color: var(--bg-panel);
     border-left: 1px solid var(--border-color);
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 5;
     padding: var(--spacing-md) 0;
 }

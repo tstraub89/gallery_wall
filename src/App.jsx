@@ -1,5 +1,6 @@
 import React from 'react';
 import { ProjectProvider } from './context/ProjectContext';
+import { LayoutProvider } from './context/LayoutContext';
 import { AppLayout, Header, LeftSidebar, MainCanvas, RightSidebar } from './components/Layout/AppLayout';
 import FrameLibrary from './components/Library/FrameLibrary';
 import CanvasWorkspace from './components/Canvas/CanvasWorkspace';
@@ -22,24 +23,26 @@ function App() {
 
   return (
     <ProjectProvider>
-      <AppLayout>
-        <Header>
-          <Logo />
-          <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-            <ProjectMenu />
-            <GlobalActions />
-          </div>
-        </Header>
-        <LeftSidebar>
-          <FrameLibrary />
-        </LeftSidebar>
-        <MainCanvas>
-          <CanvasWorkspace />
-        </MainCanvas>
-        <RightSidebar>
-          <PropertiesPanel />
-        </RightSidebar>
-      </AppLayout>
+      <LayoutProvider>
+        <AppLayout>
+          <Header>
+            <Logo />
+            <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+              <ProjectMenu />
+              <GlobalActions />
+            </div>
+          </Header>
+          <LeftSidebar>
+            <FrameLibrary />
+          </LeftSidebar>
+          <MainCanvas>
+            <CanvasWorkspace />
+          </MainCanvas>
+          <RightSidebar>
+            <PropertiesPanel />
+          </RightSidebar>
+        </AppLayout>
+      </LayoutProvider>
     </ProjectProvider>
   );
 }

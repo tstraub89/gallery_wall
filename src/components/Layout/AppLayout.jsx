@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import styles from './AppLayout.module.css';
 
+import { useLayout } from '../../context/LayoutContext';
+
 export const AppLayout = ({ children }) => {
-    const [sidebarWidth, setSidebarWidth] = useState(250);
     const [isResizing, setIsResizing] = useState(false);
+    const { isLeftSidebarOpen, isRightSidebarOpen, sidebarWidth, setSidebarWidth } = useLayout();
 
     useEffect(() => {
         const handleMouseMove = (e) => {
@@ -34,22 +36,21 @@ export const AppLayout = ({ children }) => {
     return (
         <div
             className={styles.container}
-            style={{ '--sidebar-width': `${sidebarWidth}px` }}
+            style={{
+                '--sidebar-width': isLeftSidebarOpen ? `${sidebarWidth}px` : '0px',
+                '--properties-width': isRightSidebarOpen ? '300px' : '0px'
+            }}
         >
             {children}
-            {/* Drag Handle overlaid or inserted? 
-                The grid layout expects specific children. 
-                We can insert the handle as a child, but we need to position it correctly.
-                Actually, dragging the border of the sidebar is better.
-                Let's pass the resize handle capability to the Sidebar or position absolute?
-            */}
-            <div
-                className={styles.resizeHandle}
-                onMouseDown={(e) => {
-                    e.preventDefault();
-                    setIsResizing(true);
-                }}
-            />
+            {isLeftSidebarOpen && (
+                <div
+                    className={styles.resizeHandle}
+                    onMouseDown={(e) => {
+                        e.preventDefault();
+                        setIsResizing(true);
+                    }}
+                />
+            )}
         </div>
     );
 };

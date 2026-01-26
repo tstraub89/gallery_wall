@@ -1,0 +1,72 @@
+.container {
+    position: relative;
+}
+
+.trigger {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.trigger:hover,
+.trigger.open {
+    background: #e5e5e7;
+    color: var(--text-primary);
+}
+
+.chevron {
+    font-size: 10px;
+    opacity: 0.6;
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    min-width: 200px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    z-index: 200;
+    padding: 4px 0;
+}
+
+.item {
+    padding: 8px 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary);
+    font-size: 13px;
+    transition: background 0.1s;
+}
+
+.item:hover {
+    background: var(--bg-app);
+}
+
+.item.danger {
+    color: #ff3b30;
+}
+
+.item.danger:hover {
+    background: #fff1f0;
+}
+
+.separator {
+    height: 1px;
+    background: var(--border-color);
+    margin: 4px 0;
+}

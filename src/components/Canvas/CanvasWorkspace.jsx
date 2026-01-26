@@ -11,9 +11,15 @@ import { useCanvasViewport } from '../../hooks/useCanvasViewport';
 import { useCanvasInteraction } from '../../hooks/useCanvasInteraction';
 import { useCanvasShortcuts } from '../../hooks/useCanvasShortcuts';
 
+import { useLayout } from '../../context/LayoutContext';
+
 const CanvasWorkspace = () => {
     const { currentProject, updateProject, selectFrame, selectedFrameIds, setSelection, addImageToLibrary, undo, redo, focusedArea, setFocusedArea, setSelectedImages } = useProject();
     const containerRef = useRef(null);
+
+    // Layout Context for stationary canvas
+    const { isLeftSidebarOpen, sidebarWidth } = useLayout();
+    const prevIsLeftSidebarOpen = useRef(isLeftSidebarOpen);
 
     // Grid State
     const [showGrid, setShowGrid] = useState(true);
@@ -21,6 +27,21 @@ const CanvasWorkspace = () => {
 
     // Viewport Hook
     const { scale, setScale, pan, setPan } = useCanvasViewport(containerRef);
+
+    // Counter-act sidebar movement
+    React.useLayoutEffect(() => {
+        if (prevIsLeftSidebarOpen.current !== isLeftSidebarOpen) {
+            // Sidebar CHANGED
+            if (isLeftSidebarOpen) {
+                // Opening: Sidebar pushes content right, so we pan LEFT (-) to keep it in place visually
+                setPan(p => ({ ...p, x: p.x - sidebarWidth }));
+            } else {
+                // Closing: Sidebar removal pulls content left, so we pan RIGHT (+)
+                setPan(p => ({ ...p, x: p.x + sidebarWidth }));
+            }
+            prevIsLeftSidebarOpen.current = isLeftSidebarOpen;
+        }
+    }, [isLeftSidebarOpen, sidebarWidth, setPan]);
 
     // Helper: Snap (used for rendering visual feedback, passing to interactions handled inside hook but also here if needed?)
     // Actually interaction hook handles snapping for drag. logic duplicated? 
@@ -220,8 +241,20 @@ const CanvasWorkspace = () => {
                 <span>{Math.round(scale * 100)}%</span>
                 <button onClick={() => setScale(s => Math.min(5, Math.round((s + 0.1) * 10) / 10))} title="Zoom In">+</button>
                 <div className={styles.separator} />
-                <button onClick={() => setShowGrid(s => !s)} style={{ background: showGrid ? 'rgba(0,122,255,0.6)' : undefined }}>#</button>
-                <button onClick={() => setSnapToGrid(s => !s)} style={{ background: snapToGrid ? 'rgba(0,122,255,0.6)' : undefined }}>S</button>
+                <button
+                    onClick={() => setShowGrid(s => !s)}
+                    className={showGrid ? styles.active : ''}
+                    title="Toggle Grid"
+                >
+                    #
+                </button>
+                <button
+                    onClick={() => setSnapToGrid(s => !s)}
+                    className={snapToGrid ? styles.active : ''}
+                    title="Toggle Snap"
+                >
+                    S
+                </button>
             </div>
             {isMarquee && marqueeRect && (
                 <div
