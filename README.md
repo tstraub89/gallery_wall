@@ -11,46 +11,44 @@ A powerful, interactive web application designed to help you plan complex galler
 ## 🚀 Key Highlights
 
 *   **Precision Layout Canvas**: An infinite workspace with pan, zoom, and smart snapping tools (`S`, `#`) for pixel-perfect alignment.
-*   **Inventory First Workflow**: Keep track of your physical frames. Even if you remove a frame from the wall, it stays in your "Unplaced" library for later use.
-*   **Instant Visualization**: Drag and drop photos from your computer directly onto frames to see your memories in situ.
-*   **Intelligent Import**: Quickly build your library by pasting a list of dimensions (e.g., "8x10", "11 1/4 x 14"). The app handles fractions and matting automatically.
-*   **Print-Ready Photo Export**: preparing your gallery for reality? Export all your cropped, high-resolution photos in a single ZIP, ready for printing.
-*   **Template Support**: Switch between standard flat walls and specialized staircase configurations (ascending/descending).
-*   **Circular & Oval Shapes**: Design beyond rectangles with full support for round frames and matted cutouts.
-*   **Frame Color & Content**: Personalize frames with custom colors (presets or picker) and add labels (e.g., "Light Switch") for easy identification.
-*   **Direct Dimension Control**: Resize frames directly on the canvas using editable width/height inputs, automatically updating your library inventory.
+*   **Adaptive Grid Inventory**: A smart sidebar that shifts between list and grid views, featuring "Placed" status overlays on frame previews.
+*   **Tabbed Properties Panel**: Organized controls for **Frame** (size, color, matting) and **Photo** (crop, zoom, rotate) to maximize efficiency.
+*   **Intelligent Search & Filter**: Instantly find frames by label or size (e.g., "8x10") and photos by filename. Filter collections by shape or status.
+*   **Dynamic Text Scaling**: Frame labels and dimensions automatically scale to fit their container, ensuring readability on any frame size.
+*   **Portable Project Bundles**: Save your entire workspace—including photos—into a single `.gwall` file for easy sharing or backup.
+*   **Print-Ready Photo Export**: preparing your gallery for reality? Export all your cropped photos in a high-resolution ZIP (with smart DPI capping), ready for professional printing.
+*   **Modern Glass HUD**: Sleek, translucent on-canvas controls for zoom, grid toggles, and snapping that maximize workspace visibility.
 
 ---
 
 ## 🛠️ Detailed Features
 
 ### 🖼️ Inventory & Frame Management
-*   **1:1 Inventory Manifest**: Every frame is accounted for individually in the sidebar with "Placed" and "(Duplicated)" status indicators.
-*   **Manual & Batch Addition**: Add custom frames with specific internal openings (matting) or import an entire collection via text.
-*   **Smart Parsing**: Comprehensive handling of fractions (e.g., "11 1/4"), automatic detection of matted openings, and keyword support for "round" or "oval" frames.
-*   **Intelligent Default Matting**: Automatically adds a 1-inch mat border when the "matted" keyword is present without specific dimensions.
-*   **Geometric Variety**: Choose between traditional rectangular frames and modern round/oval shapes with automatic proportional scaling.
-*   **Color & Aesthetics**: Set frame colors using presets or a color picker; changes sync automatically back to your library.
-*   **Dynamic Matting**: Toggle and adjust matting openings on the fly for any frame in your design.
+*   **1:1 Inventory Manifest**: Every frame is accounted for individually with "Placed" and "(Duplicated)" indicators.
+*   **Smart Parsing & Import**: Batch import dimensions from plain text (e.g., "8x10", "11 1/4 x 14 matted"). Handles fractions and keywords automatically.
+*   **Custom Labels**: Name your frames (e.g., "Light Switch", "Aunt Marie") directly. Labels sync between library and canvas.
+*   **Geometric Variety**: Full support for traditional rectangles and modern round/oval shapes with automatic proportional scaling.
+*   **Aesthetics**: Set frame colors using presets or a color picker; toggle and adjust matting openings on the fly.
+*   **Direct Dimension Control**: Resize frames directly in the Properties Panel; changes update the wall and inventory dynamically.
+*   **Additive Layout Logic**: Adding borders or mats grows the frame *outward*, ensuring your internal photo dimensions and scaling remain exactly as intended.
 
 ### 📸 Photo Management
-*   **Batch Upload**: Add multiple photos at once and view them in a beautiful masonry grid.
-*   **Multi-Select**: Manage your library efficiently with `Ctrl / Cmd + Click` selection.
-*   **Smart Integration**: Drag files directly from your computer onto a canvas frame to place them and auto-save them to your library simultaneously.
-*   **Robust Drag-and-Drop**: Global safeguards prevent accidental browser navigations when dropping photos.
+*   **Masonry Library**: A beautiful, efficient grid for managing your uploaded photos.
+*   **Smart Integration**: Drag files directly from your computer onto a canvas frame to place them and auto-save them to your library.
+*   **Photo Fine-Tuning**: Dedicated adjustment tab for scale, position, and 90° rotation within the frame.
+*   **Search**: Find photos by filename instantly as your library grows.
 
 ### 🎨 Workspace Interaction
-*   **Marquee Selection**: Bulk-select frames by dragging on the background.
-*   **Context Menu**: Right-click for quick access to Layering (Bring to Front), Duplication, and Photo removal.
-*   **Advanced Alignment**: One-click tools to align selected frames by edges or centers.
-*   **Frame Rotation**: Instantly rotate any frame 90° (swapping width/height) with a single click. Smart matting adjustments included.
-*   **Undo / Redo**: Full history support with `Ctrl+Z` / `Ctrl+Y`.
+*   **Marquee Selection**: Bulk-select, nudge, or duplicate clusters of frames by dragging on the background.
+*   **Context Menu**: Right-click for layering (Bring to Front), duplication, and photo removal.
+*   **Advanced Alignment**: Use **Lucide-React** standard icons to align frames by edges or centers.
+*   **Undo / Redo**: Full session history support via `Ctrl+Z` / `Ctrl+Y`.
+*   **Automatic Persistence**: Your progress is instantly saved to local storage—refresh or return later exactly where you left off.
 
 ### 💾 Project Controls
-*   **Shopping List**: Export a text manifest of all frames in your design for easy shopping or assembly.
-*   **Photo Export**: Generate a ZIP file of all your photos, cropped to their exact visible area (with 1/8" bleed) for high-quality printing.
-*   **Multi-Project Support**: Create and switch between distinct gallery wall designs.
+*   **Shopping List**: Export a text manifest of all frames in your design for easy shopping.
 *   **Canvas Snapshot**: Save your layout as a PNG to share or use as a reference.
+*   **Multi-Project Support**: Create and switch between distinct gallery wall designs.
 
 ---
 
@@ -85,4 +83,6 @@ Click the **"?"** button in the header for the in-app **Quick Start Guide**.
 > [!TIP]
 > You can load [example_staircase.gwall](./example_staircase.gwall) to try out the tool with a preconfigured gallery wall layout. You can also check [example_frame_template.txt](./example_frame_template.txt) to see how to format your own frame collection for batch importing.
 
-**Tech Stack**: Built with React (Vite), CSS Modules, and IndexedDB for persistent local storage.
+**Tech Stack**: Built with React 19 (Vite), CSS Modules, and IndexedDB for persistent local storage.
+
+© 2026 Timothy Straub. All Rights Reserved.
