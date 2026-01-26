@@ -76,6 +76,7 @@ const FrameLibrary = () => {
 
             <div className={styles.footer}>
                 <span>Gallery Planner v{pkg.version}</span>
+                <span style={{ marginTop: '2px', fontSize: '9px', opacity: 0.5 }}>© 2026 Timothy Straub</span>
             </div>
         </div>
     );

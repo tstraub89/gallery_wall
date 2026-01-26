@@ -65,6 +65,9 @@
     text-align: center;
     border-top: 1px solid var(--border-color);
     background: rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .footer span {
