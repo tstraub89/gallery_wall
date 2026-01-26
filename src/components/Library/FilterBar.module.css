@@ -1,0 +1,138 @@
+.container {
+    padding: 0 var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.searchRow {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.searchWrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 8px;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 6px 8px 6px 30px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    font-size: 13px;
+    transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.controls {
+    display: flex;
+    gap: 4px;
+}
+
+.dropdownWrapper {
+    position: relative;
+}
+
+.iconBtn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.iconBtn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+}
+
+.iconBtn.active {
+    background: rgba(0, 122, 255, 0.1);
+    color: var(--accent-color);
+    border-color: rgba(0, 122, 255, 0.2);
+}
+
+.dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    min-width: 160px;
+    z-index: 100;
+    overflow: hidden;
+    animation: fadeIn 0.1s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdownHeader {
+    padding: 8px 12px;
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.dropdownItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    text-align: left;
+    font-size: 13px;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.dropdownItem:hover {
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.dropdownItem.selected {
+    color: var(--accent-color);
+    font-weight: 500;
+}
+
+.dropdownItem input[type="checkbox"] {
+    margin-left: 8px;
+}

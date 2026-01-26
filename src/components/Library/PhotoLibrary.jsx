@@ -1,10 +1,11 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 import { useProject } from '../../context/ProjectContext';
-import { saveImage } from '../../utils/imageStore';
+import { saveImage, getImageMetadata, migrateLegacyImages } from '../../utils/imageStore';
 import { useImage } from '../../hooks/useImage';
 import { v4 as uuidv4 } from 'uuid';
 import styles from './PhotoLibrary.module.css';
 import DeleteConfirmDialog from './DeleteConfirmDialog';
+import FilterBar from './FilterBar';
 
 const PhotoItem = ({ imageId, isUsed, isSelected, onSelect }) => {
     const { url, status } = useImage(imageId);
@@ -36,7 +37,7 @@ const PhotoItem = ({ imageId, isUsed, isSelected, onSelect }) => {
     if (status === 'not-found' || status === 'error') {
         return (
             <div
-                className={`${styles.photoItem} ${styles.notFound} ${isSelected ? styles.selected : ''}`}
+                className={`${styles.photoItem} ${styles.notFound} ${isSelected ? styles.selected : ''} `}
                 onClick={handleClick}
                 title="Photo not found - click to select for deletion"
             >
@@ -51,7 +52,7 @@ const PhotoItem = ({ imageId, isUsed, isSelected, onSelect }) => {
 
     return (
         <div
-            className={`${styles.photoItem} ${isUsed ? styles.used : ''} ${isSelected ? styles.selected : ''}`}
+            className={`${styles.photoItem} ${isUsed ? styles.used : ''} ${isSelected ? styles.selected : ''} `}
             draggable
             onDragStart={handleDragStart}
             onClick={handleClick}
@@ -72,6 +73,33 @@ const PhotoLibrary = () => {
     // Delete confirmation dialog
     const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
 
+    // Filter State
+    const [searchTerm, setSearchTerm] = useState(''); // Not used yet but needed for prop
+    const [activeFilters, setActiveFilters] = useState({});
+    const [sortBy, setSortBy] = useState('newest');
+
+    // Metadata Cache
+    const [metadata, setMetadata] = useState({});
+
+    // 1. Run Migration & Fetch Metadata on Mount / Project Change
+    useEffect(() => {
+        if (!currentProject) return;
+
+        const init = async () => {
+            // Run migration silently
+            await migrateLegacyImages();
+
+            // Fetch all metadata
+            const ids = currentProject.images || [];
+            if (ids.length > 0) {
+                const meta = await getImageMetadata(ids);
+                setMetadata(prev => ({ ...prev, ...meta })); // Merge
+            }
+        };
+        init();
+    }, [currentProject?.id, currentProject?.images?.length]);
+
+
     const handleFileChange = async (e) => {
         const files = Array.from(e.target.files);
         if (files.length === 0) return;
@@ -79,7 +107,17 @@ const PhotoLibrary = () => {
         for (const file of files) {
             try {
                 const imageId = uuidv4();
-                await saveImage(imageId, file);
+                const result = await saveImage(imageId, file);
+                // Result contains metadata, update cache immediately
+                setMetadata(prev => ({
+                    ...prev,
+                    [imageId]: {
+                        width: result.width,
+                        height: result.height,
+                        aspectRatio: result.aspectRatio,
+                        name: result.name
+                    }
+                }));
                 addImageToLibrary(currentProject.id, imageId);
             } catch (err) {
                 console.error("Failed to add image to library", err);
@@ -95,7 +133,8 @@ const PhotoLibrary = () => {
         selectFrame(null);
         setFocusedArea('library');
 
-        const images = currentProject.images || [];
+        // Use PROCESSED list for index finding to ensure consistent range select
+        const images = processedImages;
         const clickedIndex = images.indexOf(imageId);
 
         if (e.ctrlKey || e.metaKey) {
@@ -108,7 +147,7 @@ const PhotoLibrary = () => {
             // Update anchor to this item
             setAnchorIndex(clickedIndex);
         } else if (e.shiftKey && anchorIndex !== null) {
-            // Range select: select all between anchor and clicked
+            // Range select
             const start = Math.min(anchorIndex, clickedIndex);
             const end = Math.max(anchorIndex, clickedIndex);
             const rangeIds = images.slice(start, end + 1);
@@ -211,7 +250,16 @@ const PhotoLibrary = () => {
             if (!file.type.startsWith('image/')) continue;
             try {
                 const imageId = uuidv4();
-                await saveImage(imageId, file);
+                const result = await saveImage(imageId, file);
+                setMetadata(prev => ({
+                    ...prev,
+                    [imageId]: {
+                        width: result.width,
+                        height: result.height,
+                        aspectRatio: result.aspectRatio,
+                        name: result.name
+                    }
+                }));
                 addImageToLibrary(currentProject.id, imageId);
             } catch (err) {
                 console.error("Failed to add dropped image to library", err);
@@ -225,6 +273,84 @@ const PhotoLibrary = () => {
         e.dataTransfer.dropEffect = 'copy';
     };
 
+    // --- Filtering Logic ---
+    const processedImages = useMemo(() => {
+        if (!currentProject?.images) return [];
+        let result = [...currentProject.images];
+        const usedSet = getUsedImageIds();
+
+        // 1. Search
+        if (searchTerm) {
+            const lower = searchTerm.toLowerCase();
+            result = result.filter(id => {
+                const m = metadata[id];
+                return m && m.name && m.name.toLowerCase().includes(lower);
+            });
+        }
+
+        // 2. Filter
+        if (activeFilters.unused) {
+            result = result.filter(id => !usedSet.has(id));
+        }
+        if (activeFilters.used) {
+            result = result.filter(id => usedSet.has(id));
+        }
+
+        if (activeFilters.portrait) {
+            result = result.filter(id => {
+                const m = metadata[id];
+                return m && m.height > m.width;
+            });
+        }
+        if (activeFilters.landscape) {
+            result = result.filter(id => {
+                const m = metadata[id];
+                return m && m.width > m.height;
+            });
+        }
+        if (activeFilters.square) {
+            result = result.filter(id => {
+                const m = metadata[id];
+                return m && Math.abs(m.width - m.height) < 1; // Tolerance for floating point or near-square
+            });
+        }
+
+        // 3. Sort
+        // "Newest" is default storage order (ProjectContext prepends images: [New...Old])
+        // So for "Newest" we do nothing.
+        // For "Oldest" we reverse.
+        if (sortBy === 'oldest') {
+            result.reverse();
+        }
+
+        return result;
+
+    }, [currentProject?.images, metadata, activeFilters, sortBy, searchTerm]);
+
+    const handleFilterChange = (key, val) => {
+        const newFilters = { ...activeFilters, [key]: val };
+
+        // Mutually exclusive logic
+        if (key === 'portrait' && val) {
+            newFilters.landscape = false;
+            newFilters.square = false;
+        }
+        if (key === 'landscape' && val) {
+            newFilters.portrait = false;
+            newFilters.square = false;
+        }
+        if (key === 'square' && val) {
+            newFilters.portrait = false;
+            newFilters.landscape = false;
+        }
+
+        if (key === 'used' && val) newFilters.unused = false;
+        if (key === 'unused' && val) newFilters.used = false;
+
+        setActiveFilters(newFilters);
+    };
+
+
     if (!currentProject) return null;
 
     // Determine usage
@@ -237,6 +363,30 @@ const PhotoLibrary = () => {
             onDrop={handleDrop}
             onDragOver={handleDragOver}
         >
+            <div className={styles.filterRow}>
+                <FilterBar
+                    searchTerm={searchTerm}
+                    onSearchChange={setSearchTerm}
+                    showSearch={true}
+                    placeholder="Search filename..."
+                    sortOptions={[
+                        { value: 'newest', label: 'Newest' },
+                        { value: 'oldest', label: 'Oldest' }
+                    ]}
+                    currentSort={sortBy}
+                    onSortChange={setSortBy}
+                    filterOptions={[
+                        { key: 'unused', label: 'Unused Only' },
+                        { key: 'used', label: 'Used Only' },
+                        { key: 'portrait', label: 'Portrait' },
+                        { key: 'landscape', label: 'Landscape' },
+                        { key: 'square', label: 'Square' }
+                    ]}
+                    activeFilters={activeFilters}
+                    onFilterChange={handleFilterChange}
+                />
+            </div>
+
             <div className={styles.actions}>
                 <div className={styles.btnRow}>
                     <button
@@ -267,8 +417,8 @@ const PhotoLibrary = () => {
 
             <div className={styles.scrollWrapper}>
                 <div className={styles.masonryGrid}>
-                    {currentProject.images && currentProject.images.length > 0 ? (
-                        currentProject.images.map(imageId => (
+                    {processedImages.length > 0 ? (
+                        processedImages.map(imageId => (
                             <PhotoItem
                                 key={imageId}
                                 imageId={imageId}
@@ -279,7 +429,7 @@ const PhotoLibrary = () => {
                         ))
                     ) : (
                         <div className={styles.emptyState}>
-                            No photos yet. Click "Add Photos" or drag them here to start.
+                            {currentProject.images.length === 0 ? "No photos yet." : "No matching photos."}
                         </div>
                     )}
                 </div>
