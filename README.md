@@ -11,26 +11,25 @@ A powerful, interactive web application designed to help you plan complex galler
 ## 🚀 Key Highlights
 
 *   **Precision Layout Canvas**: An infinite workspace with pan, zoom, and smart snapping tools (`S`, `#`) for pixel-perfect alignment.
-*   **Adaptive Grid Inventory**: A smart sidebar that shifts between list and grid views, featuring "Placed" status overlays on frame previews.
-*   **Tabbed Properties Panel**: Organized controls for **Frame** (size, color, matting) and **Photo** (crop, zoom, rotate) to maximize efficiency.
-*   **Intelligent Search & Filter**: Instantly find frames by label or size (e.g., "8x10") and photos by filename. Filter collections by shape or status.
-*   **Dynamic Text Scaling**: Frame labels and dimensions automatically scale to fit their container, ensuring readability on any frame size.
+*   **Instant Visualization**: Drag and drop photos from your computer directly onto frames to see your memories in situ.
 *   **Portable Project Bundles**: Save your entire workspace—including photos—into a single `.gwall` file for easy sharing or backup.
 *   **Print-Ready Photo Export**: preparing your gallery for reality? Export all your cropped photos in a high-resolution ZIP (with smart DPI capping), ready for professional printing.
-*   **Modern Glass HUD**: Sleek, translucent on-canvas controls for zoom, grid toggles, and snapping that maximize workspace visibility.
+*   **Intelligent Search & Filter**: Instantly find frames by label or size (e.g., "8x10") and photos by filename. Filter collections by shape or status.
+*   **Inventory First Workflow**: Keep track of your physical frames. Even if you remove a frame from the wall, it stays in your "Unplaced" library for later use.
 
 ---
 
 ## 🛠️ Detailed Features
 
 ### 🖼️ Inventory & Frame Management
+*   **Adaptive Grid Inventory**: A smart sidebar that shifts between list and grid views, featuring "Placed" status overlays on frame previews.
 *   **1:1 Inventory Manifest**: Every frame is accounted for individually with "Placed" and "(Duplicated)" indicators.
 *   **Smart Parsing & Import**: Batch import dimensions from plain text (e.g., "8x10", "11 1/4 x 14 matted"). Handles fractions and keywords automatically.
-*   **Custom Labels**: Name your frames (e.g., "Light Switch", "Aunt Marie") directly. Labels sync between library and canvas.
+*   **Custom Labels & Scaling**: Name your frames (e.g., "Light Switch") directly. Labels automatically scale to fit their container for maximum readability.
 *   **Geometric Variety**: Full support for traditional rectangles and modern round/oval shapes with automatic proportional scaling.
 *   **Aesthetics**: Set frame colors using presets or a color picker; toggle and adjust matting openings on the fly.
-*   **Direct Dimension Control**: Resize frames directly in the Properties Panel; changes update the wall and inventory dynamically.
-*   **Additive Layout Logic**: Adding borders or mats grows the frame *outward*, ensuring your internal photo dimensions and scaling remain exactly as intended.
+*   **Direct Dimension Control**: Resize frames directly in a tabbed **Properties Panel**; changes update the wall and inventory dynamically.
+*   **Additive Layout Logic**: Adding borders or mats grows the frame *outward*, ensuring your internal photo dimensions remain exactly as intended.
 
 ### 📸 Photo Management
 *   **Masonry Library**: A beautiful, efficient grid for managing your uploaded photos.
@@ -39,6 +38,7 @@ A powerful, interactive web application designed to help you plan complex galler
 *   **Search**: Find photos by filename instantly as your library grows.
 
 ### 🎨 Workspace Interaction
+*   **Modern Glass HUD**: Sleek, translucent on-canvas controls for zoom, grid toggles, and snapping that maximize workspace visibility.
 *   **Marquee Selection**: Bulk-select, nudge, or duplicate clusters of frames by dragging on the background.
 *   **Context Menu**: Right-click for layering (Bring to Front), duplication, and photo removal.
 *   **Advanced Alignment**: Use **Lucide-React** standard icons to align frames by edges or centers.
