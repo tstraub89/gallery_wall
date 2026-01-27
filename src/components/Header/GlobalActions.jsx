@@ -327,6 +327,8 @@ const GlobalActions = () => {
 
             <button className={styles.helpBtn} onClick={() => setShowHelp(true)} title="Show Help Guide">?</button>
 
+            {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+
             <div className={styles.divider} />
 
             <button
