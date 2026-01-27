@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
-
-const LayoutContext = createContext();
+import React, { useState } from 'react';
+import { LayoutContext } from './LayoutContextCore';
 
 export const LayoutProvider = ({ children }) => {
     const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
@@ -26,12 +25,4 @@ export const LayoutProvider = ({ children }) => {
             {children}
         </LayoutContext.Provider>
     );
-};
-
-export const useLayout = () => {
-    const context = useContext(LayoutContext);
-    if (context === undefined) {
-        throw new Error('useLayout must be used within a LayoutProvider');
-    }
-    return context;
 };

@@ -1,8 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { useProject } from '../../context/ProjectContext';
 import styles from './FrameList.module.css';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import FilterBar from './FilterBar';
+
+const EMPTY_ARRAY = [];
 
 const FrameList = () => {
     const { currentProject, setSelection, removeFromLibrary } = useProject();
@@ -13,15 +15,11 @@ const FrameList = () => {
     const [activeFilters, setActiveFilters] = useState({}); // { unplaced: true, portrait: false, etc }
     const [sortBy, setSortBy] = useState('newest'); // 'newest', 'area', 'width'
 
-    if (!currentProject) {
-        return <div className={styles.empty}>Select or create a project to view frames.</div>;
-    }
-
-    const templates = currentProject.library || [];
-    const instances = currentProject.frames || [];
+    const templates = currentProject?.library || EMPTY_ARRAY;
+    const instances = currentProject?.frames || EMPTY_ARRAY;
 
     // --- Filtering & Sorting Logic ---
-    const processedTemplates = useMemo(() => {
+    const calculateProcessedTemplates = () => {
         let result = [...templates];
 
         // 1. Search
@@ -86,7 +84,13 @@ const FrameList = () => {
         }
 
         return result;
-    }, [templates, instances, searchTerm, activeFilters, sortBy]);
+    };
+
+    const processedTemplates = calculateProcessedTemplates();
+
+    if (!currentProject) {
+        return <div className={styles.empty}>Select or create a project to view frames.</div>;
+    }
 
     const handleFrameClick = (id, isInstance = false) => {
         if (isInstance) {

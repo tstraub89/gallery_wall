@@ -13,6 +13,15 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
         currentProject.frames.filter(f => selectedFrameIds.includes(f.id)),
         [currentProject.frames, selectedFrameIds]);
 
+    const [activeTab, setActiveTab] = React.useState('frame');
+
+    // Force switch to frame tab if multiple selection (since we don't support multi-photo edit yet)
+    React.useEffect(() => {
+        if (selectedFrames.length > 1) {
+            setActiveTab('frame');
+        }
+    }, [selectedFrames.length]);
+
     // CRITICAL SAFETY: If we have IDs but no matching frames found (e.g. just deleted)
     if (selectedFrames.length === 0) {
         return <div className={styles.empty}>No frames selected</div>;
@@ -177,15 +186,6 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
             library: updatedLibrary
         });
     };
-
-    const [activeTab, setActiveTab] = React.useState('frame');
-
-    // Force switch to frame tab if multiple selection (since we don't support multi-photo edit yet)
-    React.useEffect(() => {
-        if (selectedFrames.length > 1) {
-            setActiveTab('frame');
-        }
-    }, [selectedFrames.length]);
 
     const isPhotoTabDisabled = selectedFrames.length > 1;
 

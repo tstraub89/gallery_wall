@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styles from './AppLayout.module.css';
 
-import { useLayout } from '../../context/LayoutContext';
+import { useLayout } from '../../hooks/useLayout';
 
 export const AppLayout = ({ children }) => {
     const [isResizing, setIsResizing] = useState(false);
@@ -31,7 +31,7 @@ export const AppLayout = ({ children }) => {
             window.removeEventListener('mousemove', handleMouseMove);
             window.removeEventListener('mouseup', handleMouseUp);
         };
-    }, [isResizing]);
+    }, [isResizing, setSidebarWidth]);
 
     return (
         <div

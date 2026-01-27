@@ -3,7 +3,7 @@ import { useProject } from '../../context/ProjectContext';
 import styles from './ProjectMenu.module.css';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import { PanelLeftOpen, PanelLeftClose } from 'lucide-react';
-import { useLayout } from '../../context/LayoutContext';
+import { useLayout } from '../../hooks/useLayout';
 
 const ProjectMenu = () => {
     const {

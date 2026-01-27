@@ -11,7 +11,7 @@ import { useCanvasViewport } from '../../hooks/useCanvasViewport';
 import { useCanvasInteraction } from '../../hooks/useCanvasInteraction';
 import { useCanvasShortcuts } from '../../hooks/useCanvasShortcuts';
 
-import { useLayout } from '../../context/LayoutContext';
+import { useLayout } from '../../hooks/useLayout';
 
 const CanvasWorkspace = () => {
     const { currentProject, updateProject, selectFrame, selectedFrameIds, setSelection, addImageToLibrary, undo, redo, focusedArea, setFocusedArea, setSelectedImages } = useProject();

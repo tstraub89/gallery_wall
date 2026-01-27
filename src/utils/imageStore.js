@@ -43,7 +43,7 @@ export const saveImage = async (id, blob) => {
     let metadata = { width: 0, height: 0, aspectRatio: 1 };
     try {
         metadata = await getImageDimensions(blob);
-    } catch (e) {
+    } catch {
         console.warn("Could not calculate dimensions for image", id);
     }
 

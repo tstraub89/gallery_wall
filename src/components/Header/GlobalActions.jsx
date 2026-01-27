@@ -11,7 +11,7 @@ import { generateProjectZip, exportProjectBundle, importProjectBundle } from '..
 import { saveImage } from '../../utils/imageStore';
 import { v4 as uuidv4 } from 'uuid';
 import { Github, PanelRightOpen, PanelRightClose, FolderOpen, Download } from 'lucide-react';
-import { useLayout } from '../../context/LayoutContext';
+import { useLayout } from '../../hooks/useLayout';
 
 // Helper to convert blob URL or external URL to base64
 const blobToBase64 = (url) => new Promise((resolve, reject) => {

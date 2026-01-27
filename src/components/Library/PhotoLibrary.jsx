@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useProject } from '../../context/ProjectContext';
 import { saveImage, getImageMetadata, migrateLegacyImages } from '../../utils/imageStore';
 import { useImage } from '../../hooks/useImage';
@@ -6,6 +6,8 @@ import { v4 as uuidv4 } from 'uuid';
 import styles from './PhotoLibrary.module.css';
 import DeleteConfirmDialog from './DeleteConfirmDialog';
 import FilterBar from './FilterBar';
+
+const EMPTY_ARRAY = [];
 
 const PhotoItem = ({ imageId, isUsed, isSelected, onSelect }) => {
     const { url, status } = useImage(imageId);
@@ -97,7 +99,7 @@ const PhotoLibrary = () => {
             }
         };
         init();
-    }, [currentProject?.id, currentProject?.images?.length]);
+    }, [currentProject]);
 
 
     const handleFileChange = async (e) => {
@@ -160,9 +162,10 @@ const PhotoLibrary = () => {
     };
 
     // Determine which photos are in use
-    const getUsedImageIds = () => {
-        return new Set(currentProject.frames.map(f => f.imageId).filter(Boolean));
-    };
+    const getUsedImageIds = React.useCallback(() => {
+        const frames = currentProject?.frames || EMPTY_ARRAY;
+        return new Set(frames.map(f => f.imageId).filter(Boolean));
+    }, [currentProject]);
 
     // Count how many selected images are in use
     const getInUseCount = () => {
@@ -273,11 +276,13 @@ const PhotoLibrary = () => {
         e.dataTransfer.dropEffect = 'copy';
     };
 
+    const images = currentProject?.images || EMPTY_ARRAY;
+    const frames = currentProject?.frames || EMPTY_ARRAY;
+
     // --- Filtering Logic ---
-    const processedImages = useMemo(() => {
-        if (!currentProject?.images) return [];
-        let result = [...currentProject.images];
-        const usedSet = getUsedImageIds();
+    const calculateProcessedImages = () => {
+        let result = [...images];
+        const usedSet = new Set(frames.map(f => f.imageId).filter(Boolean));
 
         // 1. Search
         if (searchTerm) {
@@ -316,16 +321,14 @@ const PhotoLibrary = () => {
         }
 
         // 3. Sort
-        // "Newest" is default storage order (ProjectContext prepends images: [New...Old])
-        // So for "Newest" we do nothing.
-        // For "Oldest" we reverse.
         if (sortBy === 'oldest') {
             result.reverse();
         }
 
         return result;
+    };
 
-    }, [currentProject?.images, metadata, activeFilters, sortBy, searchTerm]);
+    const processedImages = calculateProcessedImages();
 
     const handleFilterChange = (key, val) => {
         const newFilters = { ...activeFilters, [key]: val };
