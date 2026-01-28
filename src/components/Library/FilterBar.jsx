@@ -11,11 +11,14 @@ const FilterBar = ({
     filterOptions = [],
     activeFilters = {},
     onFilterChange,
+    onClear,
     placeholder = "Search...",
     showSearch = true
 }) => {
     const [showFilters, setShowFilters] = React.useState(false);
     const [showSort, setShowSort] = React.useState(false);
+
+    const hasActiveFilters = Object.values(activeFilters).some(Boolean);
 
     return (
         <div className={styles.container}>
@@ -67,7 +70,7 @@ const FilterBar = ({
                     {/* Filter Dropdown */}
                     <div className={styles.dropdownWrapper}>
                         <button
-                            className={`${styles.iconBtn} ${Object.values(activeFilters).some(v => v) ? styles.active : ''}`}
+                            className={`${styles.iconBtn} ${hasActiveFilters ? styles.active : ''}`}
                             onClick={() => { setShowFilters(!showFilters); setShowSort(false); }}
                             title="Filters"
                         >
@@ -76,7 +79,20 @@ const FilterBar = ({
 
                         {showFilters && (
                             <div className={styles.dropdown}>
-                                <div className={styles.dropdownHeader}>Filter</div>
+                                <div className={styles.dropdownHeader}>
+                                    <span>Filter</span>
+                                    {hasActiveFilters && (
+                                        <button
+                                            className={styles.clearBtn}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                onClear && onClear();
+                                            }}
+                                        >
+                                            Clear
+                                        </button>
+                                    )}
+                                </div>
                                 {filterOptions.map(opt => (
                                     <label key={opt.key} className={styles.dropdownItem}>
                                         <span>{opt.label}</span>

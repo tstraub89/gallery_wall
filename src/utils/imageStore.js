@@ -1,6 +1,8 @@
 const DB_NAME = 'GalleryPlannerDB';
 const STORE_NAME = 'images';
-const DB_VERSION = 1;
+const PROJECTS_STORE = 'projects';
+const THUMB_STORE = 'thumbnails';
+const DB_VERSION = 3;
 
 export const initDB = () => {
     return new Promise((resolve, reject) => {
@@ -12,6 +14,12 @@ export const initDB = () => {
             const db = event.target.result;
             if (!db.objectStoreNames.contains(STORE_NAME)) {
                 db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains(PROJECTS_STORE)) {
+                db.createObjectStore(PROJECTS_STORE, { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains(THUMB_STORE)) {
+                db.createObjectStore(THUMB_STORE, { keyPath: 'id' });
             }
         };
 
@@ -36,36 +44,72 @@ const getImageDimensions = (blob) => {
     });
 };
 
-export const saveImage = async (id, blob) => {
-    const db = await initDB();
+// Helper: Generate Thumbnail
+const generateThumbnail = (blob, maxWidth = 800, maxHeight = 800) => {
+    return new Promise((resolve) => {
+        const img = new Image();
+        const url = URL.createObjectURL(blob);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            const canvas = document.createElement('canvas');
+            let { width, height } = img;
 
-    // Calculate dimensions before saving
-    let metadata = { width: 0, height: 0, aspectRatio: 1 };
-    try {
-        metadata = await getImageDimensions(blob);
-    } catch {
-        console.warn("Could not calculate dimensions for image", id);
-    }
+            if (width > height) {
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                }
+            }
 
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-
-        // Extract name if available (it might be a Blob with no name if generated, but File usually has it)
-        const name = blob.name || 'Untitled';
-
-        const request = store.put({ id, blob, name, ...metadata });
-
-        request.onsuccess = () => resolve({ id, name, ...metadata });
-        request.onerror = () => reject('Error saving image');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob((thumbBlob) => resolve(thumbBlob), 'image/jpeg', 0.8);
+        };
+        img.src = url;
     });
 };
 
-export const getImage = async (id) => {
+export const saveImage = async (id, blob) => {
     const db = await initDB();
+
+    // Parallelize metadata calc and thumb generation
+    const [metadata, thumbBlob] = await Promise.all([
+        getImageDimensions(blob).catch(() => ({ width: 0, height: 0, aspectRatio: 1 })),
+        generateThumbnail(blob)
+    ]);
+
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readonly');
-        const store = transaction.objectStore(STORE_NAME);
+        const transaction = db.transaction([STORE_NAME, THUMB_STORE], 'readwrite');
+        const imageStore = transaction.objectStore(STORE_NAME);
+        const thumbStore = transaction.objectStore(THUMB_STORE);
+
+        const name = blob.name || 'Untitled';
+
+        imageStore.put({ id, blob, name, ...metadata });
+        // Store thumbnail
+        thumbStore.put({ id, blob: thumbBlob });
+
+        transaction.oncomplete = () => resolve({ id, name, ...metadata });
+        transaction.onerror = () => reject('Error saving image');
+    });
+};
+
+export const getImage = async (id, type = 'full') => {
+    const db = await initDB();
+    const storeName = type === 'thumb' ? THUMB_STORE : STORE_NAME;
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([storeName], 'readonly');
+        const store = transaction.objectStore(storeName);
         const request = store.get(id);
 
         request.onsuccess = () => resolve(request.result ? request.result.blob : null);
@@ -78,77 +122,175 @@ export const getImageMetadata = async (ids = null) => {
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([STORE_NAME], 'readonly');
         const store = transaction.objectStore(STORE_NAME);
-        const request = store.getAll(); // Get all records
 
-        request.onsuccess = () => {
-            const all = request.result || [];
-            // Map to metadata only (exclude blob for perf if needed, but IDB retrieval gets whole obj)
-            // If ids filter provided, use it
-            const filtered = ids
-                ? all.filter(item => ids.includes(item.id))
-                : all;
+        // Optimization: For large libraries, using a cursor is faster than getAll() 
+        // if we only need metadata and want to avoid massive memory allocation for blobs
+        const metadataMap = {};
 
-            const metadataMap = {};
-            filtered.forEach(item => {
-                metadataMap[item.id] = {
-                    width: item.width,
-                    height: item.height,
-                    aspectRatio: item.aspectRatio,
-                    name: item.name // Include name
+        if (ids && ids.length < 50) {
+            // If few specific IDs, just get them
+            let count = 0;
+            if (ids.length === 0) return resolve({});
+
+            ids.forEach(id => {
+                const req = store.get(id);
+                req.onsuccess = () => {
+                    if (req.result) {
+                        const { width, height, aspectRatio, name } = req.result;
+                        metadataMap[id] = { width, height, aspectRatio, name };
+                    }
+                    count++;
+                    if (count === ids.length) resolve(metadataMap);
                 };
             });
-            resolve(metadataMap);
-        };
-        request.onerror = () => reject('Error fetching metadata');
+        } else {
+            // Scan all (or many)
+            const request = store.openCursor();
+            request.onsuccess = (event) => {
+                const cursor = event.target.result;
+                if (cursor) {
+                    const item = cursor.value;
+                    if (!ids || ids.includes(item.id)) {
+                        metadataMap[item.id] = {
+                            width: item.width,
+                            height: item.height,
+                            aspectRatio: item.aspectRatio,
+                            name: item.name
+                        };
+                    }
+                    cursor.continue();
+                } else {
+                    resolve(metadataMap);
+                }
+            };
+        }
+        transaction.onerror = () => reject('Error fetching metadata');
     });
 };
 
 export const migrateLegacyImages = async () => {
     const db = await initDB();
-    return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
+    console.log("Starting image migration check...");
+
+    return new Promise((resolve) => {
+        const transaction = db.transaction([STORE_NAME, THUMB_STORE], 'readonly');
         const store = transaction.objectStore(STORE_NAME);
-        const request = store.getAll();
 
-        request.onsuccess = async () => {
-            const allImages = request.result;
-            let updatedCount = 0;
+        const request = store.openCursor();
+        let migrationQueue = [];
 
-            for (const item of allImages) {
-                if (!item.width || !item.height) {
-                    try {
-                        const dims = await getImageDimensions(item.blob);
-                        // Update record in separate transaction to avoid timeouts? 
-                        // Actually we can reuse if small, but let's do one-by-one or batch if needed.
-                        // For simplicity in this helper, we'll assume the transaction is still alive or start new ones.
-                        // Wait, 'await' inside onsuccess callback with same transaction might be tricky if it commits.
-                        // Better structure: gather IDs effectively, then process.
-                        // NOTE: Transaction might autoclose if we await.
+        request.onsuccess = (event) => {
+            const cursor = event.target.result;
+            if (cursor) {
+                const item = cursor.value;
 
-                        // Let's restart transaction for updates.
-                        const updateTx = db.transaction([STORE_NAME], 'readwrite');
-                        const updateStore = updateTx.objectStore(STORE_NAME);
-                        updateStore.put({ ...item, ...dims });
-                        updatedCount++;
-                    } catch (err) {
-                        console.error("Migration failed for", item.id, err);
-                    }
-                }
+                // We check thumbnails in parallel by adding ID to a list and checking later
+                // or we can do it here if we use a different approach.
+                // Actually, let's just collect all images that might need help.
+                migrationQueue.push(item);
+
+                cursor.continue();
+            } else {
+                // Done scanning, now process queue
+                processMigrationQueue(db, migrationQueue).then(resolve);
             }
-            resolve(updatedCount);
         };
-        request.onerror = () => reject('Error scanning DB');
+        request.onerror = () => {
+            console.error("Migration scan failed");
+            resolve(0);
+        };
     });
+};
+
+const processMigrationQueue = async (db, queue) => {
+    let updatedCount = 0;
+    console.log(`Checking ${queue.length} images for migration...`);
+
+    for (const item of queue) {
+        let needsDims = !item.width || !item.height;
+        let needsThumb = false;
+
+        // Check if thumbnail exists
+        try {
+            const thumb = await new Promise((resolve, reject) => {
+                const tx = db.transaction([THUMB_STORE], 'readonly');
+                const req = tx.objectStore(THUMB_STORE).get(item.id);
+                req.onsuccess = () => resolve(req.result);
+                req.onerror = () => reject();
+            });
+            if (!thumb) needsThumb = true;
+        } catch {
+            needsThumb = true;
+        }
+
+        if (needsDims || needsThumb) {
+            try {
+                const updates = {};
+                if (needsDims) {
+                    const dims = await getImageDimensions(item.blob);
+                    Object.assign(updates, dims);
+                }
+
+                const thumbBlob = await generateThumbnail(item.blob);
+
+                const upTx = db.transaction([STORE_NAME, THUMB_STORE], 'readwrite');
+                if (needsDims) {
+                    upTx.objectStore(STORE_NAME).put({ ...item, ...updates });
+                }
+                upTx.objectStore(THUMB_STORE).put({ id: item.id, blob: thumbBlob });
+
+                await new Promise((resolve) => {
+                    upTx.oncomplete = resolve;
+                    upTx.onerror = resolve; // Continue on error if one fails
+                });
+
+                updatedCount++;
+            } catch (err) {
+                console.error("Migration failed for image", item.id, err);
+            }
+        }
+    }
+
+    if (updatedCount > 0) console.log(`Migration finished: updated ${updatedCount} images.`);
+    return updatedCount;
 };
 
 export const deleteImage = async (id) => {
     const db = await initDB();
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME], 'readwrite');
-        const store = transaction.objectStore(STORE_NAME);
-        const request = store.delete(id);
+        const transaction = db.transaction([STORE_NAME, THUMB_STORE], 'readwrite');
+        transaction.objectStore(STORE_NAME).delete(id);
+        transaction.objectStore(THUMB_STORE).delete(id);
 
-        request.onsuccess = () => resolve();
-        request.onerror = () => reject('Error deleting image');
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject('Error deleting image');
+    });
+};
+
+// --- Project Persistence ---
+
+export const saveProjectData = async (data) => {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([PROJECTS_STORE], 'readwrite');
+        const store = transaction.objectStore(PROJECTS_STORE);
+
+        // We store the shell (metadata + frames)
+        store.put({ id: 'current_session', ...data });
+
+        transaction.oncomplete = () => resolve();
+        transaction.onerror = () => reject('Error saving project data');
+    });
+};
+
+export const loadProjectData = async () => {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction([PROJECTS_STORE], 'readonly');
+        const store = transaction.objectStore(PROJECTS_STORE);
+        const request = store.get('current_session');
+
+        request.onsuccess = () => resolve(request.result || null);
+        request.onerror = () => reject('Error loading project data');
     });
 };

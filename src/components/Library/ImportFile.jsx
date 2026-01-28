@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Upload } from 'lucide-react';
-import { useProject } from '../../context/ProjectContext';
+import { useProject } from '../../hooks/useProject';
 import { parseFrameFile } from '../../utils/frameParser';
 import styles from './ImportFile.module.css';
 

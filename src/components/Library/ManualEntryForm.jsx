@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useProject } from '../../context/ProjectContext';
+import { useProject } from '../../hooks/useProject';
 import styles from './ManualEntryForm.module.css';
 
 const ManualEntryForm = () => {

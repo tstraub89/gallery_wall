@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useProject } from '../../context/ProjectContext';
+import { useProject } from '../../hooks/useProject';
 import styles from './FrameList.module.css';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import FilterBar from './FilterBar';
@@ -7,13 +7,17 @@ import FilterBar from './FilterBar';
 const EMPTY_ARRAY = [];
 
 const FrameList = () => {
-    const { currentProject, setSelection, removeFromLibrary } = useProject();
+    const {
+        currentProject,
+        setSelection,
+        removeFromLibrary,
+        frameState,
+        updateFrameState
+    } = useProject();
     const [frameToRemove, setFrameToRemove] = useState(null); // templateId
 
-    // Filter & Sort State
-    const [searchTerm, setSearchTerm] = useState('');
-    const [activeFilters, setActiveFilters] = useState({}); // { unplaced: true, portrait: false, etc }
-    const [sortBy, setSortBy] = useState('newest'); // 'newest', 'area', 'width'
+    // Persistent Filter & Sort State
+    const { searchTerm, activeFilters, sortBy } = frameState;
 
     const templates = currentProject?.library || EMPTY_ARRAY;
     const instances = currentProject?.frames || EMPTY_ARRAY;
@@ -127,15 +131,16 @@ const FrameList = () => {
         if (key === 'placed' && val) newFilters.unplaced = false;
 
 
-        setActiveFilters(newFilters);
+        updateFrameState({ activeFilters: newFilters });
     };
 
     return (
-        <>
+        <div className={styles.container}>
             <FilterBar
                 searchTerm={searchTerm}
-                onSearchChange={setSearchTerm}
-                placeholder="Search... (e.g. '8x10', 'Hallway')"
+                onSearchChange={(val) => updateFrameState({ searchTerm: val })}
+                showSearch={true}
+                placeholder="Search frames..."
                 sortOptions={[
                     { value: 'newest', label: 'Newest' },
                     { value: 'oldest', label: 'Oldest' },
@@ -145,7 +150,7 @@ const FrameList = () => {
                     { value: 'height', label: 'Height' },
                 ]}
                 currentSort={sortBy}
-                onSortChange={setSortBy}
+                onSortChange={(val) => updateFrameState({ sortBy: val })}
                 filterOptions={[
                     { key: 'unplaced', label: 'Unplaced Only' },
                     { key: 'placed', label: 'Placed Only' },
@@ -156,70 +161,73 @@ const FrameList = () => {
                 ]}
                 activeFilters={activeFilters}
                 onFilterChange={handleFilterChange}
+                onClear={() => updateFrameState({ activeFilters: {} })}
             />
 
-            <div className={styles.list}>
-                {processedTemplates.map((template) => {
-                    const instance = instances.find(f => f.templateId === template.id);
-                    const isPlaced = !!instance;
+            <div className={styles.scrollWrapper}>
+                <div className={styles.list}>
+                    {processedTemplates.map((template) => {
+                        const instance = instances.find(f => f.templateId === template.id);
+                        const isPlaced = !!instance;
 
-                    return (
-                        <div
-                            key={template.id}
-                            className={`${styles.frameItem} ${isPlaced ? styles.placedItem : ''}`}
-                            draggable={!isPlaced}
-                            onClick={() => handleFrameClick(instance?.id || template.id, isPlaced)}
-                            onDragStart={(e) => {
-                                if (isPlaced) return;
-                                e.dataTransfer.setData('application/json', JSON.stringify({
-                                    type: 'FRAME_LIBRARY_ITEM',
-                                    frame: template
-                                }));
-                            }}
-                        >
+                        return (
                             <div
-                                className={styles.framePreview}
-                                style={{
-                                    aspectRatio: `${template.width}/${template.height}`,
-                                    borderRadius: template.shape === 'round' ? '50%' : '0',
-                                    borderColor: template.frameColor || '#111111'
+                                key={template.id}
+                                className={`${styles.frameItem} ${isPlaced ? styles.placedItem : ''}`}
+                                draggable={!isPlaced}
+                                onClick={() => handleFrameClick(instance?.id || template.id, isPlaced)}
+                                onDragStart={(e) => {
+                                    if (isPlaced) return;
+                                    e.dataTransfer.setData('application/json', JSON.stringify({
+                                        type: 'FRAME_LIBRARY_ITEM',
+                                        frame: template
+                                    }));
                                 }}
                             >
-                                {template.matted && (
-                                    <div
-                                        className={styles.mattedInner}
-                                        style={{ borderRadius: template.shape === 'round' ? '50%' : '0' }}
-                                    />
-                                )}
-                                {isPlaced && (
-                                    <div className={styles.placedOverlay}>PLACED</div>
-                                )}
-                                {!isPlaced && (
-                                    <button className={styles.removeBtn} onClick={(e) => handleDeleteTemplate(e, template.id)} title="Remove from library">×</button>
-                                )}
-                            </div>
-                            <div className={styles.frameInfo}>
-                                {template.label ? (
-                                    <>
-                                        <div className={styles.label} title={template.label}>{template.label}</div>
+                                <div
+                                    className={styles.framePreview}
+                                    style={{
+                                        aspectRatio: `${template.width}/${template.height}`,
+                                        borderRadius: template.shape === 'round' ? '50%' : '0',
+                                        borderColor: template.frameColor || '#111111'
+                                    }}
+                                >
+                                    {template.matted && (
+                                        <div
+                                            className={styles.mattedInner}
+                                            style={{ borderRadius: template.shape === 'round' ? '50%' : '0' }}
+                                        />
+                                    )}
+                                    {isPlaced && (
+                                        <div className={styles.placedOverlay}>PLACED</div>
+                                    )}
+                                    {!isPlaced && (
+                                        <button className={styles.removeBtn} onClick={(e) => handleDeleteTemplate(e, template.id)} title="Remove from library">×</button>
+                                    )}
+                                </div>
+                                <div className={styles.frameInfo}>
+                                    {template.label ? (
+                                        <>
+                                            <div className={styles.label} title={template.label}>{template.label}</div>
+                                            <div className={styles.dims}>{template.width}" x {template.height}"</div>
+                                        </>
+                                    ) : (
                                         <div className={styles.dims}>{template.width}" x {template.height}"</div>
-                                    </>
-                                ) : (
-                                    <div className={styles.dims}>{template.width}" x {template.height}"</div>
-                                )}
-                                <div className={styles.subInfo}>
-                                    {template.isDuplicate && '(Duplicated)'}
+                                    )}
+                                    <div className={styles.subInfo}>
+                                        {template.isDuplicate && '(Duplicated)'}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
 
-                {processedTemplates.length === 0 && (
-                    <div className={styles.empty}>
-                        {templates.length === 0 ? "No frames yet." : "No matching frames found."}
-                    </div>
-                )}
+                    {processedTemplates.length === 0 && (
+                        <div className={styles.empty}>
+                            {templates.length === 0 ? "No frames yet." : "No matching frames found."}
+                        </div>
+                    )}
+                </div>
             </div>
             {frameToRemove && (
                 <ConfirmDialog
@@ -234,7 +242,7 @@ const FrameList = () => {
                     isDanger={true}
                 />
             )}
-        </>
+        </div>
     );
 };
 

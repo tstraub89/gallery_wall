@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-
-const ProjectContext = createContext();
+import { saveProjectData, loadProjectData } from '../utils/imageStore';
+import { ProjectContext } from './ProjectContextCore';
 
 const STORAGE_KEY = 'gallery_planner_data';
 
@@ -11,6 +11,8 @@ const initialData = {
     selectedFrameIds: [], // Array of frame IDs
     selectedImageIds: [], // Array of image IDs (photo library)
     focusedArea: null, // 'canvas' | 'library' | null
+    libraryState: { searchTerm: '', activeFilters: {}, sortBy: 'newest' },
+    frameState: { searchTerm: '', activeFilters: {}, sortBy: 'newest' },
 };
 
 const createNewProject = (name) => ({
@@ -32,34 +34,77 @@ const createNewProject = (name) => ({
 
 export const ProjectProvider = ({ children }) => {
     const [data, setData] = useState(() => {
+        // Synchronous initial state from localStorage as fallback/migration boot
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
-            const parsed = JSON.parse(saved);
-            // Ensure at least one project exists
-            if (Object.keys(parsed.projects).length === 0) {
-                const fresh = createNewProject('Untitled Project');
-                return {
-                    ...parsed,
-                    projects: { [fresh.id]: fresh },
-                    currentProjectId: fresh.id
-                };
+            try {
+                return JSON.parse(saved);
+            } catch {
+                return initialData;
             }
-            return parsed;
         }
-
-        // Initial Startup
-        const fresh = createNewProject('Untitled Project');
-        return {
-            ...initialData,
-            projects: { [fresh.id]: fresh },
-            currentProjectId: fresh.id
-        };
+        return initialData;
     });
 
-    // Auto-save to localStorage
+    const [isLoaded, setIsLoaded] = useState(false);
+    const hasInitialLoaded = useRef(false);
+
+    // Initial load from IndexedDB (Migration from localStorage if empty)
     useEffect(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    }, [data]);
+        if (hasInitialLoaded.current) return;
+        hasInitialLoaded.current = true;
+
+        const init = async () => {
+            try {
+                const idbData = await loadProjectData();
+                if (idbData) {
+                    setData(idbData);
+                } else {
+                    // If IDB is empty, check localStorage
+                    const saved = localStorage.getItem(STORAGE_KEY);
+                    if (saved) {
+                        const parsed = JSON.parse(saved);
+                        setData(parsed);
+                        await saveProjectData(parsed);
+                    } else if (Object.keys(data.projects).length === 0) {
+                        // Brand new install
+                        const fresh = createNewProject('Untitled Project');
+                        const freshData = {
+                            ...initialData,
+                            projects: { [fresh.id]: fresh },
+                            currentProjectId: fresh.id
+                        };
+                        setData(freshData);
+                        await saveProjectData(freshData);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to load data from IndexedDB", err);
+            } finally {
+                setIsLoaded(true);
+            }
+        };
+        init();
+    }, [data.projects]);
+
+    // Auto-save to IndexedDB (and localStorage as tiny fallback if under limit)
+    useEffect(() => {
+        if (!isLoaded) return;
+
+        const save = async () => {
+            try {
+                await saveProjectData(data);
+                // Only keep metadata in localStorage for fast initial boot if possible?
+                // For now, full save to both, but IDB is the primary.
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            } catch (err) {
+                console.warn("Failed to auto-save to IndexedDB", err);
+            }
+        };
+
+        const timeoutId = setTimeout(save, 500); // Debounce saves
+        return () => clearTimeout(timeoutId);
+    }, [data, isLoaded]);
 
     const addProject = (name) => {
         const newProject = createNewProject(name);
@@ -89,9 +134,6 @@ export const ProjectProvider = ({ children }) => {
             return { ...prev, selectedFrameIds: frameId ? [frameId] : [] };
         });
     };
-
-    // updateProject is now defined below with history logic
-    // const updateProject = ... (removed)
 
     const deleteProject = (id) => {
         setData(prev => {
@@ -158,8 +200,6 @@ export const ProjectProvider = ({ children }) => {
             const project = prev.projects[projectId];
             if (!project) return prev;
 
-            // Optional: prevent if used? 
-            // Better to let the UI handle the check, but safety here is good
             const isUsed = project.frames.some(f => f.templateId === templateId);
             if (isUsed) {
                 console.warn("Attempted to remove a template that is in use.");
@@ -186,7 +226,6 @@ export const ProjectProvider = ({ children }) => {
             const project = prev.projects[projectId];
             if (!project) return prev;
 
-            // Avoid duplicates
             if (project.images && project.images.includes(imageId)) return prev;
 
             const currentImages = project.images || [];
@@ -206,7 +245,6 @@ export const ProjectProvider = ({ children }) => {
 
     const currentProjectRaw = data.currentProjectId ? data.projects[data.currentProjectId] : null;
 
-    // Safety: Ensure arrays exist even if localStorage has old data
     const currentProject = currentProjectRaw ? {
         ...currentProjectRaw,
         frames: currentProjectRaw.frames || [],
@@ -227,24 +265,33 @@ export const ProjectProvider = ({ children }) => {
         setData(prev => ({ ...prev, focusedArea: area }));
     };
 
-    // --- History State ---
+    const updateLibraryState = (updates) => {
+        setData(prev => ({
+            ...prev,
+            libraryState: { ...prev.libraryState, ...updates }
+        }));
+    };
+
+    const updateFrameState = (updates) => {
+        setData(prev => ({
+            ...prev,
+            frameState: { ...prev.frameState, ...updates }
+        }));
+    };
+
+    // --- History State & Undo/Redo ---
     const [history, setHistory] = useState({
         past: [],
         future: []
     });
-
-    // Helper to push state to history
-    // We only track PROJECT SPECIFIC changes, not global app state like currentProjectId?
-    // Actually, if we undo a frame move, we need the previous state of that project.
-    // So we push the COPY of the current project to past.
 
     const pushToHistory = (projectId) => {
         const currentMementro = data.projects[projectId];
         if (!currentMementro) return;
 
         setHistory(prev => ({
-            past: [...prev.past, { projectId, data: JSON.parse(JSON.stringify(currentMementro)) }],
-            future: [] // Clear future on new action
+            past: [...prev.past, { projectId, data: structuredClone(currentMementro) }],
+            future: []
         }));
     };
 
@@ -258,10 +305,8 @@ export const ProjectProvider = ({ children }) => {
 
             const currentProjectData = data.projects[projectId];
 
-            // Push current to future
-            const newFuture = [...prev.future, { projectId, data: JSON.parse(JSON.stringify(currentProjectData)) }];
+            const newFuture = [...prev.future, { projectId, data: structuredClone(currentProjectData) }];
 
-            // Restore
             setData(d => ({
                 ...d,
                 projects: {
@@ -270,10 +315,7 @@ export const ProjectProvider = ({ children }) => {
                 }
             }));
 
-            return {
-                past: newPast,
-                future: newFuture
-            };
+            return { past: newPast, future: newFuture };
         });
     };
 
@@ -287,10 +329,8 @@ export const ProjectProvider = ({ children }) => {
 
             const currentProjectData = data.projects[projectId];
 
-            // Push current to past
-            const newPast = [...prev.past, { projectId, data: JSON.parse(JSON.stringify(currentProjectData)) }];
+            const newPast = [...prev.past, { projectId, data: structuredClone(currentProjectData) }];
 
-            // Restore
             setData(d => ({
                 ...d,
                 projects: {
@@ -299,10 +339,7 @@ export const ProjectProvider = ({ children }) => {
                 }
             }));
 
-            return {
-                past: newPast,
-                future: newFuture
-            };
+            return { past: newPast, future: newFuture };
         });
     };
 
@@ -314,18 +351,11 @@ export const ProjectProvider = ({ children }) => {
             ...prev,
             projects: {
                 ...prev.projects,
-                [id]: { ...prev.projects[id], ...updates, updatedAt: Date.now() } // Do not merge updates deep?
-                // Logic: updateProject(id, { frames: newFrames })
-                // We want to replace frames array, not merge.
-                // Spread ...updates usually replaces keys. Correct.
+                [id]: { ...prev.projects[id], ...updates, updatedAt: Date.now() }
             }
         }));
     };
 
-    // ... existing delete/add logic ...
-    // Note: deleteProject might need history? For now let's scope undo to "Project Modifications".
-
-    // Expose undo/redo to context
     return (
         <ProjectContext.Provider value={{
             projects: data.projects,
@@ -334,6 +364,7 @@ export const ProjectProvider = ({ children }) => {
             selectedFrameIds: data.selectedFrameIds || [],
             selectedImageIds: data.selectedImageIds || [],
             focusedArea: data.focusedArea,
+            isLoaded,
             addProject,
             switchProject,
             deleteProject,
@@ -345,6 +376,10 @@ export const ProjectProvider = ({ children }) => {
             setSelection,
             setSelectedImages,
             setFocusedArea,
+            libraryState: data.libraryState || initialData.libraryState,
+            frameState: data.frameState || initialData.frameState,
+            updateLibraryState,
+            updateFrameState,
             undo,
             redo,
             canUndo: history.past.length > 0,
@@ -354,6 +389,3 @@ export const ProjectProvider = ({ children }) => {
         </ProjectContext.Provider>
     );
 };
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const useProject = () => useContext(ProjectContext);

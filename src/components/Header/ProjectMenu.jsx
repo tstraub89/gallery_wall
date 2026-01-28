@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useProject } from '../../context/ProjectContext';
+import { useProject } from '../../hooks/useProject';
 import styles from './ProjectMenu.module.css';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import { PanelLeftOpen, PanelLeftClose } from 'lucide-react';

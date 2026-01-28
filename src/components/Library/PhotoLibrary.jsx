@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { useProject } from '../../context/ProjectContext';
+import { useProject } from '../../hooks/useProject';
 import { saveImage, getImageMetadata, migrateLegacyImages } from '../../utils/imageStore';
 import { useImage } from '../../hooks/useImage';
+import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 import { v4 as uuidv4 } from 'uuid';
 import styles from './PhotoLibrary.module.css';
 import DeleteConfirmDialog from './DeleteConfirmDialog';
@@ -10,7 +11,8 @@ import FilterBar from './FilterBar';
 const EMPTY_ARRAY = [];
 
 const PhotoItem = ({ imageId, isUsed, isSelected, onSelect }) => {
-    const { url, status } = useImage(imageId);
+    const [ref, isVisible] = useIntersectionObserver();
+    const { url, status } = useImage(imageId, 'thumb', isVisible);
 
     const handleDragStart = (e) => {
         // Only allow dragging if image is loaded
@@ -30,45 +32,56 @@ const PhotoItem = ({ imageId, isUsed, isSelected, onSelect }) => {
         onSelect(e);
     };
 
-    // Loading state
-    if (status === 'loading') {
-        return <div className={styles.loading}>Loading...</div>;
-    }
-
-    // Not found or error state - still selectable for deletion
-    if (status === 'not-found' || status === 'error') {
-        return (
-            <div
-                className={`${styles.photoItem} ${styles.notFound} ${isSelected ? styles.selected : ''} `}
-                onClick={handleClick}
-                title="Photo not found - click to select for deletion"
-            >
+    return (
+        <div
+            ref={ref}
+            className={`${styles.photoItem} ${isUsed ? styles.used : ''} ${isSelected ? styles.selected : ''}`}
+            draggable={status === 'loaded'}
+            onDragStart={handleDragStart}
+            onClick={handleClick}
+            title={isUsed ? "This photo is already on the wall" : "Drag to add to a frame"}
+            style={{
+                minHeight: status === 'loaded' ? 'auto' : '120px',
+                display: status === 'loaded' ? 'block' : 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: '#f5f5f5',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                position: 'relative'
+            }}
+        >
+            {status === 'loading' ? (
+                <div className={styles.loading}>Loading...</div>
+            ) : (status === 'not-found' || status === 'error') ? (
                 <div className={styles.notFoundContent}>
                     <span className={styles.notFoundIcon}>🖼️</span>
                     <span className={styles.notFoundText}>Not Found</span>
                 </div>
-                {isSelected && <div className={styles.selectedOverlay}>✓</div>}
-            </div>
-        );
-    }
-
-    return (
-        <div
-            className={`${styles.photoItem} ${isUsed ? styles.used : ''} ${isSelected ? styles.selected : ''} `}
-            draggable
-            onDragStart={handleDragStart}
-            onClick={handleClick}
-            title={isUsed ? "This photo is already on the wall" : "Drag to add to a frame"}
-        >
-            <img src={url} alt="Library Item" />
-            {isUsed && <div className={styles.usedLabel}>Use Again</div>}
-            {isSelected && <div className={styles.selectedOverlay}>✓</div>}
+            ) : (
+                <>
+                    <img src={url} alt="Library Item" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                    {isUsed && <div className={styles.usedLabel}>Used Again</div>}
+                    {isSelected && <div className={styles.selectedOverlay}>✓</div>}
+                </>
+            )}
         </div>
     );
 };
 
 const PhotoLibrary = () => {
-    const { currentProject, addImageToLibrary, updateProject, selectFrame, selectedImageIds, setSelectedImages, setFocusedArea } = useProject();
+    const {
+        currentProject,
+        addImageToLibrary,
+        selectedImageIds,
+        setSelectedImages,
+        isLoaded,
+        libraryState,
+        updateLibraryState,
+        updateProject,
+        selectFrame,
+        setFocusedArea
+    } = useProject();
     const fileInputRef = useRef(null);
     // Track anchor index for range selection
     const [anchorIndex, setAnchorIndex] = React.useState(null);
@@ -76,16 +89,15 @@ const PhotoLibrary = () => {
     const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
 
     // Filter State
-    const [searchTerm, setSearchTerm] = useState(''); // Not used yet but needed for prop
-    const [activeFilters, setActiveFilters] = useState({});
-    const [sortBy, setSortBy] = useState('newest');
+    // Persistent State
+    const { searchTerm, activeFilters, sortBy } = libraryState;
 
     // Metadata Cache
     const [metadata, setMetadata] = useState({});
 
     // 1. Run Migration & Fetch Metadata on Mount / Project Change
     useEffect(() => {
-        if (!currentProject) return;
+        if (!currentProject || !isLoaded) return;
 
         const init = async () => {
             // Run migration silently
@@ -99,7 +111,7 @@ const PhotoLibrary = () => {
             }
         };
         init();
-    }, [currentProject]);
+    }, [currentProject, isLoaded]);
 
 
     const handleFileChange = async (e) => {
@@ -350,11 +362,17 @@ const PhotoLibrary = () => {
         if (key === 'used' && val) newFilters.unused = false;
         if (key === 'unused' && val) newFilters.used = false;
 
-        setActiveFilters(newFilters);
+        updateLibraryState({ activeFilters: newFilters });
     };
 
 
-    if (!currentProject) return null;
+    if (!isLoaded) {
+        return <div className={styles.empty}>Loading...</div>;
+    }
+
+    if (!currentProject) {
+        return <div className={styles.empty}>Select or create a project.</div>;
+    }
 
     // Determine usage
     const usedImageIds = new Set(currentProject.frames.map(f => f.imageId).filter(Boolean));
@@ -369,7 +387,7 @@ const PhotoLibrary = () => {
             <div className={styles.filterRow}>
                 <FilterBar
                     searchTerm={searchTerm}
-                    onSearchChange={setSearchTerm}
+                    onSearchChange={(val) => updateLibraryState({ searchTerm: val })}
                     showSearch={true}
                     placeholder="Search filename..."
                     sortOptions={[
@@ -377,7 +395,7 @@ const PhotoLibrary = () => {
                         { value: 'oldest', label: 'Oldest' }
                     ]}
                     currentSort={sortBy}
-                    onSortChange={setSortBy}
+                    onSortChange={(val) => updateLibraryState({ sortBy: val })}
                     filterOptions={[
                         { key: 'unused', label: 'Unused Only' },
                         { key: 'used', label: 'Used Only' },
@@ -387,6 +405,7 @@ const PhotoLibrary = () => {
                     ]}
                     activeFilters={activeFilters}
                     onFilterChange={handleFilterChange}
+                    onClear={() => updateLibraryState({ activeFilters: {} })}
                 />
             </div>
 

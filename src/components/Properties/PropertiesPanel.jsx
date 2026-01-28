@@ -1,5 +1,5 @@
 import React from 'react';
-import { useProject } from '../../context/ProjectContext';
+import { useProject } from '../../hooks/useProject';
 import styles from './PropertiesPanel.module.css';
 
 // Sub-components

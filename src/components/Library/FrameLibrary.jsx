@@ -52,9 +52,7 @@ const FrameLibrary = () => {
                             <span>{isManualOpen ? '▼' : '▶'}</span>
                         </div>
                         {isManualOpen && <ManualEntryForm />}
-                        <div className={styles.scrollArea}>
-                            <FrameList />
-                        </div>
+                        <FrameList />
                     </div>
                 )}
             </div>

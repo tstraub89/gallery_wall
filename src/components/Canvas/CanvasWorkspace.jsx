@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { useProject } from '../../context/ProjectContext';
+import { useProject } from '../../hooks/useProject';
 import styles from './CanvasWorkspace.module.css';
 import { v4 as uuidv4 } from 'uuid';
 import { PPI, GRID_SIZE } from '../../constants';

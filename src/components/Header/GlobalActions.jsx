@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useProject } from '../../context/ProjectContext';
+import { useProject } from '../../hooks/useProject';
 import styles from './GlobalActions.module.css';
 import { toBlob } from 'html-to-image';
 import { PPI } from '../../constants';
