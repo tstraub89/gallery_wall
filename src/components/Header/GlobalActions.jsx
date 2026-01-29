@@ -91,19 +91,40 @@ const GlobalActions = () => {
             await waitForImages(node);
             await new Promise(resolve => setTimeout(resolve, 300));
 
-            const scales = [1.0, 0.8, 0.6, 0.4, 0.2, 0.1];
+            // Calculate target scale for ~1920px width or 1080px height
+            const currentWidth = currentProject.wallConfig.width * PPI;
+            const currentHeight = currentProject.wallConfig.height * PPI;
+
+            const targetWidth = 1920;
+            const targetHeight = 1080;
+
+            // We want at least 1920w, but if the wall is tall, ensure 1080h? 
+            // Actually, usually 1920px width is a good baseline for "HD".
+            // Let's go for max of (1920 / width) or (1080 / height) relative to current? 
+            // No, strictly scaling to 1920px width seems safest for "HD".
+
+            const scaleToHD = Math.max(targetWidth / currentWidth, targetHeight / currentHeight, 1.0);
+
+            // Try HD, then fallback to current (1.0), then lower.
+            const scales = [scaleToHD, 1.0, 0.8, 0.5];
+
             let blob = null;
             let lastError = null;
 
             for (const s of scales) {
                 try {
-                    const widthPx = currentProject.wallConfig.width * PPI * s;
-                    const heightPx = currentProject.wallConfig.height * PPI * s;
+                    // Fix: DO NOT scale width/height here since that just expands the canvas size
+                    // while keeping content small (unless transformed). 
+                    // Instead, keep width/height as the original node dimensions (layout size),
+                    // and use pixelRatio to render higher density pixels (true resolution).
+
+                    const widthPx = currentWidth;
+                    const heightPx = currentHeight;
 
                     blob = await toBlob(node, {
                         width: widthPx,
                         height: heightPx,
-                        pixelRatio: 1,
+                        pixelRatio: s, // This renders "s" times more pixels per CSS pixel
                         style: {
                             transform: 'none',
                             left: '0',
