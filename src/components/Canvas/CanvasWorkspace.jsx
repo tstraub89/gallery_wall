@@ -127,6 +127,42 @@ const CanvasWorkspace = () => {
         updateProject(currentProject.id, { frames: updatedFrames });
     };
 
+    const handleZoomTo100 = React.useCallback(() => {
+        if (!containerRef.current || !currentProject) return;
+        const containerWidth = containerRef.current.offsetWidth;
+        const containerHeight = containerRef.current.offsetHeight;
+        const wallWidth = currentProject.wallConfig.width * PPI;
+        const wallHeight = currentProject.wallConfig.height * PPI;
+
+        const nextScale = 1;
+        const nextPanX = containerWidth / 2 - (50 + wallWidth / 2) * nextScale;
+        const nextPanY = containerHeight / 2 - (50 + wallHeight / 2) * nextScale;
+
+        setScale(nextScale);
+        setPan({ x: nextPanX, y: nextPanY });
+    }, [currentProject, setScale, setPan]);
+
+    const handleZoomToFit = React.useCallback(() => {
+        if (!containerRef.current || !currentProject) return;
+        const containerWidth = containerRef.current.offsetWidth;
+        const containerHeight = containerRef.current.offsetHeight;
+        const wallWidth = currentProject.wallConfig.width * PPI;
+        const wallHeight = currentProject.wallConfig.height * PPI;
+
+        const padding = 80;
+        const scaleX = (containerWidth - padding) / wallWidth;
+        const scaleY = (containerHeight - padding) / wallHeight;
+        let nextScale = Math.min(scaleX, scaleY);
+        nextScale = Math.min(Math.max(0.1, nextScale), 5);
+        nextScale = Math.round(nextScale * 100) / 100;
+
+        const nextPanX = containerWidth / 2 - (50 + wallWidth / 2) * nextScale;
+        const nextPanY = containerHeight / 2 - (50 + wallHeight / 2) * nextScale;
+
+        setScale(nextScale);
+        setPan({ x: nextPanX, y: nextPanY });
+    }, [currentProject, setScale, setPan]);
+
     // Interaction Hook
     const {
         isMarquee,
@@ -222,6 +258,7 @@ const CanvasWorkspace = () => {
                                     transform: `rotate(${frame.rotation}deg)`,
                                     zIndex: frame.zIndex,
                                     userSelect: 'none',
+                                    backgroundColor: frame.imageId ? (frame.frameColor || '#111111') : '#ffffff',
                                     borderWidth: `${bWidthPx}px`,
                                     borderStyle: 'solid',
                                     borderColor: frame.frameColor || '#111111',
@@ -240,6 +277,9 @@ const CanvasWorkspace = () => {
                 <button onClick={() => setScale(s => Math.max(0.1, Math.round((s - 0.1) * 10) / 10))} title="Zoom Out">-</button>
                 <span>{Math.round(scale * 100)}%</span>
                 <button onClick={() => setScale(s => Math.min(5, Math.round((s + 0.1) * 10) / 10))} title="Zoom In">+</button>
+                <div className={styles.separator} />
+                <button onClick={handleZoomTo100} title="Zoom to 100%">1:1</button>
+                <button onClick={handleZoomToFit} title="Zoom to Fit">Fit</button>
                 <div className={styles.separator} />
                 <button
                     onClick={() => setShowGrid(s => !s)}

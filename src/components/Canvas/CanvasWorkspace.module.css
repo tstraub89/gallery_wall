@@ -75,7 +75,6 @@
 
 .frame {
     position: absolute;
-    background-color: #fff;
     border: 1px solid #111;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
     cursor: grab;
@@ -98,8 +97,7 @@
     width: 100%;
     height: 100%;
     position: relative;
-    background-color: #f0f0f0;
-    /* placeholder for artwork */
+    /* placeholder for artwork removed to prevent zoom bleed */
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -134,12 +132,13 @@
 .hud button {
     color: rgba(255, 255, 255, 0.7);
     font-weight: 600;
-    width: 28px;
+    min-width: 28px;
     height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: 14px;
+    padding: 0 4px;
     background: transparent;
     transition: all 0.2s;
     font-size: 14px;
