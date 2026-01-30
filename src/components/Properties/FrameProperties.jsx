@@ -236,13 +236,13 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                                 <input
                                     className={styles.fluidInput}
                                     type="number" step="0.1"
-                                    value={(minX / PPI).toFixed(2)}
+                                    value={Math.round((minX / PPI) * 10) / 10}
                                     onChange={(e) => updateRelative('x', parseFloat(e.target.value) * PPI)}
                                 />
                                 <input
                                     className={styles.fluidInput}
                                     type="number" step="0.1"
-                                    value={(minY / PPI).toFixed(2)}
+                                    value={Math.round((minY / PPI) * 10) / 10}
                                     onChange={(e) => updateRelative('y', parseFloat(e.target.value) * PPI)}
                                 />
                             </div>
