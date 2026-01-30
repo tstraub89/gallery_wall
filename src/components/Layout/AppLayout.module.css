@@ -29,11 +29,9 @@
     grid-area: left;
     background-color: var(--bg-panel);
     border-right: 1px solid var(--border-color);
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
     z-index: 5;
     position: relative;
-    padding: var(--spacing-md) 0;
 }
 
 .resizeHandle {
@@ -72,8 +70,6 @@
     grid-area: right;
     background-color: var(--bg-panel);
     border-left: 1px solid var(--border-color);
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
     z-index: 5;
-    padding: var(--spacing-md) 0;
 }
