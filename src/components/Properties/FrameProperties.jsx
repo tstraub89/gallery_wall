@@ -13,7 +13,12 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
         currentProject.frames.filter(f => selectedFrameIds.includes(f.id)),
         [currentProject.frames, selectedFrameIds]);
 
-    const [activeTab, setActiveTab] = React.useState('frame');
+    const [activeTab, setActiveTab] = React.useState(() => {
+        if (selectedFrames.length === 1 && selectedFrames[0].imageId) {
+            return 'photo';
+        }
+        return 'frame';
+    });
 
     // Force switch to frame tab if multiple selection (since we don't support multi-photo edit yet)
     React.useEffect(() => {

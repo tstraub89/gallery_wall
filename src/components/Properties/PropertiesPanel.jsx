@@ -19,6 +19,7 @@ const PropertiesPanel = () => {
         <div className={styles.container}>
             {hasSelection ? (
                 <FrameProperties
+                    key={selectedFrameIds.join(',')}
                     currentProject={currentProject}
                     selectedFrameIds={selectedFrameIds}
                     updateProject={updateProject}

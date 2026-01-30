@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import styles from './FilterBar.module.css';
 import { Search, Filter, ArrowUpDown } from 'lucide-react';
+import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 
 const FilterBar = ({
     searchTerm,
@@ -17,6 +18,12 @@ const FilterBar = ({
 }) => {
     const [showFilters, setShowFilters] = React.useState(false);
     const [showSort, setShowSort] = React.useState(false);
+
+    const sortRef = useRef();
+    const filterRef = useRef();
+
+    useOnClickOutside(sortRef, () => setShowSort(false));
+    useOnClickOutside(filterRef, () => setShowFilters(false));
 
     const hasActiveFilters = Object.values(activeFilters).some(Boolean);
 
@@ -38,7 +45,7 @@ const FilterBar = ({
 
                 <div className={styles.controls} style={{ marginLeft: showSearch ? 0 : 'auto' }}>
                     {/* Sort Dropdown */}
-                    <div className={styles.dropdownWrapper}>
+                    <div className={styles.dropdownWrapper} ref={sortRef}>
                         <button
                             className={`${styles.iconBtn} ${showSort ? styles.active : ''}`}
                             onClick={() => { setShowSort(!showSort); setShowFilters(false); }}
@@ -68,7 +75,7 @@ const FilterBar = ({
                     </div>
 
                     {/* Filter Dropdown */}
-                    <div className={styles.dropdownWrapper}>
+                    <div className={styles.dropdownWrapper} ref={filterRef}>
                         <button
                             className={`${styles.iconBtn} ${hasActiveFilters ? styles.active : ''}`}
                             onClick={() => { setShowFilters(!showFilters); setShowSort(false); }}

@@ -12,7 +12,6 @@ const ImageProperties = ({ frame, updateProject, currentProject }) => {
 
     return (
         <>
-            <div className={styles.header} style={{ paddingLeft: 0 }}><h3>Image Settings</h3></div>
             <div className={styles.propGroup}>
                 <label>Scale</label>
                 <div className={styles.row}>
