@@ -2,7 +2,7 @@
   "name": "gallery_wall",
   "homepage": "http://tstraub89.github.io/gallery_wall",
   "private": true,
-  "version": "1.8.6",
+  "version": "2.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,7 +10,8 @@
     "deploy": "gh-pages -d dist",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "type-check": "tsc -b"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -24,7 +25,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@types/react": "^19.2.5",
+    "@types/file-saver": "^2.0.7",
+    "@types/node": "^25.1.0",
+    "@types/react": "^19.2.10",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^9.39.1",
@@ -32,6 +35,7 @@
     "eslint-plugin-react-refresh": "^0.4.24",
     "gh-pages": "^6.3.0",
     "globals": "^16.5.0",
+    "typescript": "^5.9.3",
     "vite": "^7.2.4"
   }
 }

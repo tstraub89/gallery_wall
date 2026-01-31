@@ -181,6 +181,22 @@
     background-color: var(--bg-app);
 }
 
+.removeImageBtn {
+    background-color: transparent;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    color: #dc3545;
+    padding: var(--spacing-sm);
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.removeImageBtn:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+    border-color: #dc3545;
+}
+
 .actionBtn {
     background-color: var(--bg-panel);
     border: 1px solid var(--border-color);
