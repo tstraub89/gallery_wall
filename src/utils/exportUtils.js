@@ -212,6 +212,18 @@ export const importProjectBundle = async (file) => {
     if (!projectJsonFile) throw new Error('Invalid .gwall file: missing project.json');
 
     const project = JSON.parse(await projectJsonFile.async('text'));
+
+    // Validate required project structure
+    if (!project || typeof project !== 'object') {
+        throw new Error('Invalid .gwall file: project.json is not an object');
+    }
+    if (!Array.isArray(project.frames)) {
+        throw new Error('Invalid .gwall file: project.frames is missing or not an array');
+    }
+    if (!project.wallConfig || typeof project.wallConfig !== 'object') {
+        throw new Error('Invalid .gwall file: wallConfig is missing or invalid');
+    }
+
     const images = [];
 
     // Extract images from the 'images/' folder

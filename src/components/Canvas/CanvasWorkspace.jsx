@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { useProject } from '../../hooks/useProject';
 import styles from './CanvasWorkspace.module.css';
 import { v4 as uuidv4 } from 'uuid';
-import { PPI, GRID_SIZE } from '../../constants';
+import { PPI, GRID_SIZE, WALL_PADDING } from '../../constants';
 import FrameContent from './FrameContent';
 import ContextMenu from './ContextMenu';
 
@@ -135,8 +135,8 @@ const CanvasWorkspace = () => {
         const wallHeight = currentProject.wallConfig.height * PPI;
 
         const nextScale = 1;
-        const nextPanX = containerWidth / 2 - (50 + wallWidth / 2) * nextScale;
-        const nextPanY = containerHeight / 2 - (50 + wallHeight / 2) * nextScale;
+        const nextPanX = containerWidth / 2 - (WALL_PADDING + wallWidth / 2) * nextScale;
+        const nextPanY = containerHeight / 2 - (WALL_PADDING + wallHeight / 2) * nextScale;
 
         setScale(nextScale);
         setPan({ x: nextPanX, y: nextPanY });
@@ -156,8 +156,8 @@ const CanvasWorkspace = () => {
         nextScale = Math.min(Math.max(0.1, nextScale), 5);
         nextScale = Math.round(nextScale * 100) / 100;
 
-        const nextPanX = containerWidth / 2 - (50 + wallWidth / 2) * nextScale;
-        const nextPanY = containerHeight / 2 - (50 + wallHeight / 2) * nextScale;
+        const nextPanX = containerWidth / 2 - (WALL_PADDING + wallWidth / 2) * nextScale;
+        const nextPanY = containerHeight / 2 - (WALL_PADDING + wallHeight / 2) * nextScale;
 
         setScale(nextScale);
         setPan({ x: nextPanX, y: nextPanY });
@@ -193,7 +193,8 @@ const CanvasWorkspace = () => {
         setSelection,
         snapToGrid,
         addImageToLibrary,
-        setFocusedArea
+        setFocusedArea,
+        frameSelector: styles.frame
     });
 
     // Shortcuts Hook
@@ -232,7 +233,8 @@ const CanvasWorkspace = () => {
                 <div id="canvas-wall" className={`${styles.wall} ${showGrid ? styles.grid : ''} ${styles[currentProject.wallConfig.type]}`} style={{ width: `${currentProject.wallConfig.width * PPI}px`, height: `${currentProject.wallConfig.height * PPI}px`, backgroundColor: currentProject.wallConfig.backgroundColor, '--grid-size': `${GRID_SIZE * PPI}px` }}>
                     {currentProject.frames.map(frame => {
                         const isDraggingThis = selectedFrameIds.includes(frame.id) && isDraggingFrame && hasDragged;
-                        let displayX = frame.x, displayY = frame.y;
+                        let displayX = Number.isFinite(frame.x) ? frame.x : 0;
+                        let displayY = Number.isFinite(frame.y) ? frame.y : 0;
                         if (isDraggingThis) {
                             const initPos = initialPositions[frame.id];
                             if (initPos) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './PropertiesPanel.module.css';
+import ValidatedNumberInput from '../Common/ValidatedNumberInput';
 
 const WallProperties = ({ currentProject, updateProject }) => {
     const wall = currentProject.wallConfig;
@@ -18,8 +19,22 @@ const WallProperties = ({ currentProject, updateProject }) => {
                 <div className={styles.propGroup}>
                     <label>Dimensions (WxH)</label>
                     <div className={styles.row}>
-                        <input className={styles.fluidInput} type="number" value={wall.width} onChange={(e) => handleWallChange('width', parseFloat(e.target.value))} />
-                        <input className={styles.fluidInput} type="number" value={wall.height} onChange={(e) => handleWallChange('height', parseFloat(e.target.value))} />
+                        <ValidatedNumberInput
+                            className={styles.fluidInput}
+                            value={wall.width}
+                            onChange={(val) => handleWallChange('width', val)}
+                            min={1}
+                            allowNegative={false}
+                            step={1}
+                        />
+                        <ValidatedNumberInput
+                            className={styles.fluidInput}
+                            value={wall.height}
+                            onChange={(val) => handleWallChange('height', val)}
+                            min={1}
+                            allowNegative={false}
+                            step={1}
+                        />
                     </div>
                 </div>
                 <div className={styles.propGroup}>

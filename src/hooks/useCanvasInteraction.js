@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { saveImage } from '../utils/imageStore';
-import { PPI, GRID_SIZE } from '../constants';
-import styles from '../components/Canvas/CanvasWorkspace.module.css';
+import { PPI, GRID_SIZE, WALL_PADDING } from '../constants';
 
 export const useCanvasInteraction = ({
     containerRef,
@@ -16,7 +15,8 @@ export const useCanvasInteraction = ({
     setSelection,
     snapToGrid,
     addImageToLibrary,
-    setFocusedArea
+    setFocusedArea,
+    frameSelector // CSS class selector for frame elements
 }) => {
     // Interaction State
     const [isPanning, setIsPanning] = useState(false);
@@ -54,7 +54,7 @@ export const useCanvasInteraction = ({
         }
 
         if (e.button === 0) {
-            const isFrame = e.target.closest(`.${styles.frame}`);
+            const isFrame = e.target.closest(`.${frameSelector}`);
             if (!isFrame) {
                 setIsMarquee(true);
                 setDragStart({ x: clientX, y: clientY });
@@ -97,7 +97,10 @@ export const useCanvasInteraction = ({
         const positions = {};
         currentProject.frames.forEach(f => {
             if (nextSelectedIds.includes(f.id)) {
-                positions[f.id] = { x: f.x, y: f.y };
+                positions[f.id] = {
+                    x: Number.isFinite(f.x) ? f.x : 0,
+                    y: Number.isFinite(f.y) ? f.y : 0
+                };
             }
         });
         setInitialPositions(positions);
@@ -126,10 +129,10 @@ export const useCanvasInteraction = ({
                 // FrameScreenX = ContainerX + PanX + (50+FrameWallX)*Scale
                 // FrameWallX = ((FrameScreenX - ContainerX - PanX) / Scale) - 50
 
-                const wallX1 = ((minX - rect.left - pan.x) / scale) - 50;
-                const wallX2 = ((maxX - rect.left - pan.x) / scale) - 50;
-                const wallY1 = ((minY - rect.top - pan.y) / scale) - 50;
-                const wallY2 = ((maxY - rect.top - pan.y) / scale) - 50;
+                const wallX1 = ((minX - rect.left - pan.x) / scale) - WALL_PADDING;
+                const wallX2 = ((maxX - rect.left - pan.x) / scale) - WALL_PADDING;
+                const wallY1 = ((minY - rect.top - pan.y) / scale) - WALL_PADDING;
+                const wallY2 = ((maxY - rect.top - pan.y) / scale) - WALL_PADDING;
 
                 const candidates = currentProject.frames.filter(f => {
                     const bWidthPx = (f.borderWidth || 0.1) * PPI;
@@ -209,7 +212,7 @@ export const useCanvasInteraction = ({
                 setSelection(candidateFrameIds);
             }
         } else if (isDraggingFrame && !hasDragged && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
-            const frameEl = e.target.closest(`.${styles.frame}`);
+            const frameEl = e.target.closest(`.${frameSelector}`);
             if (frameEl) {
                 const frameId = frameEl.getAttribute('data-frame-id');
                 if (frameId) selectFrame(frameId, false);
@@ -239,7 +242,7 @@ export const useCanvasInteraction = ({
 
     const handleContextMenu = (e) => {
         e.preventDefault();
-        const frameEl = e.target.closest(`.${styles.frame}`);
+        const frameEl = e.target.closest(`.${frameSelector}`);
         const frameId = frameEl ? frameEl.getAttribute('data-frame-id') : null;
         if (frameId) {
             if (!selectedFrameIds.includes(frameId)) selectFrame(frameId, false);
@@ -258,7 +261,7 @@ export const useCanvasInteraction = ({
                     const imageId = uuidv4();
                     await saveImage(imageId, file);
                     addImageToLibrary(currentProject.id, imageId);
-                    const frameEl = e.target.closest(`.${styles.frame}`);
+                    const frameEl = e.target.closest(`.${frameSelector}`);
                     if (frameEl) {
                         const frameId = frameEl.getAttribute('data-frame-id');
                         if (frameId) {
@@ -297,7 +300,7 @@ export const useCanvasInteraction = ({
                 updateProject(currentProject.id, { frames: [...currentProject.frames, newFrame] });
             }
             if (d.type === 'PHOTO_LIBRARY_ITEM') {
-                const frameEl = e.target.closest(`.${styles.frame}`);
+                const frameEl = e.target.closest(`.${frameSelector}`);
                 if (frameEl) {
                     const frameId = frameEl.getAttribute('data-frame-id');
                     if (frameId) {

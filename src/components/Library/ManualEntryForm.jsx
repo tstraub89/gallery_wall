@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { useProject } from '../../hooks/useProject';
 import styles from './ManualEntryForm.module.css';
+import ValidatedNumberInput from '../Common/ValidatedNumberInput';
 
 const ManualEntryForm = () => {
     const { currentProject, addToLibrary } = useProject();
     const [label, setLabel] = useState('');
-    const [width, setWidth] = useState('8');
-    const [height, setHeight] = useState('10');
+    const [width, setWidth] = useState(8);
+    const [height, setHeight] = useState(10);
     const [isMatted, setIsMatted] = useState(false);
-    const [matWidth, setMatWidth] = useState('5');
-    const [matHeight, setMatHeight] = useState('7');
+    const [matWidth, setMatWidth] = useState(5);
+    const [matHeight, setMatHeight] = useState(7);
     const [shape, setShape] = useState('rect');
     const [frameColor, setFrameColor] = useState('#111111');
 
@@ -18,15 +19,15 @@ const ManualEntryForm = () => {
         if (!currentProject) return;
 
         const frameDims = {
-            width: parseFloat(width),
-            height: parseFloat(height),
+            width: width,
+            height: height,
             label: label,
             shape: shape,
             frameColor: frameColor,
-            matted: isMatted ? { width: parseFloat(matWidth), height: parseFloat(matHeight) } : null
+            matted: isMatted ? { width: matWidth, height: matHeight } : null
         };
 
-        if (isNaN(frameDims.width) || isNaN(frameDims.height)) {
+        if (isNaN(frameDims.width) || isNaN(frameDims.height) || frameDims.width <= 0 || frameDims.height <= 0) {
             alert("Please enter valid width and height.");
             return;
         }
@@ -49,11 +50,23 @@ const ManualEntryForm = () => {
             <div className={styles.row}>
                 <div className={styles.field}>
                     <label>Width</label>
-                    <input type="number" step="0.1" value={width} onChange={e => setWidth(e.target.value)} />
+                    <ValidatedNumberInput
+                        value={width}
+                        onChange={(val) => setWidth(val)}
+                        min={0.1}
+                        step={0.1}
+                        allowNegative={false}
+                    />
                 </div>
                 <div className={styles.field}>
                     <label>Height</label>
-                    <input type="number" step="0.1" value={height} onChange={e => setHeight(e.target.value)} />
+                    <ValidatedNumberInput
+                        value={height}
+                        onChange={(val) => setHeight(val)}
+                        min={0.1}
+                        step={0.1}
+                        allowNegative={false}
+                    />
                 </div>
             </div>
 
@@ -87,11 +100,23 @@ const ManualEntryForm = () => {
                 <div className={styles.row}>
                     <div className={styles.field}>
                         <label>Opening W</label>
-                        <input type="number" step="0.1" value={matWidth} onChange={e => setMatWidth(e.target.value)} />
+                        <ValidatedNumberInput
+                            value={matWidth}
+                            onChange={(val) => setMatWidth(val)}
+                            min={0.1}
+                            step={0.1}
+                            allowNegative={false}
+                        />
                     </div>
                     <div className={styles.field}>
                         <label>Opening H</label>
-                        <input type="number" step="0.1" value={matHeight} onChange={e => setMatHeight(e.target.value)} />
+                        <ValidatedNumberInput
+                            value={matHeight}
+                            onChange={(val) => setMatHeight(val)}
+                            min={0.1}
+                            step={0.1}
+                            allowNegative={false}
+                        />
                     </div>
                 </div>
             )}

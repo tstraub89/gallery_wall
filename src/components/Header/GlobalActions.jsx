@@ -74,6 +74,7 @@ const GlobalActions = () => {
 
         const imgElements = Array.from(node.querySelectorAll('img'));
         const originalSources = new Map();
+        let failedConversions = 0;
 
         try {
             for (const img of imgElements) {
@@ -83,7 +84,8 @@ const GlobalActions = () => {
                         const b64 = await blobToBase64(img.src);
                         img.src = b64;
                     } catch {
-                        // Silently handle base64 conversion errors during export
+                        // Track failed conversion but continue with export
+                        failedConversions++;
                     }
                 }
             }
@@ -148,6 +150,11 @@ const GlobalActions = () => {
             link.href = url;
             link.click();
             setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+            // Show warning if some images failed to convert
+            if (failedConversions > 0) {
+                setExportError(`Export completed but ${failedConversions} image(s) may be missing`);
+            }
         } catch (err) {
             console.error('Export failed', err);
             setExportError(err instanceof Event ? 'Browser Error (Images fail to load)' : (err.message || String(err)));

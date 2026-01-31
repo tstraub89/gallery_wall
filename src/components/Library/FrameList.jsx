@@ -75,17 +75,13 @@ const FrameList = () => {
                 case 'height':
                     return b.height - a.height;
                 case 'oldest':
-                    // Assuming library order is oldest first
-                    return 0;
+                    // Items without createdAt (legacy) sort as oldest (epoch 0)
+                    return (a.createdAt || 0) - (b.createdAt || 0);
                 case 'newest':
                 default:
-                    return 0;
+                    return (b.createdAt || 0) - (a.createdAt || 0);
             }
         });
-
-        if (sortBy === 'newest') {
-            result.reverse();
-        }
 
         return result;
     };

@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './PropertiesPanel.module.css';
+import ValidatedNumberInput from '../Common/ValidatedNumberInput';
 
 const ImageProperties = ({ frame, updateProject, currentProject }) => {
     const handleImageChange = (field, value) => {
@@ -21,10 +22,12 @@ const ImageProperties = ({ frame, updateProject, currentProject }) => {
                         onChange={(e) => handleImageChange('scale', parseFloat(e.target.value))}
                         className={styles.slider}
                     />
-                    <input
-                        type="number" step="0.1"
+                    <ValidatedNumberInput
                         value={frame.imageState?.scale || 1}
-                        onChange={(e) => handleImageChange('scale', parseFloat(e.target.value))}
+                        onChange={(val) => handleImageChange('scale', val)}
+                        min={0.1}
+                        step={0.1}
+                        allowNegative={false}
                         className={styles.numberInput}
                     />
                 </div>
@@ -38,10 +41,10 @@ const ImageProperties = ({ frame, updateProject, currentProject }) => {
                         onChange={(e) => handleImageChange('x', parseFloat(e.target.value))}
                         className={styles.slider}
                     />
-                    <input
-                        type="number"
+                    <ValidatedNumberInput
                         value={frame.imageState?.x || 0}
-                        onChange={(e) => handleImageChange('x', parseFloat(e.target.value))}
+                        onChange={(val) => handleImageChange('x', val)}
+                        allowNegative={true}
                         className={styles.numberInput}
                     />
                 </div>
@@ -55,10 +58,10 @@ const ImageProperties = ({ frame, updateProject, currentProject }) => {
                         onChange={(e) => handleImageChange('y', parseFloat(e.target.value))}
                         className={styles.slider}
                     />
-                    <input
-                        type="number"
+                    <ValidatedNumberInput
                         value={frame.imageState?.y || 0}
-                        onChange={(e) => handleImageChange('y', parseFloat(e.target.value))}
+                        onChange={(val) => handleImageChange('y', val)}
+                        allowNegative={true}
                         className={styles.numberInput}
                     />
                 </div>

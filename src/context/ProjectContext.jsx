@@ -3,8 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { saveProjectData, loadProjectData } from '../utils/imageStore';
 import { ProjectContext } from './ProjectContextCore';
 
-const STORAGE_KEY = 'gallery_planner_data';
-
 const initialData = {
     projects: {}, // { [id]: Project }
     currentProjectId: null,
@@ -33,23 +31,12 @@ const createNewProject = (name) => ({
 });
 
 export const ProjectProvider = ({ children }) => {
-    const [data, setData] = useState(() => {
-        // Synchronous initial state from localStorage as fallback/migration boot
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-            try {
-                return JSON.parse(saved);
-            } catch {
-                return initialData;
-            }
-        }
-        return initialData;
-    });
+    const [data, setData] = useState(initialData);
 
     const [isLoaded, setIsLoaded] = useState(false);
     const hasInitialLoaded = useRef(false);
 
-    // Initial load from IndexedDB (Migration from localStorage if empty)
+    // Initial load from IndexedDB
     useEffect(() => {
         if (hasInitialLoaded.current) return;
         hasInitialLoaded.current = true;
@@ -60,23 +47,15 @@ export const ProjectProvider = ({ children }) => {
                 if (idbData) {
                     setData(idbData);
                 } else {
-                    // If IDB is empty, check localStorage
-                    const saved = localStorage.getItem(STORAGE_KEY);
-                    if (saved) {
-                        const parsed = JSON.parse(saved);
-                        setData(parsed);
-                        await saveProjectData(parsed);
-                    } else if (Object.keys(data.projects).length === 0) {
-                        // Brand new install
-                        const fresh = createNewProject('Untitled Project');
-                        const freshData = {
-                            ...initialData,
-                            projects: { [fresh.id]: fresh },
-                            currentProjectId: fresh.id
-                        };
-                        setData(freshData);
-                        await saveProjectData(freshData);
-                    }
+                    // Brand new install
+                    const fresh = createNewProject('Untitled Project');
+                    const freshData = {
+                        ...initialData,
+                        projects: { [fresh.id]: fresh },
+                        currentProjectId: fresh.id
+                    };
+                    setData(freshData);
+                    await saveProjectData(freshData);
                 }
             } catch (err) {
                 console.error("Failed to load data from IndexedDB", err);
@@ -85,18 +64,15 @@ export const ProjectProvider = ({ children }) => {
             }
         };
         init();
-    }, [data.projects]);
+    }, []);
 
-    // Auto-save to IndexedDB (and localStorage as tiny fallback if under limit)
+    // Auto-save to IndexedDB
     useEffect(() => {
         if (!isLoaded) return;
 
         const save = async () => {
             try {
                 await saveProjectData(data);
-                // Only keep metadata in localStorage for fast initial boot if possible?
-                // For now, full save to both, but IDB is the primary.
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
             } catch (err) {
                 console.warn("Failed to auto-save to IndexedDB", err);
             }
@@ -175,7 +151,8 @@ export const ProjectProvider = ({ children }) => {
         const libraryItem = {
             id: uuidv4(),
             ...frameDimensions,
-            count: 1
+            count: 1,
+            createdAt: Date.now()
         };
 
         setData(prev => {
@@ -286,11 +263,11 @@ export const ProjectProvider = ({ children }) => {
     });
 
     const pushToHistory = (projectId) => {
-        const currentMementro = data.projects[projectId];
-        if (!currentMementro) return;
+        const currentMemento = data.projects[projectId];
+        if (!currentMemento) return;
 
         setHistory(prev => ({
-            past: [...prev.past, { projectId, data: structuredClone(currentMementro) }],
+            past: [...prev.past, { projectId, data: structuredClone(currentMemento) }],
             future: []
         }));
     };

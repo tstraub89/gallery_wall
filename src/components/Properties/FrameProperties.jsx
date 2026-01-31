@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import styles from './PropertiesPanel.module.css';
 import { PPI } from '../../constants';
 import ImageProperties from './ImageProperties';
+import ValidatedNumberInput from '../Common/ValidatedNumberInput';
 import {
     AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd,
     AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd
@@ -233,17 +234,19 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                         <div className={styles.propGroup}>
                             <label>Position (X / Y)</label>
                             <div className={styles.row}>
-                                <input
+                                <ValidatedNumberInput
                                     className={styles.fluidInput}
-                                    type="number" step="0.1"
+                                    step={0.1}
                                     value={Math.round((minX / PPI) * 10) / 10}
-                                    onChange={(e) => updateRelative('x', parseFloat(e.target.value) * PPI)}
+                                    onChange={(val) => updateRelative('x', val * PPI)}
+                                    allowNegative={true}
                                 />
-                                <input
+                                <ValidatedNumberInput
                                     className={styles.fluidInput}
-                                    type="number" step="0.1"
+                                    step={0.1}
                                     value={Math.round((minY / PPI) * 10) / 10}
-                                    onChange={(e) => updateRelative('y', parseFloat(e.target.value) * PPI)}
+                                    onChange={(val) => updateRelative('y', val * PPI)}
+                                    allowNegative={true}
                                 />
                             </div>
                         </div>
@@ -252,20 +255,24 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                             <label>Dimensions (W x H)</label>
                             <div className={styles.row}>
                                 <div className={styles.inputStack} style={{ flex: 1 }}>
-                                    <input
+                                    <ValidatedNumberInput
                                         className={styles.fluidInput}
-                                        type="number" step="0.1"
+                                        step={0.1}
                                         value={getValue('width') || ''}
-                                        onChange={(e) => updateAll('width', parseFloat(e.target.value))}
+                                        onChange={(val) => updateAll('width', val)}
+                                        min={0.1}
+                                        allowNegative={false}
                                         placeholder={selectedFrames.length > 1 ? "-" : ""}
                                     />
                                 </div>
                                 <div className={styles.inputStack} style={{ flex: 1 }}>
-                                    <input
+                                    <ValidatedNumberInput
                                         className={styles.fluidInput}
-                                        type="number" step="0.1"
+                                        step={0.1}
                                         value={getValue('height') || ''}
-                                        onChange={(e) => updateAll('height', parseFloat(e.target.value))}
+                                        onChange={(val) => updateAll('height', val)}
+                                        min={0.1}
+                                        allowNegative={false}
                                         placeholder={selectedFrames.length > 1 ? "-" : ""}
                                     />
                                 </div>
@@ -317,10 +324,13 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                                     onChange={(e) => updateAll('borderWidth', parseFloat(e.target.value))}
                                     className={styles.slider}
                                 />
-                                <input
-                                    type="number" step="0.1"
+                                <ValidatedNumberInput
                                     value={getValue('borderWidth') || 0.1}
-                                    onChange={(e) => updateAll('borderWidth', parseFloat(e.target.value))}
+                                    onChange={(val) => updateAll('borderWidth', val)}
+                                    min={0}
+                                    max={2}
+                                    step={0.1}
+                                    allowNegative={false}
                                     className={styles.numberInput}
                                 />
                             </div>
@@ -381,20 +391,24 @@ const FrameProperties = ({ currentProject, selectedFrameIds, updateProject }) =>
                                 <div className={styles.row} style={{ marginTop: '4px', gap: '12px' }}>
                                     <div className={styles.inputStack}>
                                         <label>Opening W</label>
-                                        <input
+                                        <ValidatedNumberInput
                                             className={styles.fluidInput}
-                                            type="number" step="0.1"
+                                            step={0.1}
                                             value={matDims.width}
-                                            onChange={(e) => handleMatDimChange('width', parseFloat(e.target.value))}
+                                            onChange={(val) => handleMatDimChange('width', val)}
+                                            min={0.1}
+                                            allowNegative={false}
                                         />
                                     </div>
                                     <div className={styles.inputStack}>
                                         <label>Opening H</label>
-                                        <input
+                                        <ValidatedNumberInput
                                             className={styles.fluidInput}
-                                            type="number" step="0.1"
+                                            step={0.1}
                                             value={matDims.height}
-                                            onChange={(e) => handleMatDimChange('height', parseFloat(e.target.value))}
+                                            onChange={(val) => handleMatDimChange('height', val)}
+                                            min={0.1}
+                                            allowNegative={false}
                                         />
                                     </div>
                                 </div>
