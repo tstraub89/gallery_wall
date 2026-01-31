@@ -24,7 +24,8 @@ const FrameContent: React.FC<FrameContentProps> = ({ frame, ppi }) => {
             className={styles.frameContent}
             style={{
                 userSelect: 'none',
-                borderRadius: frame.shape === 'round' ? '50%' : '0'
+                borderRadius: frame.shape === 'round' ? '50%' : '0',
+                backgroundColor: url ? 'transparent' : '#fff'
             }}
         >
             {/* ... image ... */}

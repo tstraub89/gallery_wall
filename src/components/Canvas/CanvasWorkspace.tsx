@@ -285,7 +285,7 @@ const CanvasWorkspace: React.FC = () => {
             height: `${heightPx + bWidthPx * 2}px`,
             zIndex: frame.zIndex,
             padding: `${bWidthPx}px`,
-            backgroundColor: frame.imageId ? (frame.frameColor || '#111') : '#fff',
+            backgroundColor: frame.frameColor || '#111',
             cursor: isDragging ? 'grabbing' : 'grab',
             transition: isDragging ? 'none' : 'box-shadow 0.1s',
             borderRadius: frame.shape === 'round' ? '50%' : '2px',
