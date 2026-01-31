@@ -2,6 +2,8 @@
 
 **Visualize your perfect gallery wall before you hang a single nail.**
 
+![Gallery Wall Planner Preview](./example.png)
+
 A powerful, interactive web application designed to help you plan complex gallery layouts with real frames and personal photos. Transition from a pile of frames on the floor to a perfectly aligned wall with confidence.
 
 <a href="https://www.buymeacoffee.com/tstraub89" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="60" width="217"></a>
@@ -81,8 +83,10 @@ Click the **"?"** button in the header for the in-app **Quick Start Guide**.
 3.  **Browse**: Open `http://localhost:5173`.
 
 > [!TIP]
-> You can load [example_staircase.gwall](./example_staircase.gwall) to try out the tool with a preconfigured gallery wall layout. You can also check [example_frame_template.txt](./example_frame_template.txt) to see how to format your own frame collection for batch importing.
+> You can load [example.gwall](./example.gwall) to try out the tool with a preconfigured gallery wall layout. You can also check [example_frame_template.txt](./example_frame_template.txt) to see how to format your own frame collection for batch importing.
 
-**Tech Stack**: Built with React 19 (Vite), CSS Modules, and IndexedDB for persistent local storage.
+**Tech Stack**: Built with React 19 (Vite), **TypeScript**, CSS Modules, and IndexedDB for persistent local storage.
+
+v2.0.0 Released Jan 2026. 🚀✨
 
 © 2026 Timothy Straub. All Rights Reserved.
