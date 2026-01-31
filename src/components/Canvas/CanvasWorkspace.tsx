@@ -143,30 +143,58 @@ const CanvasWorkspace: React.FC = () => {
         }
     }, [currentProject, selectedFrameIds, updateProject, setSelection]);
 
-    const handleDeleteFrame = React.useCallback((frameId: string) => {
+    const handleDeleteFrame = React.useCallback((frameIdOrIds: string | string[]) => {
         if (!currentProject) return;
-        const updatedFrames = currentProject.frames.filter(f => f.id !== frameId);
+        const idsToDelete = Array.isArray(frameIdOrIds) ? frameIdOrIds : [frameIdOrIds];
+        const idSet = new Set(idsToDelete);
+        const updatedFrames = currentProject.frames.filter(f => !idSet.has(f.id));
         updateProject(currentProject.id, { frames: updatedFrames });
-        setSelection(selectedFrameIds.filter(id => id !== frameId));
+        setSelection(selectedFrameIds.filter(id => !idSet.has(id)));
     }, [currentProject, updateProject, selectedFrameIds, setSelection]);
 
-    const handleBringToFront = (frameId: string) => {
+    const handleBringToFront = (frameIdOrIds: string | string[]) => {
         if (!currentProject) return;
+        const ids = Array.isArray(frameIdOrIds) ? frameIdOrIds : [frameIdOrIds];
+        const idSet = new Set(ids);
         const maxZ = Math.max(0, ...currentProject.frames.map(f => f.zIndex || 0));
-        const updatedFrames = currentProject.frames.map(f => f.id === frameId ? { ...f, zIndex: maxZ + 1 } : f);
+        const updatedFrames = currentProject.frames.map((f, i) =>
+            idSet.has(f.id) ? { ...f, zIndex: maxZ + 1 + i } : f
+        );
         updateProject(currentProject.id, { frames: updatedFrames });
     };
 
-    const handleSendToBack = (frameId: string) => {
+    const handleSendToBack = (frameIdOrIds: string | string[]) => {
         if (!currentProject) return;
+        const ids = Array.isArray(frameIdOrIds) ? frameIdOrIds : [frameIdOrIds];
+        const idSet = new Set(ids);
         const minZ = Math.min(1000, ...currentProject.frames.map(f => f.zIndex || 0));
-        const updatedFrames = currentProject.frames.map(f => f.id === frameId ? { ...f, zIndex: Math.max(0, minZ - 1) } : f);
+        const updatedFrames = currentProject.frames.map((f, i) =>
+            idSet.has(f.id) ? { ...f, zIndex: Math.max(0, minZ - 1 - i) } : f
+        );
         updateProject(currentProject.id, { frames: updatedFrames });
     };
 
-    const handleRemovePhoto = (frameId: string) => {
+    const handleRemovePhoto = (frameIdOrIds: string | string[]) => {
         if (!currentProject) return;
-        const updatedFrames = currentProject.frames.map(f => f.id === frameId ? { ...f, imageId: null } : f);
+        const ids = Array.isArray(frameIdOrIds) ? frameIdOrIds : [frameIdOrIds];
+        const idSet = new Set(ids);
+        const updatedFrames = currentProject.frames.map(f =>
+            idSet.has(f.id) ? { ...f, imageId: null } : f
+        );
+        updateProject(currentProject.id, { frames: updatedFrames });
+    };
+
+    const handleRotatePhoto = (frameIdOrIds: string | string[]) => {
+        if (!currentProject) return;
+        const ids = Array.isArray(frameIdOrIds) ? frameIdOrIds : [frameIdOrIds];
+        const idSet = new Set(ids);
+        const updatedFrames = currentProject.frames.map(f => {
+            if (idSet.has(f.id) && f.imageId) {
+                const currentState = f.imageState || { scale: 1, x: 0, y: 0, rotation: 0 };
+                return { ...f, imageState: { ...currentState, rotation: (currentState.rotation + 90) % 360 } };
+            }
+            return f;
+        });
         updateProject(currentProject.id, { frames: updatedFrames });
     };
 
@@ -327,23 +355,46 @@ const CanvasWorkspace: React.FC = () => {
                 }}
             >
                 {/* Wall with Grid */}
-                {currentProject.wallConfig && (
-                    <div
-                        id="canvas-wall"
-                        className={`${styles.wall} ${showGrid ? styles.grid : ''} ${currentProject.wallConfig.type === 'staircase-asc' ? styles['staircase-asc'] :
-                            currentProject.wallConfig.type === 'staircase-desc' ? styles['staircase-desc'] : ''
-                            }`}
-                        style={{
-                            width: `${currentProject.wallConfig.width * PPI}px`,
-                            height: `${currentProject.wallConfig.height * PPI}px`,
-                            backgroundColor: currentProject.wallConfig.backgroundColor,
-                            top: 0,
-                            left: 0,
-                            pointerEvents: 'auto',
-                            '--grid-size': `${gridSizePx}px`
-                        } as React.CSSProperties}
-                    />
-                )}
+                {currentProject.wallConfig && (() => {
+                    const wallType = currentProject.wallConfig.type;
+                    const stairAngle = currentProject.wallConfig.stairAngle ?? 50;
+
+                    // Calculate clip-path for staircase walls
+                    // The stairAngle/slope directly represents what % of wall height is clipped on one side
+                    // e.g., 30 means 30% of wall height is clipped, 45 means 45%, etc.
+                    let clipPath: string | undefined;
+
+                    if (wallType === 'staircase-asc' || wallType === 'staircase-desc') {
+                        // Clamp to valid range: 10-100% of wall height rise
+                        const clipPercent = Math.min(100, Math.max(10, stairAngle));
+                        const bottomPercent = 100 - clipPercent;
+
+                        if (wallType === 'staircase-asc') {
+                            // Left is full height (100%), right clips up
+                            clipPath = `polygon(0 0, 100% 0, 100% ${bottomPercent}%, 0 100%)`;
+                        } else {
+                            // Right is full height (100%), left clips up  
+                            clipPath = `polygon(0 0, 100% 0, 100% 100%, 0 ${bottomPercent}%)`;
+                        }
+                    }
+
+                    return (
+                        <div
+                            id="canvas-wall"
+                            className={`${styles.wall} ${showGrid ? styles.grid : ''}`}
+                            style={{
+                                width: `${currentProject.wallConfig.width * PPI}px`,
+                                height: `${currentProject.wallConfig.height * PPI}px`,
+                                backgroundColor: currentProject.wallConfig.backgroundColor,
+                                top: 0,
+                                left: 0,
+                                pointerEvents: 'auto',
+                                '--grid-size': `${gridSizePx}px`,
+                                clipPath
+                            } as React.CSSProperties}
+                        />
+                    );
+                })()}
 
                 <div style={{ pointerEvents: 'none' }}>
                     {currentProject.frames.map(frame => {
@@ -412,21 +463,36 @@ const CanvasWorkspace: React.FC = () => {
                 </button>
             </div>
 
-            {contextMenu && (
-                <ContextMenu
-                    x={contextMenu.x}
-                    y={contextMenu.y}
-                    onClose={() => setContextMenu(null)}
-                    items={[
-                        { label: 'Bring to Front', onClick: () => handleBringToFront(contextMenu.frameId) },
-                        { label: 'Send to Back', onClick: () => handleSendToBack(contextMenu.frameId) },
-                        { separator: true },
-                        { label: 'Duplicate', shortcut: 'Ctrl+D', onClick: duplicateSelected },
-                        { label: 'Remove Photo', onClick: () => handleRemovePhoto(contextMenu.frameId) },
-                        { label: 'Delete', shortcut: 'Del', danger: true, onClick: () => handleDeleteFrame(contextMenu.frameId) }
-                    ]}
-                />
-            )}
+            {contextMenu && (() => {
+                // Determine which frames to act on: if right-clicked frame is selected, use all selected; otherwise just the clicked frame
+                const isClickedInSelection = selectedFrameIds.includes(contextMenu.frameId);
+                const targetIds = isClickedInSelection ? selectedFrameIds : [contextMenu.frameId];
+                const count = targetIds.length;
+                const plural = count > 1;
+
+                // Check if any target frames have photos
+                const targetFrames = currentProject?.frames.filter(f => targetIds.includes(f.id)) || [];
+                const hasAnyPhotos = targetFrames.some(f => f.imageId);
+
+                return (
+                    <ContextMenu
+                        x={contextMenu.x}
+                        y={contextMenu.y}
+                        onClose={() => setContextMenu(null)}
+                        items={[
+                            { label: plural ? `Bring ${count} to Front` : 'Bring to Front', onClick: () => handleBringToFront(targetIds) },
+                            { label: plural ? `Send ${count} to Back` : 'Send to Back', onClick: () => handleSendToBack(targetIds) },
+                            { separator: true },
+                            { label: plural ? `Duplicate ${count} Frames` : 'Duplicate', shortcut: plural ? undefined : 'Ctrl+D', onClick: duplicateSelected },
+                            ...(hasAnyPhotos ? [
+                                { label: plural ? `Rotate ${count} Photos 90°` : 'Rotate Photo 90°', onClick: () => handleRotatePhoto(targetIds) },
+                                { label: plural ? `Remove ${count} Photos` : 'Remove Photo', onClick: () => handleRemovePhoto(targetIds) }
+                            ] : []),
+                            { label: plural ? `Delete ${count} Frames` : 'Delete', shortcut: plural ? undefined : 'Del', danger: true, onClick: () => handleDeleteFrame(targetIds) }
+                        ]}
+                    />
+                );
+            })()}
         </div>
     );
 };

@@ -8,6 +8,7 @@ export interface DropdownItem {
     icon?: ReactNode;
     separator?: boolean;
     danger?: boolean;
+    title?: string;
 }
 
 interface DropdownMenuProps {
@@ -57,6 +58,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ label, icon, items = [], ch
                             <div
                                 key={index}
                                 className={`${styles.item} ${item.danger ? styles.danger : ''}`}
+                                title={item.title}
                                 onClick={(e) => {
                                     item.onClick?.(e);
                                     setIsOpen(false);

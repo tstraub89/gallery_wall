@@ -273,10 +273,10 @@ const GlobalActions = () => {
                 label="Project"
                 icon={<FolderOpen size={16} />}
                 items={[
-                    { label: 'Import Project (.gwall)', onClick: triggerImport },
-                    { label: 'Export Project (.gwall)', onClick: handleProjectExport },
+                    { label: 'Import Project (.gwall)', onClick: triggerImport, title: 'Load a saved project including all photos' },
+                    { label: 'Export Project (.gwall)', onClick: handleProjectExport, title: 'Save project with all photos for backup or sharing' },
                     { separator: true },
-                    { label: 'Reset / Clear Canvas', onClick: handleClearCanvas, danger: true }
+                    { label: 'Reset / Clear Canvas', onClick: handleClearCanvas, danger: true, title: 'Remove all frames from canvas' }
                 ]}
             />
             {/* Hidden Input for Import */}
@@ -293,9 +293,9 @@ const GlobalActions = () => {
                 label="Export"
                 icon={<Download size={16} />}
                 items={[
-                    { label: 'Save Image (PNG)', onClick: handleExport },
-                    { label: 'Shopping List (.txt)', onClick: handleShoppingListExport },
-                    { label: 'Export Photos (.zip)', onClick: handlePhotoExport }
+                    { label: 'Save Image (PNG)', onClick: handleExport, title: 'Screenshot of your wall layout' },
+                    { label: 'Shopping List (.txt)', onClick: handleShoppingListExport, title: 'Text list of all frames for shopping' },
+                    { label: 'Export Photos (.zip)', onClick: handlePhotoExport, title: 'High-res cropped photos ready for printing' }
                 ]}
             />
 

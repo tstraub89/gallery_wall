@@ -52,6 +52,20 @@ const WallProperties: React.FC<WallPropertiesProps> = ({ currentProject, updateP
                         <option value="staircase-desc">Staircase (Descending)</option>
                     </select>
                 </div>
+                {(wall.type === 'staircase-asc' || wall.type === 'staircase-desc') && (
+                    <div className={styles.propGroup}>
+                        <label title="How much the floor rises across the wall (10-100% of wall height)">Rise (%)</label>
+                        <ValidatedNumberInput
+                            className={styles.fluidInput}
+                            value={wall.stairAngle ?? 50}
+                            onChange={(val) => handleWallChange('stairAngle', val)}
+                            min={10}
+                            max={100}
+                            step={5}
+                            title="Range: 10-100%. Values outside this range will be clipped."
+                        />
+                    </div>
+                )}
                 <div className={styles.propGroup}>
                     <label>Wall Color</label>
                     <input type="color" value={wall.backgroundColor} onChange={(e) => handleWallChange('backgroundColor', e.target.value)} style={{ width: '100%', height: 32 }} />

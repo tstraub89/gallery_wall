@@ -9,6 +9,45 @@ import GlobalActions from './components/Header/GlobalActions';
 import Logo from './components/Header/Logo';
 import ProjectMenu from './components/Header/ProjectMenu';
 import WindowControls from './components/Header/WindowControls';
+import WelcomeModal from './components/Common/WelcomeModal';
+import { useProject } from './hooks/useProject';
+
+// Inner component that can use context
+const AppContent: React.FC = () => {
+  const { showWelcome, importDemoProject, startFresh } = useProject();
+
+  return (
+    <>
+      {showWelcome && (
+        <WelcomeModal
+          onLoadDemo={importDemoProject}
+          onStartFresh={startFresh}
+        />
+      )}
+      <AppLayout>
+        <Header>
+          <Logo />
+          {/* Project Selector - LEFT */}
+          <ProjectMenu />
+          {/* Project/Export Actions - LEFT */}
+          <GlobalActions />
+          <div style={{ flex: 1 }} />
+          {/* Github/Help/Collapse - RIGHT */}
+          <WindowControls />
+        </Header>
+        <LeftSidebar>
+          <FrameLibrary />
+        </LeftSidebar>
+        <MainCanvas>
+          <CanvasWorkspace />
+        </MainCanvas>
+        <RightSidebar>
+          <PropertiesPanel />
+        </RightSidebar>
+      </AppLayout>
+    </>
+  );
+};
 
 const App: React.FC = () => {
   React.useEffect(() => {
@@ -24,30 +63,11 @@ const App: React.FC = () => {
   return (
     <ProjectProvider>
       <LayoutProvider>
-        <AppLayout>
-          <Header>
-            <Logo />
-            {/* Project Selector - LEFT */}
-            <ProjectMenu />
-            {/* Project/Export Actions - LEFT */}
-            <GlobalActions />
-            <div style={{ flex: 1 }} />
-            {/* Github/Help/Collapse - RIGHT */}
-            <WindowControls />
-          </Header>
-          <LeftSidebar>
-            <FrameLibrary />
-          </LeftSidebar>
-          <MainCanvas>
-            <CanvasWorkspace />
-          </MainCanvas>
-          <RightSidebar>
-            <PropertiesPanel />
-          </RightSidebar>
-        </AppLayout>
+        <AppContent />
       </LayoutProvider>
     </ProjectProvider>
   );
 };
 
 export default App;
+

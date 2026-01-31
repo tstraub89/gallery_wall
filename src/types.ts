@@ -36,6 +36,7 @@ export interface WallConfig {
     height: number;
     backgroundColor: string;
     type: string;
+    stairAngle?: number; // degrees, 15-60, default 30
 }
 
 export interface LibraryItem extends Frame {

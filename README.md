@@ -13,6 +13,7 @@ A powerful, interactive web application designed to help you plan complex galler
 ## 🚀 Key Highlights
 
 *   **Precision Layout Canvas**: An infinite workspace with pan, zoom, and smart snapping tools (`S`, `#`) for pixel-perfect alignment.
+*   **Staircase Wall Support**: Design for staircase walls with configurable rise (10-100%) to match your exact slope.
 *   **Instant Visualization**: Drag and drop photos from your computer directly onto frames to see your memories in situ.
 *   **Portable Project Bundles**: Save your entire workspace—including photos—into a single `.gwall` file for easy sharing or backup.
 *   **Print-Ready Photo Export**: preparing your gallery for reality? Export all your cropped photos in a high-resolution ZIP (with smart DPI capping), ready for professional printing.
@@ -83,7 +84,7 @@ Click the **"?"** button in the header for the in-app **Quick Start Guide**.
 3.  **Browse**: Open `http://localhost:5173`.
 
 > [!TIP]
-> You can load [example.gwall](./example.gwall) to try out the tool with a preconfigured gallery wall layout. You can also check [example_frame_template.txt](./example_frame_template.txt) to see how to format your own frame collection for batch importing.
+> First-time users can load a demo gallery wall from the welcome screen or anytime via the Help menu (**?**). You can also check [example_frame_template.txt](./example_frame_template.txt) to see how to format your own frame collection for batch importing.
 
 **Tech Stack**: Built with React 19 (Vite), **TypeScript**, CSS Modules, and IndexedDB for persistent local storage.
 

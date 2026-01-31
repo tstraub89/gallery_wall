@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { saveProjectData, loadProjectData, cleanUpOrphanedImages } from '../utils/imageStore';
+import { saveProjectData, loadProjectData, cleanUpOrphanedImages, saveImage } from '../utils/imageStore';
 import { ProjectContext, LibraryState } from './ProjectContextCore';
 import { Project, Frame, WallConfig, LibraryItem } from '../types';
+import { importProjectBundle } from '../utils/exportUtils';
 
 interface ProjectData {
     projects: Record<string, Project>;
@@ -41,10 +42,10 @@ const createNewProject = (name?: string): Project => ({
     updatedAt: Date.now(),
     wallConfig: {
         type: 'flat', // 'flat', 'staircase', 'corner'
-        width: 300, // inches, default 25ft
-        height: 120, // inches, default 10ft
+        width: 96, // inches, default 8ft
+        height: 72, // inches, default 6ft
         backgroundColor: '#e0e0e0',
-        backgroundImage: null,
+        stairAngle: 50, // default rise percentage for staircase walls
     } as WallConfig, // Cast to ensure it matches strict WallConfig if needed (e.g. strict string literals)
     frames: [], // Array of Frame objects
     library: [], // Array of available Frame templates
@@ -55,6 +56,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     const [data, setData] = useState<ProjectData>(initialData);
 
     const [isLoaded, setIsLoaded] = useState(false);
+    const [showWelcome, setShowWelcome] = useState(false);
     const hasInitialLoaded = useRef(false);
 
     // Initial load from IndexedDB
@@ -65,21 +67,16 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
         const init = async () => {
             try {
                 const idbData = await loadProjectData();
-                if (idbData) {
+                if (idbData && Object.keys(idbData.projects || {}).length > 0) {
                     setData(idbData);
                 } else {
-                    // Brand new install
-                    const fresh = createNewProject('Untitled Project');
-                    const freshData = {
-                        ...initialData,
-                        projects: { [fresh.id]: fresh },
-                        currentProjectId: fresh.id
-                    };
-                    setData(freshData);
-                    await saveProjectData(freshData);
+                    // Brand new install - show welcome modal
+                    setShowWelcome(true);
                 }
             } catch (err) {
                 console.error("Failed to load data from IndexedDB", err);
+                // Show welcome on error too
+                setShowWelcome(true);
             } finally {
                 setIsLoaded(true);
                 // Garbage Collect Orphaned Images (Async, don't block UI)
@@ -402,6 +399,76 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
         }));
     };
 
+    // Import demo project from bundled example.gwall
+    const importDemoProject = async () => {
+        try {
+            // Use import.meta.env.BASE_URL to respect vite's base config
+            const baseUrl = import.meta.env.BASE_URL || '/';
+            const response = await fetch(`${baseUrl}example.gwall`);
+            if (!response.ok) throw new Error('Failed to fetch demo project');
+            const blob = await response.blob();
+
+            const { project, images } = await importProjectBundle(blob);
+
+            const idMap = new Map<string, string>();
+            const remappedImages: { id: string; blob: Blob }[] = [];
+
+            for (const img of images) {
+                const newId = uuidv4();
+                idMap.set(img.id, newId);
+                remappedImages.push({ id: newId, blob: img.blob });
+            }
+
+            const updatedFrames = project.frames.map((f: any) => ({
+                ...f,
+                imageId: f.imageId ? (idMap.get(f.imageId) || null) : null
+            }));
+
+            const updatedImagesArray = project.images ? project.images
+                .filter((id: any) => idMap.has(id))
+                .map((id: any) => idMap.get(id)) : [];
+
+            for (const img of remappedImages) {
+                await saveImage(img.id, img.blob);
+            }
+
+            const newProject = createNewProject(project.name || 'Demo Gallery');
+            const projectWithData = {
+                ...newProject,
+                frames: updatedFrames,
+                wallConfig: project.wallConfig || newProject.wallConfig,
+                library: project.library || [],
+                images: updatedImagesArray
+            };
+
+            const newData = {
+                ...data,
+                projects: { ...data.projects, [newProject.id]: projectWithData },
+                currentProjectId: newProject.id
+            };
+
+            setData(newData);
+            await saveProjectData(newData);
+            setShowWelcome(false);
+        } catch (err) {
+            console.error('Failed to import demo project:', err);
+            throw err;
+        }
+    };
+
+    // Start with a fresh empty project
+    const startFresh = () => {
+        const fresh = createNewProject('Untitled Project');
+        const freshData = {
+            ...initialData,
+            projects: { [fresh.id]: fresh },
+            currentProjectId: fresh.id
+        };
+        setData(freshData);
+        saveProjectData(freshData);
+        setShowWelcome(false);
+    };
+
     return (
         <ProjectContext.Provider value={{
             projects: data.projects,
@@ -429,7 +496,10 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             undo,
             redo,
             canUndo: history.past.length > 0,
-            canRedo: history.future.length > 0
+            canRedo: history.future.length > 0,
+            showWelcome,
+            importDemoProject,
+            startFresh
         }}>
             {children}
         </ProjectContext.Provider>

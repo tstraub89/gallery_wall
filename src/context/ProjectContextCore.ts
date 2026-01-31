@@ -15,6 +15,7 @@ export interface ProjectContextType {
     selectedImageIds: string[];
     focusedArea: 'canvas' | 'library' | null;
     isLoaded: boolean;
+    showWelcome: boolean;
 
     // Actions
     addProject: (name: string) => string; // Returns new ID
@@ -40,6 +41,10 @@ export interface ProjectContextType {
     redo: () => void;
     canUndo: boolean;
     canRedo: boolean;
+
+    // Onboarding
+    importDemoProject: () => Promise<void>;
+    startFresh: () => void;
 }
 
 export const ProjectContext = createContext<ProjectContextType | undefined>(undefined);

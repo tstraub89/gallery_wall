@@ -12,7 +12,7 @@ interface UseCanvasShortcutsProps {
     undo: () => void;
     redo: () => void;
     duplicateSelected: () => void;
-    handleDeleteFrame: (frameId: string) => void;
+    handleDeleteFrame: (frameIdOrIds: string | string[]) => void;
     setSnapToGrid: React.Dispatch<React.SetStateAction<boolean>>;
     setShowGrid: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -51,7 +51,7 @@ export const useCanvasShortcuts = ({
             if (e.key === 'Backspace' || e.key === 'Delete') {
                 if (focusedArea === 'canvas' && selectedFrameIds.length > 0) {
                     e.preventDefault();
-                    handleDeleteFrame(selectedFrameIds[0]);
+                    handleDeleteFrame(selectedFrameIds);
                 }
             }
 

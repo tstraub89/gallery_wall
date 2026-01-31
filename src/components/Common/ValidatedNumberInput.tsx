@@ -43,9 +43,9 @@ const ValidatedNumberInput: React.FC<ValidatedNumberInputProps> = ({
     const validate = useCallback((str: string): number | null => {
         const num = parseFloat(str);
         if (isNaN(num)) return null;
-        if (!allowNegative && num < 0) return null;
-        if (num < min || num > max) return null;
-        return num;
+        if (!allowNegative && num < 0) return 0; // Coerce to 0 instead of null
+        // Coerce to min/max instead of returning null
+        return Math.min(max, Math.max(min, num));
     }, [min, max, allowNegative]);
 
     // Regex for filtering input

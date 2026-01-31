@@ -1,11 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './HelpModal.module.css';
+import { useProject } from '../../hooks/useProject';
+import { Sparkles } from 'lucide-react';
 
 interface HelpModalProps {
     onClose: () => void;
 }
 
 const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
+    const { importDemoProject } = useProject();
+    const [isLoadingDemo, setIsLoadingDemo] = useState(false);
+
     useEffect(() => {
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === 'Escape') onClose();
@@ -13,6 +18,19 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
         window.addEventListener('keydown', handleEsc);
         return () => window.removeEventListener('keydown', handleEsc);
     }, [onClose]);
+
+    const handleLoadDemo = async () => {
+        setIsLoadingDemo(true);
+        try {
+            await importDemoProject();
+            onClose();
+        } catch (err) {
+            console.error('Failed to load demo:', err);
+            alert('Failed to load demo project. Please try again.');
+        } finally {
+            setIsLoadingDemo(false);
+        }
+    };
 
     return (
         <div className={styles.overlay} onClick={onClose}>
@@ -27,7 +45,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                         <section>
                             <h3>🎨 The Basics</h3>
                             <ul>
-                                <li><strong>Wall Setup:</strong> Use the right sidebar to change dimensions, color, and wall type (Straight or Staircase).</li>
+                                <li><strong>Wall Setup:</strong> Use the right sidebar to set dimensions, color, and wall type. For staircase walls, adjust the <em>Rise (%)</em> to match your slope.</li>
                                 <li><strong>Adding Frames:</strong> Select a frame from the library (left) to add it to your wall.</li>
                                 <li><strong>Photos:</strong> Drag and drop any image file from your computer directly onto a frame.</li>
                                 <li><strong>Scale & Rotate:</strong> Use the properties panel (right) to tweak dimensions or rotation.</li>
@@ -94,6 +112,14 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                             style={{ height: '40px', width: 'auto', display: 'block' }}
                         />
                     </a>
+                    <button
+                        className={styles.secondaryBtn}
+                        onClick={handleLoadDemo}
+                        disabled={isLoadingDemo}
+                    >
+                        <Sparkles size={16} />
+                        {isLoadingDemo ? 'Loading...' : 'Load Demo Wall'}
+                    </button>
                     <button className={styles.primaryBtn} onClick={onClose}>Got it!</button>
                 </footer>
             </div>
@@ -102,3 +128,4 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
 };
 
 export default HelpModal;
+

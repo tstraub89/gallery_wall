@@ -30,12 +30,13 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
         return 'frame';
     });
 
-    // Force switch to frame tab if multiple selection (since we don't support multi-photo edit yet)
+    // Switch to frame tab if no frames have photos and we're on photo tab
     React.useEffect(() => {
-        if (selectedFrames.length > 1) {
+        const hasAnyPhotos = selectedFrames.some(f => f.imageId);
+        if (activeTab === 'photo' && !hasAnyPhotos) {
             setActiveTab('frame');
         }
-    }, [selectedFrames.length]);
+    }, [selectedFrames, activeTab]);
 
     // CRITICAL SAFETY: If we have IDs but no matching frames found (e.g. just deleted)
     if (selectedFrames.length === 0) {
@@ -207,7 +208,9 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
         });
     };
 
-    const isPhotoTabDisabled = selectedFrames.length > 1;
+    // Disable photo tab only if NO frames have photos
+    const hasAnyPhotos = selectedFrames.some(f => f.imageId);
+    const isPhotoTabDisabled = !hasAnyPhotos;
 
     return (
         <>
@@ -225,7 +228,7 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                 <button
                     className={`${styles.tab} ${activeTab === 'photo' ? styles.activeTab : ''} ${isPhotoTabDisabled ? styles.disabledTab : ''}`}
                     onClick={() => !isPhotoTabDisabled && setActiveTab('photo')}
-                    title={isPhotoTabDisabled ? "Select a single frame to edit photo" : "Photo Settings"}
+                    title={isPhotoTabDisabled ? "No photos in selected frames" : `Photo Settings${selectedFrames.length > 1 ? ` (${selectedFrames.filter(f => f.imageId).length})` : ''}`}
                 >
                     Photo
                 </button>
@@ -435,20 +438,11 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                 )}
 
                 {activeTab === 'photo' && (
-                    <>
-                        {selectedFrames[0].imageId ? (
-                            <ImageProperties
-                                frame={selectedFrames[0]}
-                                updateProject={updateProject}
-                                currentProject={currentProject}
-                            />
-                        ) : (
-                            <div className={styles.info} style={{ textAlign: 'center', padding: '20px', color: '#888' }}>
-                                No photo selected.<br />
-                                Drag a photo from the library to this frame to edit it.
-                            </div>
-                        )}
-                    </>
+                    <ImageProperties
+                        frames={selectedFrames}
+                        updateProject={updateProject}
+                        currentProject={currentProject}
+                    />
                 )}
 
                 <button className={styles.deleteBtn} onClick={() => {
