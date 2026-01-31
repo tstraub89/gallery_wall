@@ -200,7 +200,7 @@ const GlobalActions = () => {
                 images: updatedImagesArray
             });
 
-            alert('Project imported successfully!');
+            // No alert needed, change is visible
         } catch (err: any) {
             alert('Failed to import: ' + err.message);
         } finally {

@@ -28,8 +28,8 @@ const CanvasWorkspace: React.FC = () => {
     // Viewport Hook
     const { scale, setScale, pan, setPan } = useCanvasViewport(containerRef);
 
-    // Track if initial fit has run
-    const hasInitialFit = useRef(false);
+    // Track last fitted project ID
+    const lastFittedProjectId = useRef<string | null>(null);
 
     // Track previous sidebar width for compensation (on both toggle and resize)
     const prevSidebarWidth = useRef(isLeftSidebarOpen ? sidebarWidth : 0);
@@ -72,17 +72,19 @@ const CanvasWorkspace: React.FC = () => {
         return { scale: finalScale, pan: { x, y } };
     };
 
-    // DEFAULT TO ZOOM-TO-FIT ON LOAD
+    // AUTO-ZOOM ON PROJECT SWITCH OR LOAD
     useEffect(() => {
-        if (!hasInitialFit.current && containerRef.current && currentProject?.wallConfig) {
-            const fit = calculateFitViewport();
-            if (fit) {
-                setScale(fit.scale);
-                setPan(fit.pan);
-                hasInitialFit.current = true;
+        if (containerRef.current && currentProject?.id) {
+            if (lastFittedProjectId.current !== currentProject.id) {
+                const fit = calculateFitViewport();
+                if (fit) {
+                    setScale(fit.scale);
+                    setPan(fit.pan);
+                    lastFittedProjectId.current = currentProject.id;
+                }
             }
         }
-    }, [currentProject, setScale, setPan]);
+    }, [currentProject?.id, setScale, setPan]);
 
     // Helper: Snap
     const snap = (val: number) => {
