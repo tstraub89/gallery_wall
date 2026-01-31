@@ -13,6 +13,7 @@ import { useCanvasShortcuts } from '../../hooks/useCanvasShortcuts';
 
 import { useLayout } from '../../hooks/useLayout';
 import { Frame, LibraryItem } from '../../types';
+import { preloadImages } from '../../utils/imageStore';
 
 const CanvasWorkspace: React.FC = () => {
     const { currentProject, updateProject, selectFrame, selectedFrameIds, setSelection, addImageToLibrary, undo, redo, focusedArea, setFocusedArea, setSelectedImages } = useProject();
@@ -30,6 +31,8 @@ const CanvasWorkspace: React.FC = () => {
 
     // Track last fitted project ID
     const lastFittedProjectId = useRef<string | null>(null);
+
+
 
     // Track previous sidebar width for compensation (on both toggle and resize)
     const prevSidebarWidth = useRef(isLeftSidebarOpen ? sidebarWidth : 0);
@@ -72,19 +75,53 @@ const CanvasWorkspace: React.FC = () => {
         return { scale: finalScale, pan: { x, y } };
     };
 
+
+
+
+    // Derived state for synchronous blocking
+    // If loadedProjectId !== currentProject.id, we are switching
+    const [loadedProjectId, setLoadedProjectId] = useState<string | null>(null);
+    const isSwitching = loadedProjectId !== currentProject?.id;
+
     // AUTO-ZOOM ON PROJECT SWITCH OR LOAD
     useEffect(() => {
-        if (containerRef.current && currentProject?.id) {
-            if (lastFittedProjectId.current !== currentProject.id) {
-                const fit = calculateFitViewport();
-                if (fit) {
-                    setScale(fit.scale);
-                    setPan(fit.pan);
-                    lastFittedProjectId.current = currentProject.id;
-                }
+        if (!containerRef.current || !currentProject?.id) return;
+
+        // Only fit viewport if we haven't fitted this project yet
+        if (lastFittedProjectId.current !== currentProject.id) {
+            const fit = calculateFitViewport();
+            if (fit) {
+                setScale(fit.scale);
+                setPan(fit.pan);
+                lastFittedProjectId.current = currentProject.id;
             }
         }
     }, [currentProject?.id, setScale, setPan]);
+
+    // Handle project switching - Preload and Wait
+    useEffect(() => {
+        if (!currentProject?.id) return;
+
+        const projectId = currentProject.id;
+
+        // If we're already loaded on this project, do nothing
+        if (loadedProjectId === projectId) return;
+
+        // We are officially switching. Preload images.
+        const imageIds = currentProject.frames
+            .map(f => f.imageId)
+            .filter((id): id is string => !!id);
+
+        const minDelay = new Promise(resolve => setTimeout(resolve, 500));
+        const preload = imageIds.length > 0 ? preloadImages(imageIds) : Promise.resolve();
+
+        Promise.all([minDelay, preload]).then(() => {
+            // Only update loaded state if we're still on the same project
+            if (currentProject.id === projectId) {
+                setLoadedProjectId(projectId);
+            }
+        });
+    }, [currentProject?.id, currentProject?.frames, loadedProjectId]);
 
     // Helper: Snap
     const snap = (val: number) => {
@@ -493,6 +530,12 @@ const CanvasWorkspace: React.FC = () => {
                     />
                 );
             })()}
+
+
+            <div className={`${styles.loadingOverlay} ${!isSwitching ? styles.hidden : ''}`}>
+                <div className={styles.loadingSpinner}></div>
+                <div className={styles.loadingText}>Loading project...</div>
+            </div>
         </div>
     );
 };

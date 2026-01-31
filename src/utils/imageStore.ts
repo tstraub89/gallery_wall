@@ -134,6 +134,31 @@ export const getImage = async (id: string, type: 'full' | 'thumb' = 'full'): Pro
     });
 };
 
+// Preload cache for warm-starting images
+const preloadCache = new Map<string, string>();
+
+export const getPreloadedUrl = (id: string): string | null => {
+    return preloadCache.get(id) || null;
+};
+
+export const preloadImages = async (ids: string[], type: 'full' | 'thumb' = 'full'): Promise<void> => {
+    const uniqueIds = [...new Set(ids.filter(Boolean))];
+    if (uniqueIds.length === 0) return;
+
+    await Promise.all(uniqueIds.map(async (id) => {
+        if (preloadCache.has(id)) return; // Already preloaded
+        try {
+            const blob = await getImage(id, type);
+            if (blob) {
+                const url = URL.createObjectURL(blob);
+                preloadCache.set(id, url);
+            }
+        } catch (err) {
+            console.warn('Failed to preload image:', id, err);
+        }
+    }));
+};
+
 export const getImageMetadata = async (ids: string[] | null = null): Promise<Record<string, ImageMetadata>> => {
     const db = await initDB();
     return new Promise((resolve, reject) => {

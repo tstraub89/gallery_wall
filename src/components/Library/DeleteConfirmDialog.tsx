@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import styles from './DeleteConfirmDialog.module.css';
 
 interface DeleteConfirmDialogProps {
@@ -23,7 +24,7 @@ const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
     const unusedCount = selectedCount - inUseCount;
     const hasInUse = inUseCount > 0;
 
-    return (
+    return createPortal(
         <div className={styles.overlay} onClick={onCancel}>
             <div className={styles.dialog} onClick={e => e.stopPropagation()}>
                 <h3 className={styles.title}>Delete Photos</h3>
@@ -82,7 +83,8 @@ const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({
                     </>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

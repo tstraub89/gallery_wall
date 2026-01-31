@@ -302,7 +302,7 @@ const GlobalActions = () => {
             {isBusy && (
                 <FullScreenOverlay>
                     <div className={styles.spinner}></div>
-                    <p>Processing...</p>
+                    <p>Preparing...</p>
                 </FullScreenOverlay>
             )}
             {exportError && (
