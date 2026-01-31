@@ -292,7 +292,7 @@ const CanvasWorkspace: React.FC = () => {
             backgroundColor: frame.imageId ? (frame.frameColor || '#111') : '#fff',
             cursor: isDragging ? 'grabbing' : 'grab',
             transition: isDragging ? 'none' : 'box-shadow 0.1s',
-            borderRadius: frame.shape === 'round' ? '50%' : '2px',
+            borderRadius: frame.shape === 'round' ? '50%' : '0',
             boxSizing: 'border-box' as const,
             pointerEvents: 'auto' as const
         };

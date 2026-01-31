@@ -78,16 +78,15 @@
 
 .frame {
     position: absolute;
-    /* Border handled by inline styles now to avoid double border */
-    border: none;
-    /* Using a sharper shadow with less blur for v2.0.0 */
+    /* Border handled by inline styles */
     box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
     cursor: grab;
     transition: box-shadow 0.2s;
+    border-radius: 0;
 }
 
 .frame.selected {
-    border-color: var(--accent-color) !important;
+    /* Don't override border-color here, as it turns the whole frame thickness blue */
     box-shadow: 0 0 0 2px var(--accent-color), 2px 2px 6px rgba(0, 0, 0, 0.5);
     z-index: 9999 !important;
     /* Bring selected to front visually */
