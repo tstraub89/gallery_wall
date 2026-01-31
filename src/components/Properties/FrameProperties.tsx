@@ -52,7 +52,11 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
             }
             return f[key] === first;
         });
-        return (allSame ? first : '') as Frame[K] | '';
+        const val = allSame ? first : '';
+        if (typeof val === 'number') {
+            return Math.round(val * 100) / 100 as any;
+        }
+        return val as any;
     };
 
     const updateAll = <K extends keyof Frame>(key: K, value: Frame[K]) => {
@@ -331,7 +335,10 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                                 <input
                                     type="range" min="0" max="2" step="0.1"
                                     value={getValue('borderWidth') || 0.1}
-                                    onChange={(e) => updateAll('borderWidth', parseFloat(e.target.value))}
+                                    onChange={(e) => {
+                                        const val = parseFloat(e.target.value);
+                                        updateAll('borderWidth', Math.round(val * 10) / 10);
+                                    }}
                                     className={styles.slider}
                                 />
                                 <ValidatedNumberInput

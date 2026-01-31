@@ -273,19 +273,23 @@ const CanvasWorkspace: React.FC = () => {
             displayY = snap(initialPositions[frame.id].y + dragDelta.y);
         }
 
-        const widthPx = frame.width * PPI;
-        const heightPx = frame.height * PPI;
-        const bWidthPx = (typeof frame.borderWidth === 'number' ? frame.borderWidth : 0.1) * PPI;
+        const widthPx = Math.round(frame.width * PPI);
+        const heightPx = Math.round(frame.height * PPI);
+        const bWidthInches = typeof frame.borderWidth === 'number' ? frame.borderWidth : 0.1;
+        const bWidthPx = Math.round(bWidthInches * PPI);
+
+        const leftPx = Math.round(displayX - bWidthPx);
+        const topPx = Math.round(displayY - bWidthPx);
 
         return {
             position: 'absolute' as const,
-            left: `${displayX - bWidthPx}px`,
-            top: `${displayY - bWidthPx}px`,
+            left: `${leftPx}px`,
+            top: `${topPx}px`,
             width: `${widthPx + bWidthPx * 2}px`,
             height: `${heightPx + bWidthPx * 2}px`,
             zIndex: frame.zIndex,
-            padding: `${bWidthPx}px`,
-            backgroundColor: frame.frameColor || '#111',
+            border: `${bWidthPx}px solid ${frame.frameColor || '#111'}`,
+            backgroundColor: frame.imageId ? (frame.frameColor || '#111') : '#fff',
             cursor: isDragging ? 'grabbing' : 'grab',
             transition: isDragging ? 'none' : 'box-shadow 0.1s',
             borderRadius: frame.shape === 'round' ? '50%' : '2px',

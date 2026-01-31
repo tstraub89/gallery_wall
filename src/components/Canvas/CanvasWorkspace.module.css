@@ -80,14 +80,15 @@
     position: absolute;
     /* Border handled by inline styles now to avoid double border */
     border: none;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    /* Using a sharper shadow with less blur for v2.0.0 */
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
     cursor: grab;
     transition: box-shadow 0.2s;
 }
 
 .frame.selected {
-    border-color: var(--accent-color);
-    box-shadow: 0 0 0 2px var(--accent-color), 4px 4px 10px rgba(0, 0, 0, 0.4);
+    border-color: var(--accent-color) !important;
+    box-shadow: 0 0 0 2px var(--accent-color), 2px 2px 6px rgba(0, 0, 0, 0.5);
     z-index: 9999 !important;
     /* Bring selected to front visually */
 }
