@@ -16,9 +16,12 @@
     align-items: center;
 }
 
+/* Desktop Defaults (Compact) */
 .searchIcon {
     position: absolute;
     left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
     color: var(--text-secondary);
     pointer-events: none;
 }
@@ -42,6 +45,7 @@
 .controls {
     display: flex;
     gap: 4px;
+    flex-shrink: 0;
 }
 
 .dropdownWrapper {
@@ -61,6 +65,28 @@
     cursor: pointer;
     transition: all 0.2s;
 }
+
+/* Mobile Tweaks (Touch Friendly) */
+@media (max-width: 768px) {
+    .searchIcon {
+        left: 10px;
+    }
+
+    .searchInput {
+        height: 44px;
+        font-size: 16px;
+        /* Prevents auto-zoom on iOS */
+        padding: 0 12px 0 36px;
+        border-radius: 8px;
+    }
+
+    .iconBtn {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+    }
+}
+
 
 .iconBtn:hover {
     background: rgba(0, 0, 0, 0.05);
