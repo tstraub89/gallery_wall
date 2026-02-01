@@ -1,8 +1,8 @@
-# Gallery Wall Planner 🖼️✨
+# GalleryPlanner 🖼️✨
 
 **Visualize your perfect gallery wall before you hang a single nail.**
 
-![Gallery Wall Planner Preview](./example.jpg)
+![GalleryPlanner Preview](./example.jpg)
 
 A powerful, interactive web application designed to help you plan complex gallery layouts with real frames and personal photos. Transition from a pile of frames on the floor to a perfectly aligned wall with confidence.
 
@@ -22,7 +22,7 @@ A powerful, interactive web application designed to help you plan complex galler
 
 ## 📱 Mobile Experience
 
-**Plan, measure, and visualize anywhere.** The Gallery Wall Planner is now available in your pocket.
+**Plan, measure, and visualize anywhere.** The GalleryPlanner is now available in your pocket.
 
 <p align="center">
   <img src="./mobile_app.png" width="280" alt="Mobile App Preview" />
