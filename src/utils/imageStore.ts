@@ -94,14 +94,60 @@ const generateThumbnail = (blob: Blob, maxWidth = 800, maxHeight = 800): Promise
         img.src = url;
     });
 };
+// Helper: Optimize Image (Smart Compression)
+// JPEGs/WebPs -> Pass through (Zero generation loss)
+// PNGs/TIFFs -> Convert to JPEG 0.95 (Significant size saving, maintains dims)
+const optimizeImage = (blob: Blob): Promise<Blob> => {
+    return new Promise((resolve) => {
+        // 1. Pass through efficient formats
+        if (blob.type === 'image/jpeg' || blob.type === 'image/webp') {
+            resolve(blob);
+            return;
+        }
 
+        console.log(`Optimizing image: Converting ${blob.type} to JPEG...`);
+
+        // 2. Convert inefficient formats (PNG, TIFF, BMP, etc.) to JPEG
+        const img = new Image();
+        const url = URL.createObjectURL(blob);
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) { resolve(blob); return; } // Fallback
+
+            // White background for transparent PNGs converted to JPEG
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(img, 0, 0);
+
+            canvas.toBlob((newBlob) => {
+                if (newBlob) {
+                    console.log(`Optimization complete. Original: ${Math.round(blob.size / 1024)}KB, New: ${Math.round(newBlob.size / 1024)}KB`);
+                    resolve(newBlob);
+                }
+                else resolve(blob); // Fallback
+            }, 'image/jpeg', 0.95);
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            resolve(blob); // Fallback on error
+        };
+        img.src = url;
+    });
+};
 export const saveImage = async (id: string, blob: Blob): Promise<ImageMetadata & { id: string }> => {
     const db = await initDB();
 
-    // Parallelize metadata calc and thumb generation
+    // Smart Compression: Convert PNG->JPEG, Keep JPEG as-is
+    const optimizedBlob = await optimizeImage(blob);
+
+    // Parallelize metadata calc and thumb generation using the OPTIMIZED blob
     const [metadata, thumbBlob] = await Promise.all([
-        getImageDimensions(blob).catch(() => ({ width: 0, height: 0, aspectRatio: 1 })),
-        generateThumbnail(blob)
+        getImageDimensions(optimizedBlob).catch(() => ({ width: 0, height: 0, aspectRatio: 1 })),
+        generateThumbnail(optimizedBlob)
     ]);
 
     return new Promise((resolve, reject) => {
@@ -111,7 +157,8 @@ export const saveImage = async (id: string, blob: Blob): Promise<ImageMetadata &
 
         const name = (blob as File).name || 'Untitled';
 
-        imageStore.put({ id, blob, name, ...metadata });
+        // Save the OPTIMIZED blob
+        imageStore.put({ id, blob: optimizedBlob, name, ...metadata });
         // Store thumbnail
         thumbStore.put({ id, blob: thumbBlob });
 
