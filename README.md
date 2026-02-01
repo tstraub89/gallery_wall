@@ -24,7 +24,9 @@ A powerful, interactive web application designed to help you plan complex galler
 
 **Plan, measure, and visualize anywhere.** The Gallery Wall Planner is now available in your pocket.
 
-<img src="./mobile_app.png" width="280" alt="Mobile App Preview" />
+<p align="center">
+  <img src="./mobile_app.png" width="280" alt="Mobile App Preview" />
+</p>
 
 *   **Touch-Optimized Toolset**: A carefully selected set of core features—including custom frame creation and smart snapping—optimized for a native mobile feel.
 *   **Seamless Handoff**: Start a design on the couch, export the `.gwall` bundle, and finish on your desktop.
