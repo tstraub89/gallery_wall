@@ -39,15 +39,18 @@ const FrameContent: React.FC<FrameContentProps> = ({ frame, ppi }) => {
                 <div
                     style={{
                         position: 'absolute',
-                        top: '50%', left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        fontSize: `${Math.max(6, Math.min(12, frame.width * PPI * 0.15))}px`,
-                        color: '#999',
+                        top: 0, left: 0,
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '4px',
                         pointerEvents: 'none',
                         userSelect: 'none',
+                        fontSize: `${Math.max(10, frame.width * PPI * 0.12)}px`,
+                        color: '#999',
                         textAlign: 'center',
-                        width: '100%',
-                        padding: '0 2px',
                         lineHeight: 1.2
                     }}
                 >

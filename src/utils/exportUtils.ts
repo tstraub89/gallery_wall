@@ -407,6 +407,24 @@ export const exportCanvasToBlob = async (
                 } catch (err) {
                     console.warn(`Failed to render image for frame ${frame.id}`, err);
                 }
+            } else {
+                // Empty Frame: Draw Label or Dimensions
+                const label = frame.label || `${frame.width}" x ${frame.height}"`;
+                // Match app visual: Base 10px (scaled), Dynamic 0.10 (scaled)
+                const fontSize = Math.max(10 * EXPORT_SCALE, contentW * 0.10);
+
+                ctx.save();
+                ctx.fillStyle = frame.label ? '#555555' : '#999999';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                // Use system fonts that match the app
+                ctx.font = `${frame.label ? '600' : '400'} ${fontSize}px system-ui, -apple-system, sans-serif`;
+
+                const centerX = frameX + contentW / 2;
+                const centerY = frameY + contentH / 2;
+
+                ctx.fillText(label, centerX, centerY);
+                ctx.restore();
             }
 
             // Draw Matting Overlay
