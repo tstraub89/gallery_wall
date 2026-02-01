@@ -20,6 +20,17 @@ A powerful, interactive web application designed to help you plan complex galler
 *   **Intelligent Search & Filter**: Instantly find frames by label or size (e.g., "8x10") and photos by filename. Filter collections by shape or status.
 *   **Inventory First Workflow**: Keep track of your physical frames. Even if you remove a frame from the wall, it stays in your "Unplaced" library for later use.
 
+## 📱 Mobile Experience
+
+**Plan, measure, and visualize anywhere.** The Gallery Wall Planner is now available in your pocket.
+
+<img src="./mobile_app.png" width="280" alt="Mobile App Preview" />
+
+*   **Touch-Optimized Toolset**: A carefully selected set of core features—including custom frame creation and smart snapping—optimized for a native mobile feel.
+*   **Seamless Handoff**: Start a design on the couch, export the `.gwall` bundle, and finish on your desktop.
+*   **Pocket Reference**: Keep your wall dimensions and layout accessible anywhere for quick checks or visualizing new ideas.
+*   **Touch-Native UI**: A responsive interface that adapts with bottom-sheet navigation and touch-friendly controls.
+
 ---
 
 ## 🛠️ Detailed Features
@@ -88,6 +99,6 @@ Click the **"?"** button in the header for the in-app **Quick Start Guide**.
 
 **Tech Stack**: Built with React 19 (Vite), **TypeScript**, CSS Modules, and IndexedDB for persistent local storage.
 
-v2.0.0 Released Jan 2026. 🚀✨
+v2.1.1 Released Jan 2026. 🚀✨
 
 © 2026 Timothy Straub. All Rights Reserved.
