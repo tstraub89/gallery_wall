@@ -12,9 +12,13 @@ import WindowControls from './components/Header/WindowControls';
 import WelcomeModal from './components/Common/WelcomeModal';
 import { useProject } from './hooks/useProject';
 
+import { useIsMobile } from './hooks/useIsMobile';
+import { MobileLayout } from './components/Layout/MobileLayout';
+
 // Inner component that can use context
 const AppContent: React.FC = () => {
-  const { showWelcome, importDemoProject, startFresh } = useProject();
+  const { showWelcome, importDemoProject, startFresh, undo, redo, canUndo, canRedo } = useProject();
+  const isMobile = useIsMobile();
 
   return (
     <>
@@ -24,27 +28,39 @@ const AppContent: React.FC = () => {
           onStartFresh={startFresh}
         />
       )}
-      <AppLayout>
-        <Header>
-          <Logo />
-          {/* Project Selector - LEFT */}
-          <ProjectMenu />
-          {/* Project/Export Actions - LEFT */}
-          <GlobalActions />
-          <div style={{ flex: 1 }} />
-          {/* Github/Help/Collapse - RIGHT */}
-          <WindowControls />
-        </Header>
-        <LeftSidebar>
-          <FrameLibrary />
-        </LeftSidebar>
-        <MainCanvas>
+      {isMobile ? (
+        <MobileLayout
+          onUndo={undo}
+          onRedo={redo}
+          canUndo={canUndo}
+          canRedo={canRedo}
+        >
+          {/* We reuse the same CanvasWorkspace! */}
           <CanvasWorkspace />
-        </MainCanvas>
-        <RightSidebar>
-          <PropertiesPanel />
-        </RightSidebar>
-      </AppLayout>
+        </MobileLayout>
+      ) : (
+        <AppLayout>
+          <Header>
+            <Logo />
+            {/* Project Selector - LEFT */}
+            <ProjectMenu />
+            {/* Project/Export Actions - LEFT */}
+            <GlobalActions />
+            <div style={{ flex: 1 }} />
+            {/* Github/Help/Collapse - RIGHT */}
+            <WindowControls />
+          </Header>
+          <LeftSidebar>
+            <FrameLibrary />
+          </LeftSidebar>
+          <MainCanvas>
+            <CanvasWorkspace />
+          </MainCanvas>
+          <RightSidebar>
+            <PropertiesPanel />
+          </RightSidebar>
+        </AppLayout>
+      )}
     </>
   );
 };

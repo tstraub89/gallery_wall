@@ -5,11 +5,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { PPI, GRID_SIZE } from '../../constants';
 import FrameContent from './FrameContent';
 import ContextMenu from './ContextMenu';
+import Logo from '../Header/Logo';
 
 // Hooks
 import { useCanvasViewport } from '../../hooks/useCanvasViewport';
 import { useCanvasInteraction } from '../../hooks/useCanvasInteraction';
 import { useCanvasShortcuts } from '../../hooks/useCanvasShortcuts';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { useTouchGestures } from '../../hooks/useTouchGestures';
 
 import { useLayout } from '../../hooks/useLayout';
 import { Frame, LibraryItem } from '../../types';
@@ -21,6 +24,7 @@ const CanvasWorkspace: React.FC = () => {
 
     // Layout Context for stationary canvas
     const { isLeftSidebarOpen, sidebarWidth } = useLayout();
+    const isMobile = useIsMobile();
 
     // Grid State
     const [showGrid, setShowGrid] = useState(true);
@@ -57,7 +61,8 @@ const CanvasWorkspace: React.FC = () => {
         const wallW = currentProject.wallConfig.width * PPI;
         const wallH = currentProject.wallConfig.height * PPI;
 
-        const padding = 80;
+        // Mobile uses smaller padding (16px) vs Desktop (80px)
+        const padding = isMobile ? 16 : 80;
         const availW = container.width - padding * 2;
         const availH = container.height - padding * 2;
 
@@ -308,6 +313,113 @@ const CanvasWorkspace: React.FC = () => {
         setShowGrid
     });
 
+    // Drag Snapshot for Robust Snapping
+    const dragStartSnapshot = useRef<Record<string, { x: number, y: number }>>({});
+    // Track if we've pushed the "Undo" state for the current drag operation
+    const hasCommittedDragHistory = useRef(false);
+
+    // Touch Interactions
+    useTouchGestures({
+        containerRef,
+        scale,
+        setScale,
+        pan,
+        setPan,
+        isFrameSelected: (target) => {
+            if (!target) return false;
+            // Need to cast to HTMLElement to check dataset or closest
+            const el = target as HTMLElement;
+            const frameEl = el.closest(`.${styles.frame}`);
+            if (frameEl) {
+                const id = frameEl.getAttribute('data-frame-id');
+                // It is a frame. Is it selected?
+                if (id && selectedFrameIds.includes(id)) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        onFrameDrag: (totalDx, totalDy) => {
+            // Lazy init snapshot if empty (start of drag)
+            if (Object.keys(dragStartSnapshot.current).length === 0 && currentProject && selectedFrameIds.length > 0) {
+                selectedFrameIds.forEach(id => {
+                    const f = currentProject.frames.find(fr => fr.id === id);
+                    if (f) dragStartSnapshot.current[id] = { x: f.x, y: f.y };
+                });
+                // New drag started, ensure we haven't committed history yet
+                hasCommittedDragHistory.current = false;
+            }
+
+            // Convert screen total delta to world total delta
+            const worldDx = totalDx / scale;
+            const worldDy = totalDy / scale;
+
+            if (!currentProject) return;
+
+            const updatedFrames = currentProject.frames.map(f => {
+                if (selectedFrameIds.includes(f.id) && dragStartSnapshot.current[f.id]) {
+                    const start = dragStartSnapshot.current[f.id];
+                    // Calculate from START position + Total Delta, then Snap
+                    const newX = snap(start.x + worldDx);
+                    const newY = snap(start.y + worldDy);
+                    return { ...f, x: newX, y: newY };
+                }
+                return f;
+            });
+
+            // Updating project on every move is heavy but ensures reactivity.
+            // HISTORY FIX: We only want to push to history on the FIRST move of a drag.
+            // Subsequent moves should skip history to avoid flooding the stack.
+            const shouldSkipHistory = hasCommittedDragHistory.current;
+
+            updateProject(currentProject.id, { frames: updatedFrames }, shouldSkipHistory);
+
+            if (!hasCommittedDragHistory.current) {
+                hasCommittedDragHistory.current = true;
+            }
+        },
+        onFrameDragEnd: () => {
+            dragStartSnapshot.current = {};
+            hasCommittedDragHistory.current = false;
+        },
+        onTap: (e) => {
+            setContextMenu(null); // ALWAYS dismiss context menu
+            dragStartSnapshot.current = {}; // Cleanup
+            hasCommittedDragHistory.current = false;
+
+            // Check if we tapped a frame
+            const target = e.target as HTMLElement;
+            const frameEl = target.closest(`.${styles.frame}`);
+            if (frameEl) {
+                const frameId = frameEl.getAttribute('data-frame-id');
+                if (frameId) {
+                    selectFrame(frameId, false);
+                    return;
+                }
+            }
+            // Background tap -> Deselect
+            setSelection([]);
+            setFocusedArea('canvas');
+        },
+        onLongPress: (e) => {
+            // Trigger Context Menu
+            // Note: useTouchGestures passes the original TouchEvent
+            const t = e.touches[0];
+            const target = e.target as HTMLElement;
+            const frameEl = target.closest(`.${styles.frame}`);
+            const frameId = frameEl ? frameEl.getAttribute('data-frame-id') : null;
+
+            // Artificial Context Menu trigger
+            if (frameId) {
+                if (!selectedFrameIds.includes(frameId)) selectFrame(frameId, false);
+                setContextMenu({ x: t.clientX, y: t.clientY, frameId });
+
+                // Haptic feedback if available
+                if (navigator.vibrate) navigator.vibrate(50);
+            }
+        }
+    });
+
     // Forceful Background Click Deselection
     const onContainerMouseDown = (e: React.MouseEvent) => {
         if (e.target === containerRef.current && e.button === 0) {
@@ -391,64 +503,160 @@ const CanvasWorkspace: React.FC = () => {
                     pointerEvents: 'none'
                 }}
             >
-                {/* Wall with Grid */}
-                {currentProject.wallConfig && (() => {
-                    const wallType = currentProject.wallConfig.type;
-                    const stairAngle = currentProject.wallConfig.stairAngle ?? 50;
+                {/* Artboard Wrapper for Export */}
+                <div
+                    style={{
+                        position: 'relative',
+                        width: `${currentProject.wallConfig.width * PPI}px`,
+                        height: `${currentProject.wallConfig.height * PPI}px`,
+                    }}
+                >
+                    {/* Wall with Grid */}
+                    {currentProject.wallConfig && (() => {
+                        const wallType = currentProject.wallConfig.type;
+                        const stairAngle = currentProject.wallConfig.stairAngle ?? 50;
 
-                    // Calculate clip-path for staircase walls
-                    // The stairAngle/slope directly represents what % of wall height is clipped on one side
-                    // e.g., 30 means 30% of wall height is clipped, 45 means 45%, etc.
-                    let clipPath: string | undefined;
+                        // Calculate clip-path for staircase walls
+                        let clipPath: string | undefined;
 
-                    if (wallType === 'staircase-asc' || wallType === 'staircase-desc') {
-                        // Clamp to valid range: 10-100% of wall height rise
-                        const clipPercent = Math.min(100, Math.max(10, stairAngle));
-                        const bottomPercent = 100 - clipPercent;
+                        if (wallType === 'staircase-asc' || wallType === 'staircase-desc') {
+                            const clipPercent = Math.min(100, Math.max(10, stairAngle));
+                            const bottomPercent = 100 - clipPercent;
 
-                        if (wallType === 'staircase-asc') {
-                            // Left is full height (100%), right clips up
-                            clipPath = `polygon(0 0, 100% 0, 100% ${bottomPercent}%, 0 100%)`;
-                        } else {
-                            // Right is full height (100%), left clips up  
-                            clipPath = `polygon(0 0, 100% 0, 100% 100%, 0 ${bottomPercent}%)`;
+                            if (wallType === 'staircase-asc') {
+                                clipPath = `polygon(0 0, 100% 0, 100% ${bottomPercent}%, 0 100%)`;
+                            } else {
+                                clipPath = `polygon(0 0, 100% 0, 100% 100%, 0 ${bottomPercent}%)`;
+                            }
                         }
-                    }
 
-                    return (
-                        <div
-                            id="canvas-wall"
-                            className={`${styles.wall} ${showGrid ? styles.grid : ''}`}
-                            style={{
-                                width: `${currentProject.wallConfig.width * PPI}px`,
-                                height: `${currentProject.wallConfig.height * PPI}px`,
-                                backgroundColor: currentProject.wallConfig.backgroundColor,
-                                top: 0,
-                                left: 0,
-                                pointerEvents: 'auto',
-                                '--grid-size': `${gridSizePx}px`,
-                                clipPath
-                            } as React.CSSProperties}
-                        />
-                    );
-                })()}
+                        return (
+                            <div
+                                id="canvas-wall"
+                                className={`${styles.wall} ${showGrid ? styles.grid : ''}`}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    backgroundColor: currentProject.wallConfig.backgroundColor,
+                                    // Override styled component top/left to fit wrapper
+                                    top: 0,
+                                    left: 0,
+                                    pointerEvents: 'auto',
+                                    '--grid-size': `${gridSizePx}px`,
+                                    clipPath
+                                } as React.CSSProperties}
+                            />
+                        );
+                    })()}
 
-                <div style={{ pointerEvents: 'none' }}>
+                    <div style={{ pointerEvents: 'none', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+                        {currentProject.frames.map(frame => {
+                            const isSelected = selectedFrameIds.includes(frame.id);
+                            const isCandidate = candidateFrameIds.includes(frame.id);
+                            return (
+                                <div
+                                    key={frame.id}
+                                    className={`${styles.frame} ${isSelected ? styles.selected : ''} ${isCandidate ? styles.candidate : ''}`}
+                                    data-frame-id={frame.id}
+                                    style={getFrameStyle(frame)}
+                                    // Keep drag handlers for the interactive view
+                                    onMouseDown={(e) => handleFrameMouseDown(e, frame)}
+                                >
+                                    <FrameContent frame={frame} ppi={PPI} />
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            </div>
+
+            {/* HIDDEN EXPORT CONTAINER - Fixed 1:1 Scale */}
+            {/* Placed behind the main canvas background (z-index: -5) so it's "on screen" but hidden */}
+            {/* This ensures mobile browsers (Chrome/Safari) don't cull it from painting */}
+            <div
+                id="canvas-export-target"
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: `${currentProject.wallConfig.width * PPI}px`,
+                    height: `${currentProject.wallConfig.height * PPI}px`,
+                    visibility: 'visible',
+                    pointerEvents: 'none',
+                    zIndex: -5,
+                    overflow: 'hidden' // Just in case
+                }}
+            >
+                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                    {/* Plain Wall */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: 0, left: 0,
+                            width: '100%', height: '100%',
+                            backgroundColor: currentProject.wallConfig.backgroundColor,
+                            clipPath: (() => {
+                                const wallType = currentProject.wallConfig.type;
+                                const stairAngle = currentProject.wallConfig.stairAngle ?? 50;
+                                if (wallType === 'staircase-asc' || wallType === 'staircase-desc') {
+                                    const clipPercent = Math.min(100, Math.max(10, stairAngle));
+                                    const bottomPercent = 100 - clipPercent;
+                                    if (wallType === 'staircase-asc') return `polygon(0 0, 100% 0, 100% ${bottomPercent}%, 0 100%)`;
+                                    else return `polygon(0 0, 100% 0, 100% 100%, 0 ${bottomPercent}%)`;
+                                }
+                                return undefined;
+                            })()
+                        }}
+                    />
+                    {/* Render Frames Plainly (using same getFrameStyle but forcing no interactive states if desired, 
+                        actually we want same look so let's reuse getFrameStyle but override position to be pure relative to 0,0) */}
                     {currentProject.frames.map(frame => {
-                        const isSelected = selectedFrameIds.includes(frame.id);
-                        const isCandidate = candidateFrameIds.includes(frame.id);
+                        const style = getFrameStyle(frame);
+                        // Remove transition for export
                         return (
                             <div
                                 key={frame.id}
-                                className={`${styles.frame} ${isSelected ? styles.selected : ''} ${isCandidate ? styles.candidate : ''}`}
-                                data-frame-id={frame.id}
-                                style={getFrameStyle(frame)}
-                                onMouseDown={(e) => handleFrameMouseDown(e, frame)}
+                                className={styles.frame}
+                                style={{
+                                    ...style,
+                                    transition: 'none',
+                                    cursor: 'default',
+                                    boxShadow: '1px 1px 3px rgba(0,0,0,0.4)', // Force standard shadow, no selection glow
+                                    // Ensure coordinates are correct (they are absolute in getFrameStyle based on frame.x/y)
+                                    // But getFrameStyle adds dragDelta... we DON'T want drag delta in export if currently dragging?
+                                    // Actually we probably do want "what you see", but "what you see" includes drag.
+                                    // Ideally export snapshots the committed state. Let's use clean frame.x/y
+                                    left: `${Math.round(frame.x - (typeof frame.borderWidth === 'number' ? frame.borderWidth : 0.1) * PPI)}px`,
+                                    top: `${Math.round(frame.y - (typeof frame.borderWidth === 'number' ? frame.borderWidth : 0.1) * PPI)}px`,
+                                }}
                             >
                                 <FrameContent frame={frame} ppi={PPI} />
                             </div>
                         );
                     })}
+
+                    {/* Watermark */}
+                    <div
+                        style={{
+                            position: 'absolute',
+                            bottom: '16px',
+                            right: '16px',
+                            opacity: 0.9,
+                            transform: 'scale(0.75)',
+                            transformOrigin: 'bottom right',
+                            pointerEvents: 'none',
+                            zIndex: 9999, // On top
+                            background: 'rgba(255, 255, 255, 0.85)',
+                            padding: '6px 12px',
+                            borderRadius: '12px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            backdropFilter: 'blur(4px)'
+                        }}
+                    >
+                        <Logo />
+                    </div>
                 </div>
             </div>
 

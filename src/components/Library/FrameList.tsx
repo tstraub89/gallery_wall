@@ -7,15 +7,23 @@ import { Frame } from '../../types';
 
 const EMPTY_ARRAY: Frame[] = []; // Explicitly type generic empty array if possible, or cast later
 
-const FrameList: React.FC = () => {
+interface FrameListProps {
+    onFrameSelect?: (frame: Frame) => void;
+    selectionMode?: 'standard' | 'toggle';
+}
+
+const FrameList: React.FC<FrameListProps> = ({ onFrameSelect, selectionMode = 'standard' }) => {
     const {
         currentProject,
         setSelection,
         removeFromLibrary,
         frameState,
-        updateFrameState
+        updateFrameState,
+        selectedFrameTemplateIds,
+        setSelectedFrameTemplates
     } = useProject();
     const [frameToRemove, setFrameToRemove] = useState<string | null>(null); // templateId
+    const [anchorIndex, setAnchorIndex] = useState<number | null>(null);
 
     // Persistent Filter & Sort State
     const { searchTerm, activeFilters, sortBy } = frameState;
@@ -23,7 +31,16 @@ const FrameList: React.FC = () => {
     const templates = currentProject?.library || EMPTY_ARRAY;
     const instances = currentProject?.frames || EMPTY_ARRAY;
 
-    // --- Filtering & Sorting Logic ---
+    // ... (Processed Templates calculation remains same) ...
+    // I need to copy the filtering logic here or assume it's stable.
+    // To be safe in replace_file_content, I should try to preserve as much as possible, 
+    // but since I'm rewriting the render and handling logic, I might need to include it.
+    // Actually, I can target specific blocks.
+
+    // Let's replace the handleFrameClick and the return statement primarily.
+
+    // ...
+
     const calculateProcessedTemplates = () => {
         let result = [...templates];
 
@@ -93,13 +110,56 @@ const FrameList: React.FC = () => {
         return <div className={styles.empty}>Select or create a project to view frames.</div>;
     }
 
-    const handleFrameClick = (id: string, isInstance = false) => {
-        if (isInstance) {
-            setSelection([id]);
-        } else {
-            // It's a template that's not on the wall yet
-            setSelection([]);
+    const handleTemplateClick = (e: React.MouseEvent, templateId: string, index: number) => {
+        // Mode 1: Selection Callback (e.g. Mobile Tap to Add)
+        if (onFrameSelect && selectionMode !== 'toggle' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+            const template = templates.find(t => t.id === templateId);
+            if (template) {
+                onFrameSelect(template);
+            }
+            return;
         }
+
+        // Mode 2: Standard Desktop / Batch Management
+
+        // Force toggle if selectionMode is 'toggle' (Mobile Manage Mode)
+        const isToggle = selectionMode === 'toggle' || e.ctrlKey || e.metaKey;
+
+        if (isToggle) {
+            // Toggle
+            if (selectedFrameTemplateIds.includes(templateId)) {
+                setSelectedFrameTemplates(selectedFrameTemplateIds.filter(id => id !== templateId));
+            } else {
+                setSelectedFrameTemplates([...selectedFrameTemplateIds, templateId]);
+            }
+            setAnchorIndex(index);
+        } else if (e.shiftKey && anchorIndex !== null) {
+            // Range
+            const start = Math.min(anchorIndex, index);
+            const end = Math.max(anchorIndex, index);
+            const rangeIds = processedTemplates.slice(start, end + 1).map(t => t.id);
+            setSelectedFrameTemplates(rangeIds);
+        } else {
+            // Single select
+            setSelectedFrameTemplates([templateId]);
+            setAnchorIndex(index);
+        }
+
+        // Also clear canvas selection
+        setSelection([]);
+    };
+
+    const handleBatchDelete = () => {
+        if (selectedFrameTemplateIds.length === 0) return;
+        setFrameToRemove('BATCH_DELETE');
+    };
+
+    const confirmBatchDelete = () => {
+        selectedFrameTemplateIds.forEach(id => {
+            removeFromLibrary(currentProject.id, id);
+        });
+        setSelectedFrameTemplates([]); // Clear selection
+        setFrameToRemove(null);
     };
 
     const handleDeleteTemplate = (e: React.MouseEvent, templateId: string) => {
@@ -133,46 +193,59 @@ const FrameList: React.FC = () => {
 
     return (
         <div className={styles.container}>
-            <FilterBar
-                searchTerm={searchTerm}
-                onSearchChange={(val) => updateFrameState({ searchTerm: val })}
-                showSearch={true}
-                placeholder="Search frames..."
-                sortOptions={[
-                    { value: 'newest', label: 'Newest' },
-                    { value: 'oldest', label: 'Oldest' },
-                    { value: 'area', label: 'Size (Largest)' },
-                    { value: 'area_asc', label: 'Size (Smallest)' },
-                    { value: 'width', label: 'Width' },
-                    { value: 'height', label: 'Height' },
-                ]}
-                currentSort={sortBy}
-                onSortChange={(val) => updateFrameState({ sortBy: val })}
-                filterOptions={[
-                    { key: 'unplaced', label: 'Unplaced Only' },
-                    { key: 'placed', label: 'Placed Only' },
-                    { key: 'portrait', label: 'Portrait' },
-                    { key: 'landscape', label: 'Landscape' },
-                    { key: 'square', label: 'Square' },
-                    { key: 'round', label: 'Round/Oval' },
-                ]}
-                activeFilters={activeFilters}
-                onFilterChange={handleFilterChange}
-                onClear={() => updateFrameState({ activeFilters: {} })}
-            />
+            <div className={styles.headerRow}>
+                <FilterBar
+                    searchTerm={searchTerm}
+                    onSearchChange={(val) => updateFrameState({ searchTerm: val })}
+                    showSearch={true}
+                    placeholder="Search frames..."
+                    sortOptions={[
+                        { value: 'newest', label: 'Newest' },
+                        { value: 'oldest', label: 'Oldest' },
+                        { value: 'area', label: 'Size (Largest)' },
+                        { value: 'area_asc', label: 'Size (Smallest)' },
+                        { value: 'width', label: 'Width' },
+                        { value: 'height', label: 'Height' },
+                    ]}
+                    currentSort={sortBy}
+                    onSortChange={(val) => updateFrameState({ sortBy: val })}
+                    filterOptions={[
+                        { key: 'unplaced', label: 'Unplaced Only' },
+                        { key: 'placed', label: 'Placed Only' },
+                        { key: 'portrait', label: 'Portrait' },
+                        { key: 'landscape', label: 'Landscape' },
+                        { key: 'square', label: 'Square' },
+                        { key: 'round', label: 'Round/Oval' },
+                    ]}
+                    activeFilters={activeFilters}
+                    onFilterChange={handleFilterChange}
+                    onClear={() => updateFrameState({ activeFilters: {} })}
+                />
+            </div>
+
+            {selectedFrameTemplateIds.length > 0 && (
+                <div className={styles.batchActions}>
+                    <span className={styles.selectionCount}>{selectedFrameTemplateIds.length} selected</span>
+                    <div className={styles.batchButtons}>
+                        <button className={styles.clearParamsBtn} onClick={() => setSelectedFrameTemplates([])} title="Clear Selection">✕</button>
+                        <button className={styles.batchDeleteBtn} onClick={handleBatchDelete} title="Delete Selected">🗑️</button>
+                    </div>
+                </div>
+            )}
 
             <div className={styles.scrollWrapper}>
                 <div className={styles.list}>
-                    {processedTemplates.map((template) => {
+                    {processedTemplates.map((template, index) => {
                         const instance = instances.find(f => f.templateId === template.id);
                         const isPlaced = !!instance;
+                        const isSelected = selectedFrameTemplateIds.includes(template.id);
 
                         return (
                             <div
                                 key={template.id}
-                                className={`${styles.frameItem} ${isPlaced ? styles.placedItem : ''}`}
+                                className={`${styles.frameItem} ${isPlaced ? styles.placedItem : ''} ${isSelected ? styles.selectedItem : ''}`}
                                 draggable={!isPlaced}
-                                onClick={() => handleFrameClick(instance?.id || template.id, isPlaced)}
+                                onClick={(e) => handleTemplateClick(e, template.id, index)}
                                 onDragStart={(e) => {
                                     if (isPlaced) return;
                                     e.dataTransfer.setData('application/json', JSON.stringify({
@@ -198,7 +271,10 @@ const FrameList: React.FC = () => {
                                     {isPlaced && (
                                         <div className={styles.placedOverlay}>PLACED</div>
                                     )}
-                                    {!isPlaced && (
+                                    {isSelected && !isPlaced && (
+                                        <div className={styles.selectedOverlay}>✓</div>
+                                    )}
+                                    {!isPlaced && !isSelected && (
                                         <button className={styles.removeBtn} onClick={(e) => handleDeleteTemplate(e, template.id)} title="Remove from library">×</button>
                                     )}
                                 </div>
@@ -228,12 +304,18 @@ const FrameList: React.FC = () => {
             </div>
             {frameToRemove && (
                 <ConfirmDialog
-                    title="Remove Frame Template"
-                    message="Are you sure you want to remove this frame template from your library?"
+                    title={frameToRemove === 'BATCH_DELETE' ? "Delete Selected Frames" : "Remove Frame Template"}
+                    message={frameToRemove === 'BATCH_DELETE'
+                        ? `Are you sure you want to remove ${selectedFrameTemplateIds.length} templates?`
+                        : "Are you sure you want to remove this frame template from your library?"}
                     confirmLabel="Remove"
                     onConfirm={() => {
-                        removeFromLibrary(currentProject.id, frameToRemove);
-                        setFrameToRemove(null);
+                        if (frameToRemove === 'BATCH_DELETE') {
+                            confirmBatchDelete();
+                        } else {
+                            removeFromLibrary(currentProject.id, frameToRemove);
+                            setFrameToRemove(null);
+                        }
                     }}
                     onCancel={() => setFrameToRemove(null)}
                     isDanger={true}

@@ -166,6 +166,37 @@
     justify-content: flex-end;
     align-items: center;
     gap: var(--spacing-md);
+    flex-wrap: wrap;
+}
+
+.githubLink {
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.githubLink:hover {
+    opacity: 1;
+}
+
+@media (max-width: 600px) {
+    .footer {
+        justify-content: center;
+    }
+
+    .footer>* {
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+
+    .secondaryBtn,
+    .primaryBtn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .shortcutsSection {
+        display: none;
+    }
 }
 
 .primaryBtn {

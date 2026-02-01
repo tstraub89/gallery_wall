@@ -10,6 +10,7 @@ interface ProjectData {
     currentProjectId: string | null;
     selectedFrameIds: string[];
     selectedImageIds: string[];
+    selectedFrameTemplateIds: string[];
     focusedArea: 'canvas' | 'library' | null;
     libraryState: LibraryState;
     frameState: LibraryState;
@@ -30,6 +31,7 @@ const initialData: ProjectData = {
     currentProjectId: null,
     selectedFrameIds: [], // Array of frame IDs
     selectedImageIds: [], // Array of image IDs (photo library)
+    selectedFrameTemplateIds: [], // Array of frame template IDs (frame library)
     focusedArea: null, // 'canvas' | 'library' | null
     libraryState: { searchTerm: '', activeFilters: {}, sortBy: 'newest' },
     frameState: { searchTerm: '', activeFilters: {}, sortBy: 'newest' },
@@ -293,6 +295,10 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
         setData(prev => ({ ...prev, selectedImageIds: ids }));
     };
 
+    const setSelectedFrameTemplates = (ids: string[]) => {
+        setData(prev => ({ ...prev, selectedFrameTemplateIds: ids }));
+    };
+
     const setFocusedArea = (area: 'canvas' | 'library' | null) => {
         setData(prev => ({ ...prev, focusedArea: area }));
     };
@@ -476,6 +482,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             currentProjectId: data.currentProjectId,
             selectedFrameIds: data.selectedFrameIds || [],
             selectedImageIds: data.selectedImageIds || [],
+            selectedFrameTemplateIds: data.selectedFrameTemplateIds || [],
             focusedArea: data.focusedArea,
             isLoaded,
             addProject,
@@ -488,6 +495,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             selectFrame,
             setSelection,
             setSelectedImages,
+            setSelectedFrameTemplates,
             setFocusedArea,
             libraryState: data.libraryState || initialData.libraryState,
             frameState: data.frameState || initialData.frameState,

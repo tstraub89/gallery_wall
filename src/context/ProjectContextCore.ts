@@ -13,6 +13,7 @@ export interface ProjectContextType {
     currentProjectId: string | null;
     selectedFrameIds: string[];
     selectedImageIds: string[];
+    selectedFrameTemplateIds: string[]; // Library templates
     focusedArea: 'canvas' | 'library' | null;
     isLoaded: boolean;
     showWelcome: boolean;
@@ -30,6 +31,7 @@ export interface ProjectContextType {
     selectFrame: (frameId: string, multi?: boolean) => void;
     setSelection: (ids: string[]) => void;
     setSelectedImages: (ids: string[]) => void;
+    setSelectedFrameTemplates: (ids: string[]) => void;
     setFocusedArea: (area: 'canvas' | 'library' | null) => void;
 
     libraryState: LibraryState;

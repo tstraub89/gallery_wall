@@ -1,0 +1,270 @@
+.mobileContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    background-color: #f5f5f5;
+}
+
+.mobileHeader {
+    height: 56px;
+    background-color: white;
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    z-index: 10;
+}
+
+.mobileLogo {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+/* Project Title Switcher */
+.projectTitle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #f5f5f5;
+    padding: 6px 10px;
+    border-radius: 16px;
+    cursor: pointer;
+    max-width: 150px;
+    /* Limit width */
+    margin-left: 8px;
+}
+
+.titleText {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #333;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.titleArrow {
+    color: #666;
+    flex-shrink: 0;
+}
+
+.undoGroup {
+    display: flex;
+    gap: 0;
+    margin-right: 8px;
+    border-right: 1px solid #eee;
+    padding-right: 8px;
+}
+
+.iconBtn {
+    border: none;
+    background: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    cursor: pointer;
+}
+
+.iconBtn:active {
+    opacity: 0.7;
+}
+
+.mobileMain {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background-color: #ddd;
+}
+
+/* Bottom Navigation Bar */
+.bottomNav {
+    height: 64px;
+    background-color: white;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 10;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.navItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: #666;
+    font-size: 0.75rem;
+    gap: 4px;
+}
+
+.navItem.active {
+    color: #007AFF;
+}
+
+.navIcon {
+    width: 24px;
+    height: 24px;
+    background-color: #ccc;
+    border-radius: 4px;
+    /* Optional: Replace with actual icons */
+}
+
+.navItem.active .navIcon {
+    background-color: #007AFF;
+}
+
+
+/* Menu Overlay (Bottom Sheet Style) */
+.menuOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 2100;
+    display: flex;
+    align-items: flex-end;
+    animation: fadeIn 0.15s ease-out;
+}
+
+.menuSheet {
+    width: 100%;
+    background: white;
+    border-radius: 16px 16px 0 0;
+    padding: 8px 16px 32px 16px;
+    /* Extra bottom padding */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.menuItem {
+    padding: 16px;
+    font-size: 1rem;
+    color: #333;
+    border-bottom: 1px solid #f5f5f5;
+    cursor: pointer;
+    text-align: center;
+}
+
+.menuItem.danger {
+    color: #ff3b30;
+    font-weight: 600;
+}
+
+.menuCancel {
+    margin-top: 8px;
+    padding: 16px;
+    background: #f0f0f0;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.loadingOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    font-weight: 600;
+}
+
+/* Modal for Rename */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 5000;
+    /* Higher than other overlays */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.modalBox {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 320px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modalBox h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.modalInput {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    margin-bottom: 24px;
+}
+
+.modalActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.modalActions button {
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    font-weight: 600;
+    cursor: pointer;
+    color: #666;
+}
+
+.modalActions .primaryBtn {
+    background-color: #007AFF;
+    color: white;
+    border-radius: 8px;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}

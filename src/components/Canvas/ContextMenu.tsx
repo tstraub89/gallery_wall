@@ -67,7 +67,9 @@ const ContextMenu: React.FC<ContextMenuProps> = ({ x, y, items, onClose }) => {
                         }}
                     >
                         <span className={styles.label}>{item.label}</span>
-                        {item.shortcut && <span className={styles.shortcut}>{item.shortcut}</span>}
+                        {item.shortcut && !window.matchMedia('(pointer: coarse)').matches && (
+                            <span className={styles.shortcut}>{item.shortcut}</span>
+                        )}
                     </button>
                 )
             ))}

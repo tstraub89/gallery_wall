@@ -14,6 +14,73 @@ const loadImage = (src: string): Promise<HTMLImageElement> => {
     });
 };
 
+// Helper to convert blob URL or external URL to base64
+const blobToBase64 = (url: string): Promise<string | ArrayBuffer | null> => new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+            resolve(reader.result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(xhr.response);
+    };
+    xhr.onerror = reject;
+    xhr.open('GET', url);
+    xhr.responseType = 'blob';
+    xhr.send();
+});
+
+const waitForImages = (node: HTMLElement): Promise<void[]> => {
+    const images = Array.from(node.querySelectorAll('img'));
+    return Promise.all(images.map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise<void>(resolve => {
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+        });
+    }));
+};
+
+/**
+ * Robust file saving that prefers the modern File System Access API (Chrome/Edge)
+ * and falls back to FileSaver.js (Firefox/Safari).
+ */
+export const saveFile = async (blob: Blob, suggestedName: string) => {
+    try {
+        // Feature detection for File System Access API (Chrome/Edge/Opera)
+        // @ts-ignore - Types might be missing for this modern API
+        if (window.showSaveFilePicker) {
+            const opts = {
+                suggestedName,
+                types: [{
+                    description: 'File',
+                    accept: {
+                        [blob.type]: ['.' + suggestedName.split('.').pop()]
+                    }
+                }],
+            };
+            // @ts-ignore
+            const handle = await window.showSaveFilePicker(opts);
+            const writable = await handle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+            return;
+        }
+
+        // Fallback for Firefox/Safari/Mobile
+        saveAs(blob, suggestedName);
+    } catch (err: any) {
+        // If user cancels picker, we get an AbortError. Ignore it.
+        if (err.name === 'AbortError') return;
+
+        console.warn('File System Access API failed, falling back to FileSaver', err);
+        // Last ditch fallback
+        saveAs(blob, suggestedName);
+    }
+};
+
+
 /**
  * Generates a ZIP file containing high-resolution cropped photos from the project frames.
  * @param {Project} project - The current project object containing frames.
@@ -156,10 +223,100 @@ export const generateProjectZip = async (project: Project) => {
 
     // Generate ZIP
     const content = await zip.generateAsync({ type: "blob" });
-    saveAs(content, `${project.name || 'Gallery'}_Photos_Export.zip`);
+    await saveFile(content, `${project.name || 'Gallery'}_Photos_Export.zip`);
 
     return { success: true, errorCount: errors.length };
 };
+
+/**
+ * Capture the Canvas Wall as a PNG Blob
+ */
+import { toBlob } from 'html-to-image';
+
+export const exportCanvasToBlob = async (
+    project: Project,
+    canvasId: string = 'canvas-export-target'
+): Promise<{ blob: Blob | null, error: string | null }> => {
+    const node = document.getElementById(canvasId);
+    if (!node) {
+        return { blob: null, error: 'Could not find wall element to export.' };
+    }
+
+    const imgElements = Array.from(node.querySelectorAll('img'));
+    const originalSources = new Map();
+    let failedConversions = 0;
+
+    try {
+        // Pre-process images to Base64 to avoid taint issues
+        for (const img of imgElements) {
+            if (img.src && (img.src.startsWith('blob:') || img.src.startsWith('http'))) {
+                originalSources.set(img, img.src);
+                try {
+                    const b64 = await blobToBase64(img.src);
+                    if (typeof b64 === 'string') {
+                        img.src = b64;
+                    }
+                } catch {
+                    failedConversions++;
+                }
+            }
+        }
+
+        await waitForImages(node);
+        // Small delay to ensure rendering settles
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        const currentWidth = Math.ceil(project.wallConfig.width * PPI);
+        const currentHeight = Math.ceil(project.wallConfig.height * PPI);
+
+        // Target roughly 1080p for standard export, but scalable
+        const targetWidth = 1920;
+        const targetHeight = 1080;
+        const scaleToHD = Math.max(targetWidth / currentWidth, targetHeight / currentHeight, 1.0);
+        const scales = [scaleToHD, 1.0, 0.8, 0.5];
+
+        let blob = null;
+        let lastError = null;
+
+        // Try descending scales if memory/canvas limits are hit
+        for (const s of scales) {
+            try {
+                blob = await toBlob(node, {
+                    width: currentWidth,
+                    height: currentHeight,
+                    pixelRatio: s,
+                    backgroundColor: '#ffffff',
+                    style: {
+                        transform: 'none',
+                        left: '0',
+                        top: '0',
+                        position: 'relative'
+                    },
+                    cacheBust: true,
+                    skipFonts: true,
+                });
+                if (blob) break;
+            } catch (err) {
+                lastError = err;
+            }
+        }
+
+        if (!blob) throw lastError || new Error('Failed to generate image blob');
+
+        // Restore original sources
+        for (const [img, src] of originalSources.entries()) img.src = src;
+
+        return { blob, error: failedConversions > 0 ? `Exported with ${failedConversions} missing images` : null };
+
+    } catch (err: any) {
+        // Restore original sources in case of error
+        for (const [img, src] of originalSources.entries()) img.src = src;
+        console.error('Export failed', err);
+        alert(`Export failed: ${err.message || String(err)}`);
+        return { blob: null, error: err.message || String(err) };
+    }
+};
+
 
 /**
  * Generates a .gwall file (ZIP) containing the project metadata and all images used in frames.
@@ -200,7 +357,7 @@ export const exportProjectBundle = async (project: Project) => {
 
     // 4. Generate and Save ZIP
     const content = await zip.generateAsync({ type: "blob" });
-    saveAs(content, `${project.name || 'project'}.gwall`);
+    await saveFile(content, `${project.name || 'project'}.gwall`);
 
     return {
         success: true,
@@ -255,4 +412,21 @@ export const importProjectBundle = async (file: File | Blob) => {
     }
 
     return { project, images };
+};
+
+export const generateShoppingListBlob = (project: Project): Blob | null => {
+    if (!project || !project.frames.length) return null;
+
+    const list = project.frames.map((f, i) => {
+        const hasImage = !!f.imageId;
+        let line = `Frame ${i + 1}: ${f.width}" x ${f.height}"`;
+        if (f.matted) {
+            line += ` (Matted to ${f.matted.width}" x ${f.matted.height}")`;
+        }
+        line += ` - Status: ${hasImage ? 'Filled' : 'Empty'}`;
+        return line;
+    }).join('\n');
+
+    const header = `GALLERY WALL SHOPPING LIST\nProject: ${project.name}\nTotal Frames: ${project.frames.length}\n----------------------------\n\n`;
+    return new Blob([header + list], { type: 'text/plain' });
 };

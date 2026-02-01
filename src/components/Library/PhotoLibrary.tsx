@@ -78,7 +78,13 @@ const PhotoItem: React.FC<PhotoItemProps> = ({ imageId, isUsed, isSelected, onSe
     );
 };
 
-const PhotoLibrary = () => {
+interface PhotoLibraryProps {
+    onPhotoSelect?: (imageId: string) => void;
+    selectionMode?: 'standard' | 'toggle';
+}
+
+const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMode = 'standard' }) => {
+    // ... imports ...
     const {
         currentProject,
         addImageToLibrary,
@@ -91,11 +97,12 @@ const PhotoLibrary = () => {
         setSelection,
         setFocusedArea
     } = useProject();
+
     const fileInputRef = useRef<HTMLInputElement>(null);
     // Track anchor index for range selection
-    const [anchorIndex, setAnchorIndex] = React.useState<number | null>(null);
+    const [anchorIndex, setAnchorIndex] = useState<number | null>(null);
     // Delete confirmation dialog
-    const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
     // Filter State
     // Persistent State
@@ -121,7 +128,6 @@ const PhotoLibrary = () => {
         };
         init();
     }, [currentProject, isLoaded]);
-
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
@@ -157,6 +163,13 @@ const PhotoLibrary = () => {
     let processedImages: string[] = [];
 
     const handleSelect = (imageId: string, e: MouseEvent) => {
+        // Mode 1: Selection Callback (e.g. Mobile Tap to Add)
+        if (onPhotoSelect && selectionMode !== 'toggle' && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+            onPhotoSelect(imageId);
+            return;
+        }
+
+        // Mode 2: Standard Desktop / Batch Management
         // Deselect frames on canvas
         setSelection([]);
         setFocusedArea('library');
@@ -165,7 +178,9 @@ const PhotoLibrary = () => {
         const images = processedImages;
         const clickedIndex = images.indexOf(imageId);
 
-        if (e.ctrlKey || e.metaKey) {
+        const isToggle = selectionMode === 'toggle' || e.ctrlKey || e.metaKey;
+
+        if (isToggle) {
             // Toggle selection
             if (selectedImageIds.includes(imageId)) {
                 setSelectedImages(selectedImageIds.filter(id => id !== imageId));

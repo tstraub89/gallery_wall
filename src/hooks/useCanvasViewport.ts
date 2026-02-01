@@ -1,8 +1,18 @@
 import { useState, useEffect, RefObject } from 'react';
+import { useViewport } from '../context/ViewportContext';
 
 export const useCanvasViewport = (containerRef: RefObject<HTMLElement | null>) => {
-    const [scale, setScale] = useState(1);
-    const [pan, setPan] = useState({ x: 0, y: 0 });
+    // Try to use global context first
+    const context = useViewport();
+
+    // Fallback local state if no provider (e.g. tests or isolated components)
+    const [localScale, setLocalScale] = useState(1);
+    const [localPan, setLocalPan] = useState({ x: 0, y: 0 });
+
+    const scale = context ? context.scale : localScale;
+    const setScale = context ? context.setScale : setLocalScale;
+    const pan = context ? context.pan : localPan;
+    const setPan = context ? context.setPan : setLocalPan;
 
     // Block Browser Zoom (Firefox Fix) & Handle Wheel Zoom/Pan
     useEffect(() => {
@@ -15,8 +25,7 @@ export const useCanvasViewport = (containerRef: RefObject<HTMLElement | null>) =
                 const zoomSensitivity = 0.002; // Slightly increased for better feel
                 const delta = -e.deltaY * zoomSensitivity;
                 setScale(s => {
-                    const next = Math.min(Math.max(0.1, s + delta), 5);
-                    // REMOVED ROUNDING: Store precise float preventing small deltas from being eaten
+                    const next = Math.min(Math.max(0.1, (typeof s === 'number' ? s : 1) + delta), 5);
                     return next;
                 });
             } else {
