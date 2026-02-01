@@ -22,7 +22,9 @@ interface UseTouchGesturesProps {
 
 export const useTouchGestures = ({
     containerRef,
+    pan,
     setPan,
+    scale,
     setScale,
     onLongPress,
     onTap,
@@ -34,10 +36,23 @@ export const useTouchGestures = ({
     const lastTouches = useRef<{ x: number; y: number }[]>([]);
     const lastDistance = useRef<number | null>(null);
 
+    // Refs for mutable access inside Event Listeners (prevents re-binding)
+    const scaleRef = useRef(scale);
+    const panRef = useRef(pan);
+
+    // Sync Refs
+    useEffect(() => { scaleRef.current = scale; }, [scale]);
+    useEffect(() => { panRef.current = pan; }, [pan]);
+
     // Modes
     const isPanning = useRef(false);
     const isZooming = useRef(false);
     const isDraggingFrame = useRef(false);
+
+    // Gesture Start State (for Absolute Zooming)
+    const gestureStartScale = useRef<number>(1);
+    const gestureStartPan = useRef<{ x: number, y: number }>({ x: 0, y: 0 });
+    const gestureStartVPC = useRef<{ x: number, y: number } | null>(null);
 
     // Long Press & Tap Logic
     const touchStartTime = useRef<number>(0);
@@ -102,7 +117,28 @@ export const useTouchGestures = ({
                 isPanning.current = false;
                 isDraggingFrame.current = false;
                 isZooming.current = true;
-                lastDistance.current = getDistance(e.touches[0], e.touches[1]);
+
+                const dist = getDistance(e.touches[0], e.touches[1]);
+                lastDistance.current = dist;
+
+                // Capture Start State for smooth "Absolute" zooming
+                // (Prevents jitter from incremental floating point errors)
+                gestureStartScale.current = scaleRef.current;
+                gestureStartPan.current = panRef.current;
+
+                // Calculate Start Focal Point (relative to container)
+                const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                const rect = container.getBoundingClientRect();
+                const localMidX = midX - rect.left;
+                const localMidY = midY - rect.top;
+
+                // Calculate the exact point on the "Wall" we are holding needed for the anchor
+                // World = (P - Pan) / Scale
+                gestureStartVPC.current = {
+                    x: (localMidX - panRef.current.x) / scaleRef.current,
+                    y: (localMidY - panRef.current.y) / scaleRef.current
+                };
 
                 // Cancel Tap/LongPress tasks
                 if (longPressTimer.current) clearTimeout(longPressTimer.current);
@@ -153,18 +189,32 @@ export const useTouchGestures = ({
             }
 
             // PINCH ZOOMING (2 Fingers)
-            if (e.touches.length === 2 && isZooming.current && lastDistance.current !== null) {
+            if (e.touches.length === 2 && isZooming.current && lastDistance.current !== null && gestureStartVPC.current) {
+                // Current Distance
                 const dist = getDistance(e.touches[0], e.touches[1]);
+
+                // Current Midpoint
+                const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+                const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+                const rect = container.getBoundingClientRect();
+                const localMidX = midX - rect.left;
+                const localMidY = midY - rect.top;
+
+                // Ratio from START of gesture
                 const ratio = dist / lastDistance.current;
 
-                // Apply Zoom
-                setScale(s => {
-                    const newScale = Math.min(Math.max(0.1, s * ratio), 5);
-                    return newScale;
-                });
+                // Calculate New Scale derived from START scale
+                let newScale = gestureStartScale.current * ratio;
+                newScale = Math.min(Math.max(0.1, newScale), 5); // Clamp
 
-                lastDistance.current = dist;
-                lastTouches.current = Array.from(e.touches).map(t => ({ x: t.clientX, y: t.clientY }));
+                // Calculate New Pan to keep the World Focal Point under the Current Midpoint
+                // Pan = P_current - (World_Anchor * Scale_New)
+                const newPanX = localMidX - (gestureStartVPC.current.x * newScale);
+                const newPanY = localMidY - (gestureStartVPC.current.y * newScale);
+
+                // Commit
+                setScale(newScale);
+                setPan({ x: newPanX, y: newPanY });
             }
         };
 
@@ -216,5 +266,7 @@ export const useTouchGestures = ({
             container.removeEventListener('touchend', handleTouchEnd);
             container.removeEventListener('touchcancel', handleTouchEnd);
         };
-    }, [containerRef, setPan, setScale, onLongPress, onTap, onFrameDrag, onFrameDragEnd, isFrameSelected]);
+        // Removed scale, pan, setScale, setPan from dependency array to prevent listener thrashing
+        // We utilize scaleRef and panRef inside handlers for latest values
+    }, [containerRef, onLongPress, onTap, onFrameDrag, onFrameDragEnd, isFrameSelected]);
 };
