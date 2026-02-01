@@ -2,7 +2,7 @@
 
 **Visualize your perfect gallery wall before you hang a single nail.**
 
-![Gallery Wall Planner Preview](./example.png)
+![Gallery Wall Planner Preview](./example.jpg)
 
 A powerful, interactive web application designed to help you plan complex gallery layouts with real frames and personal photos. Transition from a pile of frames on the floor to a perfectly aligned wall with confidence.
 
@@ -101,6 +101,6 @@ Click the **"?"** button in the header for the in-app **Quick Start Guide**.
 
 **Tech Stack**: Built with React 19 (Vite), **TypeScript**, CSS Modules, and IndexedDB for persistent local storage.
 
-v2.1.1 Released Jan 2026. 🚀✨
+v2.1.2 Released Feb 2026. 🚀✨
 
 © 2026 Timothy Straub. All Rights Reserved.

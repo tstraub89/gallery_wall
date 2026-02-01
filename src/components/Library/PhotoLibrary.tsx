@@ -111,6 +111,10 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
     // Metadata Cache
     const [metadata, setMetadata] = useState<Record<string, any>>({});
 
+    // Processing State
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [processingProgress, setProcessingProgress] = useState({ current: 0, total: 0 });
+
     // 1. Run Migration & Fetch Metadata on Mount / Project Change
     useEffect(() => {
         if (!currentProject || !isLoaded) return;
@@ -135,28 +139,39 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
 
         if (!currentProject) return;
 
-        for (const file of files) {
-            try {
-                const imageId = uuidv4();
-                const result = await saveImage(imageId, file);
-                // Result contains metadata, update cache immediately
-                setMetadata(prev => ({
-                    ...prev,
-                    [imageId]: {
-                        width: result.width,
-                        height: result.height,
-                        aspectRatio: result.aspectRatio,
-                        name: result.name
-                    }
-                }));
-                addImageToLibrary(currentProject.id, imageId);
-            } catch (err) {
-                console.error("Failed to add image to library", err);
-            }
-        }
+        setIsProcessing(true);
+        setProcessingProgress({ current: 0, total: files.length });
 
-        // Reset input
-        e.target.value = '';
+        try {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                // Update progress at start of item
+                setProcessingProgress(prev => ({ ...prev, current: i + 1 }));
+
+                try {
+                    const imageId = uuidv4();
+                    const result = await saveImage(imageId, file);
+                    // Result contains metadata, update cache immediately
+                    setMetadata(prev => ({
+                        ...prev,
+                        [imageId]: {
+                            width: result.width,
+                            height: result.height,
+                            aspectRatio: result.aspectRatio,
+                            name: result.name
+                        }
+                    }));
+                    addImageToLibrary(currentProject.id, imageId);
+                } catch (err) {
+                    console.error("Failed to add image to library", err);
+                }
+            }
+        } finally {
+            setIsProcessing(false);
+            setProcessingProgress({ current: 0, total: 0 });
+            // Reset input
+            e.target.value = '';
+        }
     };
 
     // Forward declaration for hoisting
@@ -296,24 +311,37 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
         const files = Array.from(e.dataTransfer.files);
         if (files.length === 0) return;
 
-        for (const file of files) {
-            if (!file.type.startsWith('image/')) continue;
-            try {
-                const imageId = uuidv4();
-                const result = await saveImage(imageId, file);
-                setMetadata(prev => ({
-                    ...prev,
-                    [imageId]: {
-                        width: result.width,
-                        height: result.height,
-                        aspectRatio: result.aspectRatio,
-                        name: result.name
-                    }
-                }));
-                addImageToLibrary(currentProject.id, imageId);
-            } catch (err) {
-                console.error("Failed to add dropped image to library", err);
+        setIsProcessing(true);
+        setProcessingProgress({ current: 0, total: files.length });
+
+        try {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (!file.type.startsWith('image/')) continue;
+
+                // Update progress
+                setProcessingProgress(prev => ({ ...prev, current: i + 1 }));
+
+                try {
+                    const imageId = uuidv4();
+                    const result = await saveImage(imageId, file);
+                    setMetadata(prev => ({
+                        ...prev,
+                        [imageId]: {
+                            width: result.width,
+                            height: result.height,
+                            aspectRatio: result.aspectRatio,
+                            name: result.name
+                        }
+                    }));
+                    addImageToLibrary(currentProject.id, imageId);
+                } catch (err) {
+                    console.error("Failed to add dropped image to library", err);
+                }
             }
+        } finally {
+            setIsProcessing(false);
+            setProcessingProgress({ current: 0, total: 0 });
         }
     };
 
@@ -500,6 +528,15 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
                     onDeleteAll={handleDeleteAll}
                     onCancel={handleCancelDelete}
                 />
+            )}
+
+            {isProcessing && (
+                <div className={styles.processingOverlay}>
+                    <div className={styles.spinner} />
+                    <div className={styles.processingText}>
+                        Processing photos... ({processingProgress.current}/{processingProgress.total})
+                    </div>
+                </div>
             )}
         </div>
     );

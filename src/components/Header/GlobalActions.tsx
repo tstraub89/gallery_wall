@@ -114,7 +114,7 @@ const GlobalActions = () => {
                 label="Export"
                 icon={<Download size={16} />}
                 items={[
-                    { label: 'Save Image (PNG)', onClick: () => exportToPng(), title: 'Screenshot of your wall layout' },
+                    { label: 'Save Snapshot (JPEG)', onClick: () => exportToPng(), title: 'Save a high-res snapshot of your wall layout' },
                     { label: 'Shopping List (.txt)', onClick: exportShoppingList, title: 'Text list of all frames for shopping' },
                     { label: 'Export Photos (.zip)', onClick: exportPhotosCrops, title: 'High-res cropped photos ready for printing' }
                 ]}
