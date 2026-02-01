@@ -195,17 +195,44 @@ const MobileEditSheet: React.FC<MobileEditSheetProps> = ({ isOpen, onClose }) =>
                                         </div>
                                     </div>
 
-                                    {/* Rotate Frame */}
-                                    <button className={styles.actionBtn} onClick={rotateFrames}>
-                                        <RotateCw size={18} />
-                                        Rotate Frame 90°
-                                    </button>
+                                    {/* Matting Toggle */}
+                                    <div className={styles.toggleRow} onClick={() => {
+                                        const hasMat = selectedFrames.every(f => !!f.matted);
+                                        const updatedFrames = currentProject.frames.map(f => {
+                                            if (selectedFrameIds.includes(f.id)) {
+                                                if (hasMat) {
+                                                    return { ...f, matted: undefined };
+                                                } else {
+                                                    // Default Mat: 2 inches smaller than frame (1 inch each side)
+                                                    // Clamp to minimum 1 inch opening
+                                                    const matW = Math.max(1, f.width - 2);
+                                                    const matH = Math.max(1, f.height - 2);
+                                                    return { ...f, matted: { width: matW, height: matH } };
+                                                }
+                                            }
+                                            return f;
+                                        });
+                                        updateProject(currentProject.id, { frames: updatedFrames });
+                                    }}>
+                                        <div className={styles.toggleLabel}>
+                                            <FrameIcon size={16} /> Matting
+                                        </div>
+                                        <div className={`${styles.switch} ${selectedFrames.every(f => !!f.matted) ? styles.switchChecked : ''}`}>
+                                            <div className={styles.switchHandle} />
+                                        </div>
+                                    </div>
 
-                                    {/* Delete Frame */}
-                                    <button className={`${styles.actionBtn} ${styles.dangerBtn}`} onClick={deleteFrames}>
-                                        <Trash2 size={18} />
-                                        Delete Frame{selectedFrames.length > 1 ? 's' : ''}
-                                    </button>
+                                    {/* Compact Actions */}
+                                    <div className={styles.compactRow}>
+                                        <button className={styles.actionBtn} onClick={rotateFrames}>
+                                            <RotateCw size={18} />
+                                            Rotate
+                                        </button>
+                                        <button className={`${styles.actionBtn} ${styles.dangerBtn}`} onClick={deleteFrames}>
+                                            <Trash2 size={18} />
+                                            Delete
+                                        </button>
+                                    </div>
                                 </div>
                             )}
 

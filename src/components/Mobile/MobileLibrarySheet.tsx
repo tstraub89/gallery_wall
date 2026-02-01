@@ -6,6 +6,7 @@ import { Frame } from '../../types';
 import { v4 as uuidv4 } from 'uuid';
 import styles from './MobileLibrarySheet.module.css';
 import { useViewport } from '../../context/ViewportContext';
+import MobileAddFrameDialog from './MobileAddFrameDialog';
 
 interface MobileLibrarySheetProps {
     isOpen: boolean;
@@ -15,6 +16,7 @@ interface MobileLibrarySheetProps {
 const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose }) => {
     const [activeTab, setActiveTab] = useState<'frames' | 'photos'>('frames');
     const [isEditMode, setIsEditMode] = useState(false);
+    const [showAddDialog, setShowAddDialog] = useState(false);
 
     const {
         currentProject,
@@ -27,6 +29,27 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
     if (!isOpen || !currentProject) return null;
 
     // -- Handlers --
+
+    const handleAddCustomFrame = (width: number, height: number, shape: 'rect' | 'round', matted: boolean) => {
+        // Create manual frame template
+        const template: Frame = {
+            id: 'manual_' + uuidv4(),
+            width,
+            height,
+            label: `Custom ${width}" x ${height}"`,
+            shape,
+            frameColor: '#111111',
+            matted: matted ? { width: width - 2, height: height - 2 } : undefined, // Default logic
+            borderWidth: 0.5,
+            x: 0,
+            y: 0,
+            rotation: 0,
+            zIndex: 0
+        };
+
+        handleAddFrame(template);
+        setShowAddDialog(false);
+    };
 
     const handleAddFrame = (template: Frame) => {
         const id = uuidv4();
@@ -91,7 +114,7 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
         // Create frame with templateId linking back to library template
         const newFrame: Frame = {
             id,
-            templateId: template.id,  // CRITICAL: Links to library for PLACED tracking
+            templateId: template.id.startsWith('manual_') ? undefined : template.id,
             width: template.width,
             height: template.height,
             label: template.label,
@@ -161,12 +184,23 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
                         </button>
                     </div>
 
-                    <button
-                        className={`${styles.editBtn} ${isEditMode ? styles.editActive : ''}`}
-                        onClick={() => setIsEditMode(!isEditMode)}
-                    >
-                        {isEditMode ? 'Done' : 'Manage'}
-                    </button>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        {activeTab === 'frames' && !isEditMode && (
+                            <button
+                                className={styles.editBtn}
+                                onClick={() => setShowAddDialog(true)}
+                                style={{ background: 'var(--accent-color)', color: 'white', border: 'none' }}
+                            >
+                                + Custom
+                            </button>
+                        )}
+                        <button
+                            className={`${styles.editBtn} ${isEditMode ? styles.editActive : ''}`}
+                            onClick={() => setIsEditMode(!isEditMode)}
+                        >
+                            {isEditMode ? 'Done' : 'Manage'}
+                        </button>
+                    </div>
                 </div>
 
                 <div className={styles.scrollArea}>
@@ -184,6 +218,13 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
                     )}
                 </div>
             </div>
+
+            {showAddDialog && (
+                <MobileAddFrameDialog
+                    onClose={() => setShowAddDialog(false)}
+                    onAdd={handleAddCustomFrame}
+                />
+            )}
         </div>
     );
 };

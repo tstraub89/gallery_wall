@@ -43,6 +43,8 @@ body {
   background-color: var(--bg-app);
   color: var(--text-primary);
   height: 100vh;
+  /* Fallback */
+  height: 100dvh;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
 }

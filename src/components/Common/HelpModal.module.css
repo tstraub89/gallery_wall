@@ -4,6 +4,7 @@
     left: 0;
     width: 100vw;
     height: 100vh;
+    height: 100dvh;
     background: rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(4px);
     display: flex;
@@ -19,7 +20,10 @@
     background: white;
     width: 95%;
     max-width: 850px;
-    max-height: calc(100vh - 48px);
+    max-height: calc(100vh - 80px);
+    /* Fallback */
+    max-height: calc(100dvh - 80px);
+    /* 40px top/bottom padding of overlay */
     border-radius: 12px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     display: flex;
@@ -57,6 +61,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-shrink: 0;
+    /* Prevent header shrink */
 }
 
 .header h2 {
@@ -75,7 +81,8 @@
 }
 
 .content {
-    padding: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    /* Reduced from xl */
     overflow-y: auto;
     display: grid;
     grid-template-columns: 1fr;
