@@ -148,171 +148,263 @@ const MobileEditSheet: React.FC<MobileEditSheetProps> = ({ isOpen, onClose }) =>
                             </button>
                         </div>
                     ) : (
-                        <span className={styles.sheetTitle}>{hasSelection ? 'Frame' : 'Edit'}</span>
+                        <span className={styles.sheetTitle}>{hasSelection ? 'Frame Properties' : 'Wall Properties'}</span>
                     )}
                     <button className={styles.closeBtn} onClick={onClose}>Done</button>
                 </div>
 
                 {!hasSelection ? (
-                    <div className={styles.sheetContent} style={{ textAlign: 'center', padding: '40px 20px', color: '#888' }}>
-                        <FrameIcon size={48} strokeWidth={1} style={{ opacity: 0.5, marginBottom: 12 }} />
-                        <p>Select a frame to edit its properties</p>
+                    <div className={styles.editSection}>
+                        {/* Wall Name */}
+                        <div className={styles.editRow}>
+                            <label>Wall Name</label>
+                            <input
+                                type="text"
+                                value={currentProject.name}
+                                onChange={(e) => updateProject(currentProject.id, { name: e.target.value })}
+                                className={styles.textInput}
+                                style={{ flex: 1 }}
+                            />
+                        </div>
+
+                        {/* Dimensions */}
+                        <div className={styles.editRow}>
+                            <label>Dimensions</label>
+                            <div className={styles.dimGroup}>
+                                <div className={styles.dimInputWrapper}>
+                                    <input
+                                        type="number"
+                                        value={currentProject.wallConfig.width}
+                                        onChange={(e) => updateProject(currentProject.id, { wallConfig: { ...currentProject.wallConfig, width: Number(e.target.value) } })}
+                                        className={styles.numInput}
+                                    />
+                                    <span className={styles.dimUnit}>W"</span>
+                                </div>
+                                <span style={{ color: 'var(--text-secondary)' }}>×</span>
+                                <div className={styles.dimInputWrapper}>
+                                    <input
+                                        type="number"
+                                        value={currentProject.wallConfig.height}
+                                        onChange={(e) => updateProject(currentProject.id, { wallConfig: { ...currentProject.wallConfig, height: Number(e.target.value) } })}
+                                        className={styles.numInput}
+                                    />
+                                    <span className={styles.dimUnit}>H"</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Wall Type */}
+                        <div className={styles.editRow}>
+                            <label>Wall Type</label>
+                            <select
+                                value={currentProject.wallConfig.type}
+                                onChange={(e) => updateProject(currentProject.id, { wallConfig: { ...currentProject.wallConfig, type: e.target.value as any } })}
+                                className={styles.selectInput}
+                                style={{ flex: 1 }}
+                            >
+                                <option value="flat">Flat Wall</option>
+                                <option value="staircase-asc">Staircase (Ascending)</option>
+                                <option value="staircase-desc">Staircase (Descending)</option>
+                            </select>
+                        </div>
+
+                        {/* Stair Rise & Wall Color (Conditional Layout) */}
+                        {(currentProject.wallConfig.type === 'staircase-asc' || currentProject.wallConfig.type === 'staircase-desc') ? (
+                            <div className={styles.editRow}>
+                                {/* Left: Rise Slider takes available space */}
+                                <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <label style={{ minWidth: 'auto' }}>Rise</label>
+                                    <input
+                                        type="range"
+                                        min="10"
+                                        max="100"
+                                        value={currentProject.wallConfig.stairAngle ?? 50}
+                                        onChange={(e) => updateProject(currentProject.id, { wallConfig: { ...currentProject.wallConfig, stairAngle: Number(e.target.value) } })}
+                                        className={styles.slider}
+                                    />
+                                    <span className={styles.sliderValue} style={{ minWidth: 24 }}>{currentProject.wallConfig.stairAngle ?? 50}%</span>
+                                </div>
+
+                                {/* Right: Compact Wall Color */}
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: 8, borderLeft: '1px solid var(--border-color)' }}>
+                                    <span style={{ fontSize: 11, fontWeight: 500, lineHeight: 1.1, textAlign: 'right', color: 'var(--text-primary)' }}>
+                                        Wall<br />Color
+                                    </span>
+                                    <input
+                                        type="color"
+                                        value={currentProject.wallConfig.backgroundColor || '#e0e0e0'}
+                                        onChange={(e) => updateProject(currentProject.id, { wallConfig: { ...currentProject.wallConfig, backgroundColor: e.target.value } })}
+                                        className={styles.colorInput}
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            /* Standard Wall Color Row (Flat) */
+                            <div className={styles.editRow} style={{ justifyContent: 'flex-end', gap: 12 }}>
+                                <label style={{ minWidth: 'auto', color: 'var(--text-secondary)' }}>
+                                    <Palette size={16} /> Wall Color
+                                </label>
+                                <input
+                                    type="color"
+                                    value={currentProject.wallConfig.backgroundColor || '#e0e0e0'}
+                                    onChange={(e) => updateProject(currentProject.id, { wallConfig: { ...currentProject.wallConfig, backgroundColor: e.target.value } })}
+                                    className={styles.colorInput}
+                                />
+                            </div>
+                        )}
                     </div>
                 ) : (
-                    <>
+                    <div className={styles.sheetContent}>
+                        {(activeTab === 'frame' || !hasPhoto) && (
+                            <div className={styles.editSection}>
+                                {/* Frame Color */}
+                                <div className={styles.editRow}>
+                                    <label><Palette size={16} /> Color</label>
+                                    <input
+                                        type="color"
+                                        value={getFrameValue('frameColor') as string || '#111111'}
+                                        onChange={(e) => updateFrameProperty('frameColor', e.target.value)}
+                                        className={styles.colorInput}
+                                    />
+                                </div>
 
-                        {/* Content */}
-                        <div className={styles.sheetContent}>
-                            {(activeTab === 'frame' || !hasPhoto) && (
-                                <div className={styles.editSection}>
-                                    {/* Frame Color */}
-                                    <div className={styles.editRow}>
-                                        <label><Palette size={16} /> Color</label>
+                                {/* Border Width */}
+                                <div className={styles.editRow}>
+                                    <label>Border</label>
+                                    <div className={styles.sliderRow}>
                                         <input
-                                            type="color"
-                                            value={getFrameValue('frameColor') as string || '#111111'}
-                                            onChange={(e) => updateFrameProperty('frameColor', e.target.value)}
-                                            className={styles.colorInput}
+                                            type="range"
+                                            min="0"
+                                            max="2"
+                                            step="0.1"
+                                            value={(getFrameValue('borderWidth') as number) ?? 0.5}
+                                            onChange={(e) => updateFrameProperty('borderWidth', parseFloat(e.target.value))}
+                                            className={styles.slider}
                                         />
+                                        <span className={styles.sliderValue}>
+                                            {((getFrameValue('borderWidth') as number) ?? 0.5).toFixed(1)}"
+                                        </span>
                                     </div>
+                                </div>
 
-                                    {/* Border Width */}
-                                    <div className={styles.editRow}>
-                                        <label>Border</label>
-                                        <div className={styles.sliderRow}>
-                                            <input
-                                                type="range"
-                                                min="0"
-                                                max="2"
-                                                step="0.1"
-                                                value={(getFrameValue('borderWidth') as number) ?? 0.5}
-                                                onChange={(e) => updateFrameProperty('borderWidth', parseFloat(e.target.value))}
-                                                className={styles.slider}
-                                            />
-                                            <span className={styles.sliderValue}>
-                                                {((getFrameValue('borderWidth') as number) ?? 0.5).toFixed(1)}"
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Matting Toggle */}
-                                    <div className={styles.toggleRow} onClick={() => {
-                                        const hasMat = selectedFrames.every(f => !!f.matted);
-                                        const updatedFrames = currentProject.frames.map(f => {
-                                            if (selectedFrameIds.includes(f.id)) {
-                                                if (hasMat) {
-                                                    return { ...f, matted: undefined };
-                                                } else {
-                                                    // Default Mat: 2 inches smaller than frame (1 inch each side)
-                                                    // Clamp to minimum 1 inch opening
-                                                    const matW = Math.max(1, f.width - 2);
-                                                    const matH = Math.max(1, f.height - 2);
-                                                    return { ...f, matted: { width: matW, height: matH } };
-                                                }
+                                {/* Matting Toggle */}
+                                <div className={styles.toggleRow} onClick={() => {
+                                    const hasMat = selectedFrames.every(f => !!f.matted);
+                                    const updatedFrames = currentProject.frames.map(f => {
+                                        if (selectedFrameIds.includes(f.id)) {
+                                            if (hasMat) {
+                                                return { ...f, matted: undefined };
+                                            } else {
+                                                // Default Mat: 2 inches smaller than frame (1 inch each side)
+                                                // Clamp to minimum 1 inch opening
+                                                const matW = Math.max(1, f.width - 2);
+                                                const matH = Math.max(1, f.height - 2);
+                                                return { ...f, matted: { width: matW, height: matH } };
                                             }
-                                            return f;
-                                        });
-                                        updateProject(currentProject.id, { frames: updatedFrames });
-                                    }}>
-                                        <div className={styles.toggleLabel}>
-                                            <FrameIcon size={16} /> Matting
-                                        </div>
-                                        <div className={`${styles.switch} ${selectedFrames.every(f => !!f.matted) ? styles.switchChecked : ''}`}>
-                                            <div className={styles.switchHandle} />
-                                        </div>
+                                        }
+                                        return f;
+                                    });
+                                    updateProject(currentProject.id, { frames: updatedFrames });
+                                }}>
+                                    <div className={styles.toggleLabel}>
+                                        <FrameIcon size={16} /> Matting
                                     </div>
-
-                                    {/* Compact Actions */}
-                                    <div className={styles.compactRow}>
-                                        <button className={styles.actionBtn} onClick={rotateFrames}>
-                                            <RotateCw size={18} />
-                                            Rotate
-                                        </button>
-                                        <button className={`${styles.actionBtn} ${styles.dangerBtn}`} onClick={deleteFrames}>
-                                            <Trash2 size={18} />
-                                            Delete
-                                        </button>
+                                    <div className={`${styles.switch} ${selectedFrames.every(f => !!f.matted) ? styles.switchChecked : ''}`}>
+                                        <div className={styles.switchHandle} />
                                     </div>
                                 </div>
-                            )}
 
-                            {activeTab === 'photo' && hasPhoto && (
-                                <div className={styles.editSection}>
-                                    {/* Scale */}
-                                    <div className={styles.editRow}>
-                                        <label>Scale</label>
-                                        <div className={styles.sliderRow}>
-                                            <input
-                                                type="range"
-                                                min="0.1"
-                                                max="3"
-                                                step="0.1"
-                                                value={getPhotoValue('scale') ?? 1}
-                                                onChange={(e) => updatePhotoProperty('scale', parseFloat(e.target.value))}
-                                                className={styles.slider}
-                                            />
-                                            <span className={styles.sliderValue}>
-                                                {(getPhotoValue('scale') ?? 1).toFixed(1)}x
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Position X */}
-                                    <div className={styles.editRow}>
-                                        <label>Position X</label>
-                                        <div className={styles.sliderRow}>
-                                            <input
-                                                type="range"
-                                                min="-200"
-                                                max="200"
-                                                step="5"
-                                                value={getPhotoValue('x') ?? 0}
-                                                onChange={(e) => updatePhotoProperty('x', parseFloat(e.target.value))}
-                                                className={styles.slider}
-                                            />
-                                            <span className={styles.sliderValue}>
-                                                {Math.round(getPhotoValue('x') ?? 0)}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Position Y */}
-                                    <div className={styles.editRow}>
-                                        <label>Position Y</label>
-                                        <div className={styles.sliderRow}>
-                                            <input
-                                                type="range"
-                                                min="-200"
-                                                max="200"
-                                                step="5"
-                                                value={getPhotoValue('y') ?? 0}
-                                                onChange={(e) => updatePhotoProperty('y', parseFloat(e.target.value))}
-                                                className={styles.slider}
-                                            />
-                                            <span className={styles.sliderValue}>
-                                                {Math.round(getPhotoValue('y') ?? 0)}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Rotate Photo */}
-                                    <button className={styles.actionBtn} onClick={rotatePhotos}>
+                                {/* Compact Actions */}
+                                <div className={styles.compactRow}>
+                                    <button className={styles.actionBtn} onClick={rotateFrames}>
                                         <RotateCw size={18} />
-                                        Rotate Photo 90°
+                                        Rotate
                                     </button>
-
-                                    {/* Remove Photo */}
-                                    <button className={`${styles.actionBtn} ${styles.dangerBtn}`} onClick={removePhotos}>
-                                        <ImageMinus size={18} />
-                                        Remove Photo
+                                    <button className={`${styles.actionBtn} ${styles.dangerBtn}`} onClick={deleteFrames}>
+                                        <Trash2 size={18} />
+                                        Delete
                                     </button>
                                 </div>
-                            )}
-                        </div>
-                    </>
+                            </div>
+                        )}
+
+                        {activeTab === 'photo' && hasPhoto && (
+                            <div className={styles.editSection}>
+                                {/* Scale */}
+                                <div className={styles.editRow}>
+                                    <label>Scale</label>
+                                    <div className={styles.sliderRow}>
+                                        <input
+                                            type="range"
+                                            min="0.1"
+                                            max="3"
+                                            step="0.1"
+                                            value={getPhotoValue('scale') ?? 1}
+                                            onChange={(e) => updatePhotoProperty('scale', parseFloat(e.target.value))}
+                                            className={styles.slider}
+                                        />
+                                        <span className={styles.sliderValue}>
+                                            {(getPhotoValue('scale') ?? 1).toFixed(1)}x
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Position X */}
+                                <div className={styles.editRow}>
+                                    <label>Position X</label>
+                                    <div className={styles.sliderRow}>
+                                        <input
+                                            type="range"
+                                            min="-200"
+                                            max="200"
+                                            step="5"
+                                            value={getPhotoValue('x') ?? 0}
+                                            onChange={(e) => updatePhotoProperty('x', parseFloat(e.target.value))}
+                                            className={styles.slider}
+                                        />
+                                        <span className={styles.sliderValue}>
+                                            {Math.round(getPhotoValue('x') ?? 0)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Position Y */}
+                                <div className={styles.editRow}>
+                                    <label>Position Y</label>
+                                    <div className={styles.sliderRow}>
+                                        <input
+                                            type="range"
+                                            min="-200"
+                                            max="200"
+                                            step="5"
+                                            value={getPhotoValue('y') ?? 0}
+                                            onChange={(e) => updatePhotoProperty('y', parseFloat(e.target.value))}
+                                            className={styles.slider}
+                                        />
+                                        <span className={styles.sliderValue}>
+                                            {Math.round(getPhotoValue('y') ?? 0)}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Rotate Photo */}
+                                <button className={styles.actionBtn} onClick={rotatePhotos}>
+                                    <RotateCw size={18} />
+                                    Rotate Photo 90°
+                                </button>
+
+                                {/* Remove Photo */}
+                                <button className={`${styles.actionBtn} ${styles.dangerBtn}`} onClick={removePhotos}>
+                                    <ImageMinus size={18} />
+                                    Remove Photo
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 )}
             </div>
         </>
+
     );
 };
 

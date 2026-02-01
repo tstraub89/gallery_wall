@@ -300,6 +300,69 @@
     border-radius: 6px;
 }
 
+/* Form Inputs */
+.textInput,
+.numInput,
+.selectInput {
+    height: 40px;
+    /* Touch friendly */
+    border: 1px solid var(--border-color);
+    /* #e0e0e0 usually */
+    border-radius: 8px;
+    padding: 0 12px;
+    font-size: 16px;
+    /* Prevents auto-zoom on iOS */
+    color: var(--text-primary);
+    background: var(--bg-app);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    transition: border-color 0.2s;
+}
+
+.textInput:focus,
+.numInput:focus,
+.selectInput:focus {
+    border-color: var(--accent-color);
+}
+
+.selectInput {
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+    padding-right: 32px;
+}
+
+/* Dimensions Input Group */
+.dimGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.dimInputWrapper {
+    position: relative;
+    flex: 1;
+}
+
+.dimInputWrapper input {
+    width: 100%;
+    padding-right: 24px;
+    /* Space for unit */
+}
+
+.dimUnit {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: var(--text-secondary);
+    pointer-events: none;
+}
+
 .actionBtn {
     display: flex;
     align-items: center;
