@@ -1,6 +1,6 @@
 import React, { ReactNode, useState, useRef } from 'react';
 import styles from './MobileLayout.module.css';
-import { Undo2, Redo2, MoreVertical, Share2, ChevronDown, CircleHelp } from 'lucide-react';
+import { Undo2, Redo2, Share2, ChevronDown, CircleHelp, Grid, SlidersHorizontal, Menu, Save, FileText, FolderOpen, Eraser } from 'lucide-react';
 import Logo from '../Header/Logo';
 import { useProject } from '../../hooks/useProject';
 import { useExport } from '../../hooks/useExport';
@@ -33,9 +33,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
 
     // Dialog States
     const [showClearConfirm, setShowClearConfirm] = useState(false);
-    const [showRenameDialog, setShowRenameDialog] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
-    const [renameValue, setRenameValue] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // --- Menu Actions --- //
@@ -60,21 +58,6 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
     const handleShoppingList = () => {
         setShowMenu(false);
         exportShoppingList();
-    };
-
-    const handleRenameClick = () => {
-        if (currentProject) {
-            setRenameValue(currentProject.name);
-            setShowMenu(false);
-            setShowRenameDialog(true);
-        }
-    };
-
-    const confirmRename = () => {
-        if (currentProject && renameValue.trim()) {
-            updateProject(currentProject.id, { name: renameValue.trim() });
-        }
-        setShowRenameDialog(false);
     };
 
     const handleImportClick = () => {
@@ -138,11 +121,13 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
 
                 {/* Simple Mobile Header */}
                 <header className={styles.mobileHeader}>
-                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flex: 1, minWidth: 0 }}>
-                        <div style={{ transform: 'scale(0.8)', transformOrigin: 'left center', width: '32px', overflow: 'hidden' }}>
+                    {/* Left Group: Logo + Project Title */}
+                    <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0, gap: '4px' }}>
+                        <div style={{ flexShrink: 0 }}>
                             <Logo />
                         </div>
 
+                        {/* Project Title / Switcher */}
                         <div
                             className={styles.projectTitle}
                             onClick={() => setShowSwitcher(true)}
@@ -152,6 +137,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                         </div>
                     </div>
 
+                    {/* Undo/Redo Only */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '2px' }}>
                         <div className={styles.undoGroup}>
                             <button onClick={onUndo} disabled={!canUndo} className={styles.iconBtn}>
@@ -161,28 +147,6 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                                 <Redo2 size={20} style={{ opacity: canRedo ? 1 : 0.3 }} />
                             </button>
                         </div>
-
-                        <button
-                            className={styles.iconBtn}
-                            onClick={() => shareProjectImage()}
-                            disabled={isExporting}
-                        >
-                            <Share2 size={22} color="#007AFF" />
-                        </button>
-
-                        <button
-                            className={styles.iconBtn}
-                            onClick={() => setShowHelp(true)}
-                        >
-                            <CircleHelp size={22} />
-                        </button>
-
-                        <button
-                            className={styles.iconBtn}
-                            onClick={() => setShowMenu(true)}
-                        >
-                            <MoreVertical size={22} />
-                        </button>
                     </div>
                 </header>
 
@@ -191,17 +155,17 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                 </main>
 
                 <nav className={styles.bottomNav}>
-                    <button className={`${styles.navItem} ${!showLibrary && !showEdit ? styles.active : ''}`} onClick={() => { setShowLibrary(false); setShowEdit(false); }}>
-                        <div className={styles.navIcon} />
-                        <span>View</span>
-                    </button>
-                    <button className={`${styles.navItem} ${showLibrary ? styles.active : ''}`} onClick={() => { setShowLibrary(true); setShowEdit(false); }}>
-                        <div className={styles.navIcon} />
+                    <button className={`${styles.navItem} ${showLibrary ? styles.active : ''}`} onClick={() => { setShowLibrary(true); setShowEdit(false); setShowMenu(false); }}>
+                        <Grid size={24} />
                         <span>Library</span>
                     </button>
-                    <button className={`${styles.navItem} ${showEdit ? styles.active : ''}`} onClick={() => { setShowEdit(true); setShowLibrary(false); }}>
-                        <div className={styles.navIcon} />
+                    <button className={`${styles.navItem} ${showEdit ? styles.active : ''}`} onClick={() => { setShowEdit(true); setShowLibrary(false); setShowMenu(false); }}>
+                        <SlidersHorizontal size={24} />
                         <span>Edit</span>
+                    </button>
+                    <button className={`${styles.navItem} ${showMenu ? styles.active : ''}`} onClick={() => { setShowMenu(true); setShowLibrary(false); setShowEdit(false); }}>
+                        <Menu size={24} />
+                        <span>Menu</span>
                     </button>
                 </nav>
 
@@ -211,36 +175,41 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                 {/* Overlays */}
                 {showSwitcher && <ProjectSwitcher onClose={() => setShowSwitcher(false)} />}
 
-                {/* Simple Menu Overlay */}
+                {/* Expanded Menu Overlay */}
                 {showMenu && (
                     <div className={styles.menuOverlay} onClick={() => setShowMenu(false)}>
                         <div className={styles.menuSheet} onClick={e => e.stopPropagation()}>
-                            <div className={styles.menuItem} onClick={handleRenameClick}>Rename Project</div>
-                            <div className={styles.menuItem} onClick={handleImportClick}>Import Project (.gwall)</div>
-                            <div className={styles.menuItem} onClick={handleSaveProject}>Save Project File (.gwall)</div>
-                            <div className={styles.menuItem} onClick={handleShoppingList}>Export Shopping List</div>
-                            <div className={`${styles.menuItem} ${styles.danger}`} onClick={handleClearCanvasClick}>Clear Canvas</div>
-                            <div className={styles.menuCancel} onClick={() => setShowMenu(false)}>Cancel</div>
-                        </div>
-                    </div>
-                )}
 
-                {/* Rename Dialog (Custom Modal) */}
-                {showRenameDialog && (
-                    <div className={styles.modalOverlay}>
-                        <div className={styles.modalBox}>
-                            <h3>Rename Project</h3>
-                            <input
-                                type="text"
-                                value={renameValue}
-                                onChange={(e) => setRenameValue(e.target.value)}
-                                className={styles.modalInput}
-                                autoFocus
-                            />
-                            <div className={styles.modalActions}>
-                                <button onClick={() => setShowRenameDialog(false)}>Cancel</button>
-                                <button onClick={confirmRename} className={styles.primaryBtn}>Save</button>
+
+                            <div className={styles.menuSectionLabel}>Export</div>
+                            <div className={styles.menuItem} onClick={() => { setShowMenu(false); shareProjectImage(); }}>
+                                <Share2 size={16} style={{ marginRight: 8 }} />
+                                Share Image (JPEG)
                             </div>
+                            <div className={styles.menuItem} onClick={handleSaveProject}>
+                                <Save size={16} style={{ marginRight: 8 }} />
+                                Save Project File (.gwall)
+                            </div>
+                            <div className={styles.menuItem} onClick={handleShoppingList}>
+                                <FileText size={16} style={{ marginRight: 8 }} />
+                                Export Shopping List
+                            </div>
+
+                            <div className={styles.menuSectionLabel}>System</div>
+                            <div className={styles.menuItem} onClick={handleImportClick}>
+                                <FolderOpen size={16} style={{ marginRight: 8 }} />
+                                Import Project (.gwall)
+                            </div>
+                            <div className={styles.menuItem} onClick={() => { setShowMenu(false); setShowHelp(true); }}>
+                                <CircleHelp size={16} style={{ marginRight: 8 }} />
+                                Help & Guide
+                            </div>
+                            <div className={`${styles.menuItem} ${styles.danger}`} onClick={handleClearCanvasClick}>
+                                <Eraser size={16} style={{ marginRight: 8 }} />
+                                Clear Canvas
+                            </div>
+
+                            <div className={styles.menuCancel} onClick={() => setShowMenu(false)}>Cancel</div>
                         </div>
                     </div>
                 )}
