@@ -141,6 +141,14 @@ export const getPreloadedUrl = (id: string): string | null => {
     return preloadCache.get(id) || null;
 };
 
+export const clearImageCache = () => {
+    preloadCache.forEach((url) => {
+        URL.revokeObjectURL(url);
+    });
+    preloadCache.clear();
+    console.log("Image cache cleared.");
+};
+
 export const preloadImages = async (ids: string[], type: 'full' | 'thumb' = 'full'): Promise<void> => {
     const uniqueIds = [...new Set(ids.filter(Boolean))];
     if (uniqueIds.length === 0) return;

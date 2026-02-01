@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { saveProjectData, loadProjectData, cleanUpOrphanedImages, saveImage } from '../utils/imageStore';
+import { saveProjectData, loadProjectData, cleanUpOrphanedImages, saveImage, clearImageCache } from '../utils/imageStore';
 import { ProjectContext, LibraryState } from './ProjectContextCore';
 import { Project, Frame, WallConfig, LibraryItem } from '../types';
 import { importProjectBundle } from '../utils/exportUtils';
@@ -140,6 +140,8 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
 
     const switchProject = (id: string) => {
         if (data.projects[id]) {
+            // Free memory from previous project's images
+            clearImageCache();
             setData(prev => ({ ...prev, currentProjectId: id, selectedFrameIds: [] }));
         }
     };
@@ -177,6 +179,8 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             }
 
             if (prev.currentProjectId === id) {
+                // If deleting current project, clear cache before switching
+                clearImageCache();
                 newCurrentId = remainingIds[0];
             } else {
                 newCurrentId = prev.currentProjectId;
