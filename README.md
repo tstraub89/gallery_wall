@@ -41,6 +41,7 @@ A powerful, interactive web application designed to help you plan complex galler
 *   **Adaptive Grid Inventory**: A smart sidebar that shifts between list and grid views, featuring "Placed" status overlays on frame previews.
 *   **1:1 Inventory Manifest**: Every frame is accounted for individually with "Placed" and "(Duplicated)" indicators.
 *   **Smart Parsing & Import**: Batch import dimensions from plain text (e.g., "8x10", "11 1/4 x 14 matted"). Handles fractions and keywords automatically.
+*   **Common Size Picker**: Quickly add standard frame sizes (e.g., 4x6, 5x7, 8x10) directly to your library with a single click—perfect for rapid bulk entry.
 *   **Custom Labels & Scaling**: Name your frames (e.g., "Light Switch") directly. Labels automatically scale to fit their container for maximum readability.
 *   **Geometric Variety**: Full support for traditional rectangles and modern round/oval shapes with automatic proportional scaling.
 *   **Aesthetics**: Set frame colors using presets or a color picker; toggle and adjust matting openings on the fly.
