@@ -53,6 +53,7 @@
 .framePreview {
     width: 40px;
     background: #e0e0e0;
+    /* Mat Board Color */
     border: 2px solid #333;
     position: relative;
     /* aspect-ratio set inline */
@@ -63,11 +64,11 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80%;
-    height: 80%;
-    /* approximate visual */
-    background: white;
-    border: 1px dashed #ccc;
+    /* Width/Height set inline via JS for accuracy */
+    background: #f0f0f0;
+    /* Empty opening */
+    box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.15);
+    /* Bevel depth */
 }
 
 .used {

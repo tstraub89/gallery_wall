@@ -43,7 +43,11 @@ export const useCanvasShortcuts = ({
                 if (focusedArea === 'library' && currentProject.images?.length > 0) {
                     setSelectedImages([...currentProject.images]);
                 } else {
-                    setSelection(currentProject.frames.map(f => f.id));
+                    // Filter out locked frames from "Select All"
+                    const unlockedIds = currentProject.frames
+                        .filter(f => !f.locked)
+                        .map(f => f.id);
+                    setSelection(unlockedIds);
                 }
             }
 
@@ -85,13 +89,22 @@ export const useCanvasShortcuts = ({
                 if (e.key === 'ArrowLeft') dx = -distance;
                 if (e.key === 'ArrowRight') dx = distance;
 
+                // Check if ALL selected are locked? Or just move the unlocked ones?
+                // Typically if you select a mix, you might expect the unlocked ones to move.
+                // But if ANY are locked, maybe blocking the whole group is safer/clearer?
+                // Let's filter and only move unlocked frames.
                 const updatedFrames = currentProject.frames.map(f => {
-                    if (selectedFrameIds.includes(f.id)) {
+                    if (selectedFrameIds.includes(f.id) && !f.locked) {
                         return { ...f, x: f.x + dx, y: f.y + dy };
                     }
                     return f;
                 });
-                updateProject(currentProject.id, { frames: updatedFrames });
+
+                // Optimization: prevent update if nothing changed (e.g. all selected were locked)
+                const hasChanges = updatedFrames.some((f, i) => f !== currentProject.frames[i]);
+                if (hasChanges) {
+                    updateProject(currentProject.id, { frames: updatedFrames });
+                }
             }
 
             // Toggle Snapping (S)

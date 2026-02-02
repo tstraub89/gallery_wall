@@ -198,10 +198,24 @@ export const useCanvasInteraction = ({
                         (f.y + f.height * PPI + bWidthPx) > wallY1
                     );
                 }).map(f => f.id);
-                setCandidateFrameIds(candidates);
+
+                // FILTER LOCKED FRAMES from marquee candidates
+                const unlockedCandidates = candidates.filter(id => {
+                    const f = currentProject.frames.find(fr => fr.id === id);
+                    return f && !f.locked;
+                });
+
+                setCandidateFrameIds(unlockedCandidates);
             }
 
         } else if (isDraggingFrame) {
+            // Check if ANY selected frame is locked. If so, prevent movement.
+            const hasLockedSelected = currentProject?.frames.some(f => selectedFrameIds.includes(f.id) && f.locked);
+            if (hasLockedSelected) {
+                // Do not update dragDelta or hasDragged if locked frames are involved
+                return;
+            }
+
             const dx = clientX - dragStart.x;
             const dy = clientY - dragStart.y;
 
@@ -274,10 +288,31 @@ export const useCanvasInteraction = ({
             }
         } else if (isDraggingFrame && hasDragged && currentProject) {
             const updatedFrames = currentProject.frames.map(f => {
-                const initPos = initialPositions[f.id];
-                if (initPos) {
-                    const newX = snap(initPos.x + dragDelta.x);
-                    const newY = snap(initPos.y + dragDelta.y);
+                const { x: worldDx, y: worldDy } = dragDelta;
+                if (selectedFrameIds.includes(f.id) && initialPositions[f.id]) {
+                    const start = initialPositions[f.id];
+
+                    // SNAP TO OUTER EDGES (Visual Bounds)
+                    // If snapToGrid is on, we want the VISUAL Left/Top to align with grid.
+                    // VisualLeft = InnerX - Border
+                    // We want VisualLeft to be Snapped.
+                    // InnerX = SnappedVisualLeft + Border
+
+                    const bWidth = typeof f.borderWidth === 'number' ? f.borderWidth : 0.1;
+                    const bWidthPx = bWidth * PPI;
+
+                    // Calculate proposed VISUAL position
+                    const visualX = start.x + worldDx - bWidthPx;
+                    const visualY = start.y + worldDy - bWidthPx;
+
+                    // Snap the visual position
+                    const snappedVisualX = snap(visualX);
+                    const snappedVisualY = snap(visualY);
+
+                    // Convert back to Inner position
+                    const newX = snappedVisualX + bWidthPx;
+                    const newY = snappedVisualY + bWidthPx;
+
                     return { ...f, x: newX, y: newY };
                 }
                 return f;
@@ -354,6 +389,7 @@ export const useCanvasInteraction = ({
                     shape: d.frame.shape || 'rect',
                     frameColor: d.frame.frameColor || '#111111',
                     matted: d.frame.matted,
+                    borderWidth: d.frame.borderWidth,
                     x: worldX, y: worldY,
                     rotation: 0,
                     zIndex: currentProject.frames.length + 1,

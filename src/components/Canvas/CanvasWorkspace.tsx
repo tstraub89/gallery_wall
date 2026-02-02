@@ -188,7 +188,16 @@ const CanvasWorkspace: React.FC = () => {
     const handleDeleteFrame = React.useCallback((frameIdOrIds: string | string[]) => {
         if (!currentProject) return;
         const idsToDelete = Array.isArray(frameIdOrIds) ? frameIdOrIds : [frameIdOrIds];
-        const idSet = new Set(idsToDelete);
+
+        // Filter out locked frames
+        const allowedIds = idsToDelete.filter(id => {
+            const f = currentProject.frames.find(fr => fr.id === id);
+            return f && !f.locked;
+        });
+
+        if (allowedIds.length === 0) return; // Nothing to delete
+
+        const idSet = new Set(allowedIds);
         const updatedFrames = currentProject.frames.filter(f => !idSet.has(f.id));
         updateProject(currentProject.id, { frames: updatedFrames });
         setSelection(selectedFrameIds.filter(id => !idSet.has(id)));
@@ -334,6 +343,11 @@ const CanvasWorkspace: React.FC = () => {
                 const id = frameEl.getAttribute('data-frame-id');
                 // It is a frame. Is it selected?
                 if (id && selectedFrameIds.includes(id)) {
+                    // CRITICAL: If locked, treat as background (return false)
+                    // This prevents Drag mode, falls back to Pan mode
+                    const frame = currentProject?.frames.find(f => f.id === id);
+                    if (frame?.locked) return false;
+
                     return true;
                 }
             }
@@ -454,7 +468,7 @@ const CanvasWorkspace: React.FC = () => {
 
         const widthPx = Math.round(frame.width * PPI);
         const heightPx = Math.round(frame.height * PPI);
-        const bWidthInches = typeof frame.borderWidth === 'number' ? frame.borderWidth : 0.1;
+        const bWidthInches = typeof frame.borderWidth === 'number' ? frame.borderWidth : 1.0;
         const bWidthPx = Math.round(bWidthInches * PPI);
 
         const leftPx = Math.round(displayX - bWidthPx);
@@ -563,6 +577,28 @@ const CanvasWorkspace: React.FC = () => {
                                     onMouseDown={(e) => handleFrameMouseDown(e, frame)}
                                 >
                                     <FrameContent frame={frame} ppi={PPI} />
+                                    {frame.locked && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '-10px',
+                                            right: '-10px',
+                                            background: 'white',
+                                            borderRadius: '50%',
+                                            width: '20px',
+                                            height: '20px',
+                                            boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            zIndex: 9999,
+                                            pointerEvents: 'none'
+                                        }}>
+                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                            </svg>
+                                        </div>
+                                    )}
                                 </div>
                             );
                         })}
@@ -729,6 +765,28 @@ const CanvasWorkspace: React.FC = () => {
                             { label: plural ? `Send ${count} to Back` : 'Send to Back', onClick: () => handleSendToBack(targetIds) },
                             { separator: true },
                             { label: plural ? `Duplicate ${count} Frames` : 'Duplicate', shortcut: plural ? undefined : 'Ctrl+D', onClick: duplicateSelected },
+                            { separator: true },
+                            // Lock/Unlock Logic
+                            (() => {
+                                const allLocked = targetFrames.every(f => f.locked);
+                                return {
+                                    label: allLocked ? (plural ? `Unlock ${count} Frames` : "Unlock Frame") : (plural ? `Lock ${count} Frames` : "Lock Frame"),
+                                    onClick: () => {
+                                        const newVal = !allLocked;
+                                        // Update frames
+                                        const updatedFrames = currentProject.frames.map(f =>
+                                            targetIds.includes(f.id) ? { ...f, locked: newVal } : f
+                                        );
+                                        // Sync library
+                                        const impactedTemplates = new Set(targetFrames.map(f => f.templateId).filter(Boolean));
+                                        const updatedLibrary = currentProject.library.map(l =>
+                                            impactedTemplates.has(l.id) ? { ...l, locked: newVal } : l
+                                        );
+                                        updateProject(currentProject.id, { frames: updatedFrames, library: updatedLibrary });
+                                    }
+                                };
+                            })(),
+                            { separator: true },
                             ...(hasAnyPhotos ? [
                                 { label: plural ? `Rotate ${count} Photos 90°` : 'Rotate Photo 90°', onClick: () => handleRotatePhoto(targetIds) },
                                 { label: plural ? `Remove ${count} Photos` : 'Remove Photo', onClick: () => handleRemovePhoto(targetIds) }

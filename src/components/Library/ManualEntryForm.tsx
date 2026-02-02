@@ -13,6 +13,7 @@ const ManualEntryForm: React.FC = () => {
     const [matHeight, setMatHeight] = useState(7);
     const [shape, setShape] = useState<'rect' | 'round'>('rect');
     const [frameColor, setFrameColor] = useState('#111111');
+    const [borderWidth, setBorderWidth] = useState(1.0);
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -24,6 +25,7 @@ const ManualEntryForm: React.FC = () => {
             label: label,
             shape: shape,
             frameColor: frameColor,
+            borderWidth: borderWidth,
             matted: isMatted ? { width: matWidth, height: matHeight } : undefined
         };
 
@@ -71,20 +73,31 @@ const ManualEntryForm: React.FC = () => {
             </div>
 
             <div className={styles.row}>
-                <div className={styles.field}>
+                <div className={styles.field} style={{ flex: 1 }}>
+                    <label>Border</label>
+                    <ValidatedNumberInput
+                        value={borderWidth}
+                        onChange={setBorderWidth}
+                        min={0}
+                        max={5}
+                        step={0.1}
+                    />
+                </div>
+                <div className={styles.field} style={{ flex: 2 }}>
                     <label>Shape</label>
                     <select value={shape} onChange={e => setShape(e.target.value as 'rect' | 'round')} className={styles.select}>
-                        <option value="rect">Rectangular</option>
+                        <option value="rect">Rectangle</option>
                         <option value="round">Round / Oval</option>
                     </select>
                 </div>
-                <div className={styles.field}>
+                <div className={styles.field} style={{ flex: '0 0 45px' }}>
                     <label>Color</label>
                     <input
                         type="color"
                         value={frameColor}
                         onChange={e => setFrameColor(e.target.value)}
                         className={styles.colorPicker}
+                        style={{ width: '45px', padding: '0', height: '31px' }} // Manual override for slightly wide look
                     />
                 </div>
             </div>

@@ -29,6 +29,7 @@ export interface Frame {
     shape?: 'rect' | 'round' | string;
     isDuplicate?: boolean;
     createdAt?: number;
+    locked?: boolean;
 }
 
 export interface WallConfig {

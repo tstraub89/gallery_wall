@@ -30,20 +30,13 @@ export const useIsMobile = (): boolean => {
  * Check if device is mobile based on touch capability and screen size.
  */
 function checkIsMobile(): boolean {
-    // Check for touch capability
-    const hasTouch = 'ontouchend' in document ||
-        navigator.maxTouchPoints > 0 ||
-        // @ts-expect-error - Legacy property for older browsers
-        navigator.msMaxTouchPoints > 0;
+    const screenWidth = window.innerWidth;
+    const screenHeight = window.innerHeight;
 
     // Check screen dimensions - mobile if EITHER dimension is small
     // This handles both portrait and landscape orientations
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
     const smallDimension = Math.min(screenWidth, screenHeight);
-    const isSmallScreen = smallDimension <= 768;
 
-    // Device is mobile if it has touch AND has a small dimension
-    // This excludes touch-enabled laptops/large tablets
-    return hasTouch && isSmallScreen;
+    // Standard mobile breakpoint
+    return smallDimension <= 768;
 }

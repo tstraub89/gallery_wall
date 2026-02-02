@@ -3,10 +3,11 @@ import styles from './PropertiesPanel.module.css';
 import { PPI } from '../../constants';
 import ImageProperties from './ImageProperties';
 import ValidatedNumberInput from '../Common/ValidatedNumberInput';
+import RangeSlider from '../Common/RangeSlider';
 import {
     AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd,
     AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd,
-    Trash2, RefreshCw
+    Trash2, RefreshCw, Lock, Unlock
 } from 'lucide-react';
 import { Project, Frame, MatDimensions } from '../../types';
 import { ProjectContextType } from '../../context/ProjectContextCore';
@@ -84,6 +85,48 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
         });
     };
 
+    // Lock Logic
+    const isLocked = !!getValue('locked');
+    const toggleLock = () => {
+        updateAll('locked', !isLocked);
+    };
+
+    // Visual Bounds Helper
+    // We align based on the VISUAL edge (Frame + Border)
+    const getVisualBounds = (f: Frame) => {
+        const bWidth = typeof f.borderWidth === 'number' ? f.borderWidth : 0.1;
+        return {
+            left: f.x - (bWidth * PPI),
+            top: f.y - (bWidth * PPI),
+            right: f.x + (f.width * PPI) + (bWidth * PPI),
+            bottom: f.y + (f.height * PPI) + (bWidth * PPI),
+            width: (f.width * PPI) + (bWidth * 2 * PPI),
+            height: (f.height * PPI) + (bWidth * 2 * PPI),
+            bWidthPx: bWidth * PPI
+        };
+    };
+
+    // Calculate selection bounds based on VISUAL edges
+    const selectionBounds = useMemo(() => {
+        if (selectedFrames.length === 0) return null;
+        const first = getVisualBounds(selectedFrames[0]);
+        let minL = first.left;
+        let minT = first.top;
+        let maxR = first.right;
+        let maxB = first.bottom;
+
+        selectedFrames.forEach(f => {
+            const b = getVisualBounds(f);
+            if (b.left < minL) minL = b.left;
+            if (b.top < minT) minT = b.top;
+            if (b.right > maxR) maxR = b.right;
+            if (b.bottom > maxB) maxB = b.bottom;
+        });
+
+        return { minL, minT, maxR, maxB, width: maxR - minL, height: maxB - minT };
+    }, [selectedFrames]);
+
+
     const minX = Math.min(...selectedFrames.map(f => f.x));
     const minY = Math.min(...selectedFrames.map(f => f.y));
 
@@ -102,40 +145,47 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
 
     const align = (type: 'left' | 'right' | 'top' | 'bottom' | 'middle' | 'center') => {
         const updatedFrames = currentProject.frames.map(f => {
-            if (!selectedFrameIds.includes(f.id)) return f;
+            // IGNORE LOCKED FRAMES in alignment
+            if (!selectedFrameIds.includes(f.id) || f.locked || !selectionBounds) return f;
 
-            let newX = f.x;
-            let newY = f.y;
+            const vb = getVisualBounds(f);
+            let newVisualLeft = vb.left;
+            let newVisualTop = vb.top;
 
             switch (type) {
-                case 'left': newX = minX; break;
-                case 'right': {
-                    const maxR = Math.max(...selectedFrames.map(sf => sf.x + sf.width * PPI));
-                    newX = maxR - f.width * PPI;
+                case 'left':
+                    newVisualLeft = selectionBounds.minL;
                     break;
-                }
-                case 'top': newY = minY; break;
-                case 'bottom': {
-                    const maxB = Math.max(...selectedFrames.map(sf => sf.y + sf.height * PPI));
-                    newY = maxB - f.height * PPI;
+                case 'right':
+                    newVisualLeft = selectionBounds.maxR - vb.width;
                     break;
-                }
+                case 'top':
+                    newVisualTop = selectionBounds.minT;
+                    break;
+                case 'bottom':
+                    newVisualTop = selectionBounds.maxB - vb.height;
+                    break;
                 case 'middle': {
-                    const minT = Math.min(...selectedFrames.map(sf => sf.y));
-                    const maxB2 = Math.max(...selectedFrames.map(sf => sf.y + sf.height * PPI));
-                    const mid = (minT + maxB2) / 2;
-                    newY = mid - (f.height * PPI) / 2;
+                    const mid = selectionBounds.minT + (selectionBounds.height / 2);
+                    newVisualTop = mid - (vb.height / 2);
                     break;
                 }
                 case 'center': {
-                    const minL = Math.min(...selectedFrames.map(sf => sf.x));
-                    const maxR2 = Math.max(...selectedFrames.map(sf => sf.x + sf.width * PPI));
-                    const horizMid = (minL + maxR2) / 2;
-                    newX = horizMid - (f.width * PPI) / 2;
+                    const mid = selectionBounds.minL + (selectionBounds.width / 2);
+                    newVisualLeft = mid - (vb.width / 2);
                     break;
                 }
             }
-            return { ...f, x: newX, y: newY };
+
+            // Convert VISUAL back to INTERNAL (Inner Box)
+            // InnerX = VisualLeft + BorderPx
+            const bWidthPx = (typeof f.borderWidth === 'number' ? f.borderWidth : 0.1) * PPI;
+
+            return {
+                ...f,
+                x: newVisualLeft + bWidthPx,
+                y: newVisualTop + bWidthPx
+            };
         });
         updateProject(currentProject.id, { frames: updatedFrames });
     };
@@ -215,7 +265,17 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
     return (
         <>
             <div className={styles.header}>
-                <h3>Properties ({selectedFrames.length})</h3>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                    <h3>Properties ({selectedFrames.length})</h3>
+                    <button
+                        onClick={toggleLock}
+                        className={styles.secondaryBtn}
+                        title={isLocked ? "Unlock Frames" : "Lock Frames"}
+                        style={{ padding: '4px 8px' }}
+                    >
+                        {isLocked ? <Lock size={16} /> : <Unlock size={16} />}
+                    </button>
+                </div>
             </div>
 
             <div className={styles.tabs}>
@@ -257,6 +317,7 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                                     value={Math.round((minX / PPI) * 10) / 10}
                                     onChange={(val) => updateRelative('x', val * PPI)}
                                     allowNegative={true}
+                                    disabled={isLocked}
                                 />
                                 <ValidatedNumberInput
                                     className={styles.fluidInput}
@@ -264,6 +325,7 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                                     value={Math.round((minY / PPI) * 10) / 10}
                                     onChange={(val) => updateRelative('y', val * PPI)}
                                     allowNegative={true}
+                                    disabled={isLocked}
                                 />
                             </div>
                         </div>
@@ -280,6 +342,7 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                                         min={0.1}
                                         allowNegative={false}
                                         placeholder={selectedFrames.length > 1 ? "-" : ""}
+                                        disabled={isLocked}
                                     />
                                 </div>
                                 <div className={styles.inputStack} style={{ flex: 1 }}>
@@ -291,6 +354,7 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                                         min={0.1}
                                         allowNegative={false}
                                         placeholder={selectedFrames.length > 1 ? "-" : ""}
+                                        disabled={isLocked}
                                     />
                                 </div>
                                 <button
@@ -298,6 +362,7 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                                     onClick={rotateFrame}
                                     title="Swap Width and Height"
                                     style={{ flex: 0, padding: '0 8px', minWidth: 'auto' }}
+                                    disabled={isLocked}
                                 >
                                     <RefreshCw size={14} />
                                 </button>
@@ -333,22 +398,20 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                         </div>
 
                         <div className={styles.propGroup}>
-                            <label>Frame Thickness</label>
+                            <label>Border (in)</label>
                             <div className={styles.row}>
-                                <input
-                                    type="range" min="0" max="2" step="0.1"
-                                    value={getValue('borderWidth') || 0.1}
-                                    onChange={(e) => {
-                                        const val = parseFloat(e.target.value);
-                                        updateAll('borderWidth', Math.round(val * 10) / 10);
-                                    }}
-                                    className={styles.slider}
+                                <RangeSlider
+                                    min={0}
+                                    max={5}
+                                    step={0.1}
+                                    value={(getValue('borderWidth') as number) ?? 1.0}
+                                    onChange={(val) => updateAll('borderWidth', Math.round(val * 10) / 10)}
                                 />
                                 <ValidatedNumberInput
-                                    value={getValue('borderWidth') || 0.1}
+                                    value={getValue('borderWidth') ?? 1.0}
                                     onChange={(val) => updateAll('borderWidth', val)}
                                     min={0}
-                                    max={2}
+                                    max={5}
                                     step={0.1}
                                     allowNegative={false}
                                     className={styles.numberInput}

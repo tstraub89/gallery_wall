@@ -10,9 +10,10 @@ const EMPTY_ARRAY: Frame[] = []; // Explicitly type generic empty array if possi
 interface FrameListProps {
     onFrameSelect?: (frame: Frame) => void;
     selectionMode?: 'standard' | 'toggle';
+    headerAction?: React.ReactNode;
 }
 
-const FrameList: React.FC<FrameListProps> = ({ onFrameSelect, selectionMode = 'standard' }) => {
+const FrameList: React.FC<FrameListProps> = ({ onFrameSelect, selectionMode = 'standard', headerAction }) => {
     const {
         currentProject,
         setSelection,
@@ -30,16 +31,6 @@ const FrameList: React.FC<FrameListProps> = ({ onFrameSelect, selectionMode = 's
 
     const templates = currentProject?.library || EMPTY_ARRAY;
     const instances = currentProject?.frames || EMPTY_ARRAY;
-
-    // ... (Processed Templates calculation remains same) ...
-    // I need to copy the filtering logic here or assume it's stable.
-    // To be safe in replace_file_content, I should try to preserve as much as possible, 
-    // but since I'm rewriting the render and handling logic, I might need to include it.
-    // Actually, I can target specific blocks.
-
-    // Let's replace the handleFrameClick and the return statement primarily.
-
-    // ...
 
     const calculateProcessedTemplates = () => {
         let result = [...templates];
@@ -223,6 +214,9 @@ const FrameList: React.FC<FrameListProps> = ({ onFrameSelect, selectionMode = 's
                 />
             </div>
 
+            {/* Injected Header Action (e.g. Mobile Add Button) */}
+            {headerAction}
+
             {selectedFrameTemplateIds.length > 0 && (
                 <div className={styles.batchActions}>
                     <span className={styles.selectionCount}>{selectedFrameTemplateIds.length} selected</span>
@@ -259,13 +253,20 @@ const FrameList: React.FC<FrameListProps> = ({ onFrameSelect, selectionMode = 's
                                     style={{
                                         aspectRatio: `${template.width}/${template.height}`,
                                         borderRadius: template.shape === 'round' ? '50%' : '0',
-                                        borderColor: template.frameColor || '#111111'
+                                        borderColor: template.frameColor || '#111111',
+                                        borderWidth: `${Math.max(1, (template.borderWidth ?? 0.1) * (40 / (template.width + (template.borderWidth ?? 0.1) * 2)))}px`,
+                                        borderStyle: 'solid',
+                                        backgroundColor: template.matted ? '#ffffff' : undefined
                                     }}
                                 >
                                     {template.matted && (
                                         <div
                                             className={styles.mattedInner}
-                                            style={{ borderRadius: template.shape === 'round' ? '50%' : '0' }}
+                                            style={{
+                                                width: `${(template.matted.width / template.width) * 100}%`,
+                                                height: `${(template.matted.height / template.height) * 100}%`,
+                                                borderRadius: template.shape === 'round' ? '50%' : '0'
+                                            }}
                                         />
                                     )}
                                     {isPlaced && (

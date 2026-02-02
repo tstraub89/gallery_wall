@@ -7,6 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 import styles from './MobileLibrarySheet.module.css';
 import { useViewport } from '../../context/ViewportContext';
 import MobileAddFrameDialog from './MobileAddFrameDialog';
+import { SmartLayoutProvider } from '../Library/SmartLayout/SmartLayoutContext';
+import SmartLayoutSection from '../Library/SmartLayout/SmartLayoutSection';
 
 interface MobileLibrarySheetProps {
     isOpen: boolean;
@@ -14,7 +16,7 @@ interface MobileLibrarySheetProps {
 }
 
 const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose }) => {
-    const [activeTab, setActiveTab] = useState<'frames' | 'photos'>('frames');
+    const [activeTab, setActiveTab] = useState<'frames' | 'layout' | 'photos'>('frames');
     const [isEditMode, setIsEditMode] = useState(false);
     const [showAddDialog, setShowAddDialog] = useState(false);
 
@@ -26,11 +28,15 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
 
     const viewport = useViewport();
 
+    // Swipe Dismiss Logic Removed for stability
+    // const { handlers, swipeStyle } = useSwipeDismiss({ onDismiss: onClose });
+
     if (!isOpen || !currentProject) return null;
 
     // -- Handlers --
+    // -- Handlers --
 
-    const handleAddCustomFrame = (width: number, height: number, shape: 'rect' | 'round', matted: boolean) => {
+    const handleAddCustomFrame = (width: number, height: number, shape: 'rect' | 'round', matted: boolean, borderWidth: number) => {
         // Create manual frame template
         const template: Frame = {
             id: 'manual_' + uuidv4(),
@@ -40,7 +46,7 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
             shape,
             frameColor: '#111111',
             matted: matted ? { width: width - 2, height: height - 2 } : undefined, // Default logic
-            borderWidth: 0.5,
+            borderWidth: borderWidth,
             x: 0,
             y: 0,
             rotation: 0,
@@ -162,70 +168,93 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
     };
 
     return (
-        <div className={styles.sheetOverlay} onClick={onClose}>
-            <div className={styles.sheetContent} onClick={e => e.stopPropagation()}>
-                <div className={styles.handleBar}>
-                    <div className={styles.handle} />
-                </div>
-
-                <div className={styles.header}>
-                    <div className={styles.tabs}>
-                        <button
-                            className={`${styles.tab} ${activeTab === 'frames' ? styles.activeTab : ''}`}
-                            onClick={() => setActiveTab('frames')}
-                        >
-                            Frames
-                        </button>
-                        <button
-                            className={`${styles.tab} ${activeTab === 'photos' ? styles.activeTab : ''}`}
-                            onClick={() => setActiveTab('photos')}
-                        >
-                            Photos
-                        </button>
+        <SmartLayoutProvider>
+            <div className={styles.sheetOverlay} onClick={onClose}>
+                <div
+                    className={styles.sheetContent}
+                    onClick={e => e.stopPropagation()}
+                >
+                    {/* Handle Bar (Visual only now) */}
+                    <div className={styles.handleBar}>
+                        <div className={styles.handle} />
                     </div>
 
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                        {activeTab === 'frames' && !isEditMode && (
+                    <div className={styles.header}>
+                        <div className={styles.tabs} style={{ gap: '20px' }}>
                             <button
-                                className={styles.editBtn}
-                                onClick={() => setShowAddDialog(true)}
-                                style={{ background: 'var(--accent-color)', color: 'white', border: 'none' }}
+                                className={`${styles.tab} ${activeTab === 'frames' ? styles.activeTab : ''}`}
+                                onClick={() => setActiveTab('frames')}
                             >
-                                + Custom
+                                Frames
                             </button>
+                            <button
+                                className={`${styles.tab} ${activeTab === 'layout' ? styles.activeTab : ''}`}
+                                onClick={() => setActiveTab('layout')}
+                            >
+                                Layout
+                            </button>
+                            <button
+                                className={`${styles.tab} ${activeTab === 'photos' ? styles.activeTab : ''}`}
+                                onClick={() => setActiveTab('photos')}
+                            >
+                                Photos
+                            </button>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            {/* Manage Button - Hide on Layout Tab */}
+                            {activeTab !== 'layout' && (
+                                <button
+                                    className={`${styles.editBtn} ${isEditMode ? styles.editActive : ''}`}
+                                    onClick={() => setIsEditMode(!isEditMode)}
+                                >
+                                    {isEditMode ? 'Done' : 'Manage'}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className={styles.scrollArea}>
+                        {activeTab === 'frames' && (
+                            <>
+                                <FrameList
+                                    onFrameSelect={!isEditMode ? handleAddFrame : undefined}
+                                    selectionMode={isEditMode ? 'toggle' : 'standard'}
+                                    headerAction={!isEditMode && (
+                                        <div className={styles.addFrameActions}>
+                                            <button
+                                                className={styles.addFrameBtn}
+                                                onClick={() => setShowAddDialog(true)}
+                                            >
+                                                + Add Frame
+                                            </button>
+                                        </div>
+                                    )}
+                                />
+                            </>
                         )}
-                        <button
-                            className={`${styles.editBtn} ${isEditMode ? styles.editActive : ''}`}
-                            onClick={() => setIsEditMode(!isEditMode)}
-                        >
-                            {isEditMode ? 'Done' : 'Manage'}
-                        </button>
+                        {activeTab === 'layout' && (
+                            <div style={{ padding: '0 10px' }}>
+                                <SmartLayoutSection maxSolutions={4} onComplete={onClose} isMobile={true} />
+                            </div>
+                        )}
+                        {activeTab === 'photos' && (
+                            <PhotoLibrary
+                                onPhotoSelect={!isEditMode ? handleAddPhoto : undefined}
+                                selectionMode={isEditMode ? 'toggle' : 'standard'}
+                            />
+                        )}
                     </div>
                 </div>
 
-                <div className={styles.scrollArea}>
-                    {activeTab === 'frames' && (
-                        <FrameList
-                            onFrameSelect={!isEditMode ? handleAddFrame : undefined}
-                            selectionMode={isEditMode ? 'toggle' : 'standard'}
-                        />
-                    )}
-                    {activeTab === 'photos' && (
-                        <PhotoLibrary
-                            onPhotoSelect={!isEditMode ? handleAddPhoto : undefined}
-                            selectionMode={isEditMode ? 'toggle' : 'standard'}
-                        />
-                    )}
-                </div>
+                {showAddDialog && (
+                    <MobileAddFrameDialog
+                        onClose={() => setShowAddDialog(false)}
+                        onAdd={handleAddCustomFrame}
+                    />
+                )}
             </div>
-
-            {showAddDialog && (
-                <MobileAddFrameDialog
-                    onClose={() => setShowAddDialog(false)}
-                    onAdd={handleAddCustomFrame}
-                />
-            )}
-        </div>
+        </SmartLayoutProvider>
     );
 };
 

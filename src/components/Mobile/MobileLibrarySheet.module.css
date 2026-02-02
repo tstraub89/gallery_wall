@@ -104,6 +104,34 @@
     padding-bottom: 40px;
 }
 
+.addFrameActions {
+    padding: 10px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-panel);
+    flex-shrink: 0;
+}
+
+.addFrameBtn {
+    width: 100%;
+    padding: 10px;
+    background: #007aff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.addFrameBtn:active {
+    background: #0062cc;
+    transform: scale(0.98);
+}
+
 /* === Shared Sheet Styles (for Edit and other sheets) === */
 
 .backdrop {

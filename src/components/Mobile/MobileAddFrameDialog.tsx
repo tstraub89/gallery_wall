@@ -4,7 +4,7 @@ import ValidatedNumberInput from '../Common/ValidatedNumberInput';
 
 interface MobileAddFrameDialogProps {
     onClose: () => void;
-    onAdd: (width: number, height: number, shape: 'rect' | 'round', matted: boolean) => void;
+    onAdd: (width: number, height: number, shape: 'rect' | 'round', matted: boolean, borderWidth: number) => void;
 }
 
 const MobileAddFrameDialog: React.FC<MobileAddFrameDialogProps> = ({ onClose, onAdd }) => {
@@ -12,9 +12,10 @@ const MobileAddFrameDialog: React.FC<MobileAddFrameDialogProps> = ({ onClose, on
     const [height, setHeight] = useState(16);
     const [shape, setShape] = useState<'rect' | 'round'>('rect');
     const [matted, setMatted] = useState(false);
+    const [borderWidth, setBorderWidth] = useState(1.0);
 
     const handleSubmit = () => {
-        onAdd(width, height, shape, matted);
+        onAdd(width, height, shape, matted, borderWidth);
     };
 
     return (
@@ -51,16 +52,29 @@ const MobileAddFrameDialog: React.FC<MobileAddFrameDialogProps> = ({ onClose, on
                         </div>
                     </div>
 
-                    <div className={styles.field}>
-                        <label>Shape</label>
-                        <select
-                            className={styles.shapeSelect}
-                            value={shape}
-                            onChange={(e) => setShape(e.target.value as 'rect' | 'round')}
-                        >
-                            <option value="rect">Rectangle</option>
-                            <option value="round">Round / Oval</option>
-                        </select>
+                    <div className={styles.row}>
+                        <div className={styles.field} style={{ flex: 1 }}>
+                            <label>Border (in)</label>
+                            <ValidatedNumberInput
+                                value={borderWidth}
+                                onChange={setBorderWidth}
+                                min={0}
+                                max={5}
+                                step={0.1}
+                                className={styles.inputField}
+                            />
+                        </div>
+                        <div className={styles.field} style={{ flex: 1 }}>
+                            <label>Shape</label>
+                            <select
+                                className={styles.shapeSelect}
+                                value={shape}
+                                onChange={(e) => setShape(e.target.value as 'rect' | 'round')}
+                            >
+                                <option value="rect">Rectangle</option>
+                                <option value="round">Round</option>
+                            </select>
+                        </div>
                     </div>
 
                     <div className={styles.checkboxRow} onClick={() => setMatted(!matted)}>

@@ -1,0 +1,298 @@
+.container {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+    overflow-y: auto;
+    /* Enable scrolling */
+    flex: 1;
+    /* Fill parent */
+    min-height: 0;
+}
+
+
+
+.input {
+    width: 60px;
+    padding: 4px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
+    /* Use defaults (white bg, dark text) */
+}
+
+.generateBtn {
+    background: linear-gradient(90deg, #4a90e2, #9013fe);
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.generateBtn:disabled {
+    /* Don't change opacity immediately to avoid flash */
+    cursor: default;
+}
+
+.generateBtn.loading {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.resultsGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.resultCard {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.resultCard:hover {
+    border-color: #4a90e2;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.preview {
+    width: 100%;
+    aspect-ratio: 2/1;
+    /* More horizontal aspect ratio for full width */
+    background: #f0f0f0;
+    position: relative;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.resultCard span {
+    display: block;
+    padding: 8px;
+    font-size: 13px;
+    text-align: center;
+    color: #666;
+    font-weight: 500;
+}
+
+.placeholderState {
+    margin-top: 20px;
+    padding: 20px;
+    border: 2px dashed #ddd;
+    /* var(--border-color) might be too light */
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: #999;
+    text-align: center;
+    min-height: 120px;
+}
+
+.placeholderIcon {
+    font-size: 24px;
+    opacity: 0.5;
+}
+
+.placeholderState p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+    max-width: 200px;
+}
+
+/* Standardized Row (Matches PropertiesPanel .row) */
+.row {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+    width: 100%;
+    /* Ensure full width for dropdowns */
+}
+
+
+
+/* Fluid Input for Numbers (Matches PropertiesPanel .fluidInput / .numberInput pattern) */
+.fluidInput {
+    flex: 1;
+    min-width: 50px;
+    width: 100%;
+    /* Ensure it fills container */
+    flex-shrink: 0;
+    padding: 6px;
+    /* Tighter padding */
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.numberInput {
+    flex: 0 0 auto;
+    width: 60px;
+    min-width: 60px;
+    padding: 6px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 13px;
+    text-align: center;
+}
+
+.configRow {
+    display: flex;
+    flex-direction: column;
+    /* Stack label and controls like PropGroup */
+    gap: 4px;
+    /* Tighter spacing */
+    margin-bottom: 12px;
+    align-items: flex-start;
+    /* Ensure left alignment */
+}
+
+.checkboxRow {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.checkboxRow label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.configRow label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+/* --- Mobile Specific Styles --- */
+
+/* --- Mobile Specific Styles --- */
+
+.mobileConfigRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    /* Reduced from 12px */
+    gap: 12px;
+    /* Reduced from 16px */
+    min-height: 36px;
+    /* Reduced from 44px */
+}
+
+.mobileLabel {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+    min-width: 70px;
+    /* Ensure labels align */
+}
+
+.mobileSliderContainer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+}
+
+.mobileSlider {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #e0e0e0;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+.mobileSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    margin-top: 0;
+}
+
+.mobileSlider::-moz-range-thumb {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.mobileValueDisplay {
+    font-size: 15px;
+    color: #666;
+    min-width: 40px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.mobileSelect {
+    flex: 1;
+    font-size: 16px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* iOS Style Toggle Switch */
+.toggleSwitch {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 50px;
+    height: 30px;
+    background: #e9e9ea;
+    border-radius: 15px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+    outline: none;
+}
+
+.toggleSwitch:checked {
+    background: var(--accent-color);
+}
+
+.toggleSwitch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 26px;
+    height: 26px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggleSwitch:checked::after {
+    transform: translateX(20px);
+}

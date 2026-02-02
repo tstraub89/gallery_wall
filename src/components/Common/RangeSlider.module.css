@@ -1,0 +1,50 @@
+/* RangeSlider.module.css */
+
+.slider {
+    flex: 1;
+    padding: 0;
+    cursor: pointer;
+    height: 6px;
+    border-radius: 3px;
+    accent-color: var(--accent-color);
+    background: #e0e0e0;
+    /* Default Track background (overridden by inline styles for gradient) */
+    border: 1px solid #ccc;
+    /* Track border */
+    -webkit-appearance: none;
+    appearance: none;
+    /* Required to styling track bg */
+    min-width: 40px;
+    /* Allow shrinking in narrow columns */
+    width: 100%;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: transform 0.1s;
+    margin-top: -6px;
+    /* Center thumb on 6px track */
+}
+
+.slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    border-color: var(--accent-color);
+}
+
+.slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}

@@ -84,32 +84,55 @@ const FrameContent: React.FC<FrameContentProps> = ({ frame, ppi }) => {
             )}
 
             {/* Empty State Label */}
-            {!url && (
-                <div
-                    style={{
-                        position: 'absolute',
-                        top: 0, left: 0,
-                        width: '100%',
-                        height: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '4px',
-                        pointerEvents: 'none',
-                        userSelect: 'none',
-                        fontSize: `${Math.max(10, frame.width * PPI * 0.12)}px`,
-                        color: '#999',
-                        textAlign: 'center',
-                        lineHeight: 1.2
-                    }}
-                >
-                    {frame.label ? (
-                        <span style={{ fontWeight: 600, color: '#555' }}>{frame.label}</span>
-                    ) : (
-                        <span>{frame.width}" x {frame.height}"</span>
-                    )}
-                </div>
-            )}
+            {!url && (() => {
+                // Determine visible area for text
+                const displayW = frame.matted ? frame.matted.width : frame.width;
+                const displayH = frame.matted ? frame.matted.height : frame.height;
+                const displayText = frame.label || `${displayW}" x ${displayH}"`;
+
+                // Hide text for very small openings to prevent clutter
+                if (displayW < 3 || displayH < 3) {
+                    return (
+                        <div
+                            title={displayText}
+                            style={{
+                                position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+                                pointerEvents: 'auto', // Allow hover for tooltip
+                                zIndex: 3
+                            }}
+                        />
+                    );
+                }
+
+                return (
+                    <div
+                        title={displayText} // Tooltip for full text
+                        style={{
+                            position: 'absolute',
+                            top: 0, left: 0,
+                            width: '100%',
+                            height: '100%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            padding: '4px',
+                            pointerEvents: 'none',
+                            userSelect: 'none',
+                            fontSize: `${Math.max(12, displayW * PPI * 0.2)}px`,
+                            color: '#999',
+                            textAlign: 'center',
+                            lineHeight: 1.2,
+                            zIndex: 3 // Ensure on top of mat borders if overlap occurs
+                        }}
+                    >
+                        {frame.label ? (
+                            <span style={{ fontWeight: 600, color: '#555' }}>{displayText}</span>
+                        ) : (
+                            <span>{displayText}</span>
+                        )}
+                    </div>
+                );
+            })()}
 
             {/* Image Layer */}
             {url && (
