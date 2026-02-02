@@ -8,6 +8,7 @@ interface UseTouchGesturesProps {
     setScale: React.Dispatch<React.SetStateAction<number>>;
     onLongPress?: (e: TouchEvent) => void;
     onTap?: (e: TouchEvent) => void;
+    onDoubleTap?: (e: TouchEvent) => void;
 
     // Handle Frame Dragging
     // Callback receives the TOTAL delta from the start of the drag gesture (screen pixels)
@@ -28,6 +29,7 @@ export const useTouchGestures = ({
     setScale,
     onLongPress,
     onTap,
+    onDoubleTap,
     onFrameDrag,
     onFrameDragEnd,
     isFrameSelected
@@ -58,6 +60,7 @@ export const useTouchGestures = ({
     const touchStartTime = useRef<number>(0);
     const touchStartPos = useRef<{ x: number; y: number } | null>(null);
     const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+    const lastTapTime = useRef<number>(0);
     const hasMoved = useRef(false);
 
     useEffect(() => {
@@ -107,6 +110,7 @@ export const useTouchGestures = ({
                 if (onLongPress) {
                     longPressTimer.current = setTimeout(() => {
                         if (!hasMoved.current) {
+                            if (window.navigator && window.navigator.vibrate) window.navigator.vibrate(50);
                             onLongPress(e);
                         }
                     }, 500); // 500ms long press
@@ -229,8 +233,21 @@ export const useTouchGestures = ({
             if (e.touches.length === 0 && !hasMoved.current && !isZooming.current && (isPanning.current || isDraggingFrame.current)) {
                 // If duration was short, it's a tap
                 const duration = Date.now() - touchStartTime.current;
-                if (duration < 300 && onTap) {
-                    onTap(e);
+                const timeSinceLastTap = Date.now() - lastTapTime.current;
+
+                if (duration < 300) {
+                    if (timeSinceLastTap < 300 && onDoubleTap) {
+                        // Double Tap
+                        onDoubleTap(e);
+                        lastTapTime.current = 0; // Reset to prevent triple-tap triggering another double
+                    } else {
+                        // Single Tap (Wait slightly to ensure it's not a double? Or just trigger.
+                        // For this app, immediate single tap is usually preferred for selection.
+                        // If we needed strict separation, we'd use a timer, but that adds lag.
+                        // We will fire onTap immediately. Double tap will ALSO fire onTap likely.
+                        if (onTap) onTap(e);
+                        lastTapTime.current = Date.now();
+                    }
                 }
             }
 
@@ -268,5 +285,5 @@ export const useTouchGestures = ({
         };
         // Removed scale, pan, setScale, setPan from dependency array to prevent listener thrashing
         // We utilize scaleRef and panRef inside handlers for latest values
-    }, [containerRef, onLongPress, onTap, onFrameDrag, onFrameDragEnd, isFrameSelected]);
+    }, [containerRef, onLongPress, onTap, onDoubleTap, onFrameDrag, onFrameDragEnd, isFrameSelected]);
 };

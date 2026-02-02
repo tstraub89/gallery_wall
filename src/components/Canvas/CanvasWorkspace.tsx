@@ -370,16 +370,29 @@ const CanvasWorkspace: React.FC = () => {
 
             if (!currentProject) return;
 
+            let didSnapMove = false;
+
             const updatedFrames = currentProject.frames.map(f => {
                 if (selectedFrameIds.includes(f.id) && dragStartSnapshot.current[f.id]) {
                     const start = dragStartSnapshot.current[f.id];
                     // Calculate from START position + Total Delta, then Snap
                     const newX = snap(start.x + worldDx);
                     const newY = snap(start.y + worldDy);
+
+                    // Check if we moved to a new snap position
+                    if (Math.abs(newX - f.x) > 0.1 || Math.abs(newY - f.y) > 0.1) {
+                        didSnapMove = true;
+                    }
+
                     return { ...f, x: newX, y: newY };
                 }
                 return f;
             });
+
+            // Haptic Feedback for Grid Snap
+            if (didSnapMove && navigator.vibrate && snapToGrid) {
+                navigator.vibrate(5); // Very short tick
+            }
 
             // Updating project on every move is heavy but ensures reactivity.
             // HISTORY FIX: We only want to push to history on the FIRST move of a drag.
@@ -430,6 +443,54 @@ const CanvasWorkspace: React.FC = () => {
 
                 // Haptic feedback if available
                 if (navigator.vibrate) navigator.vibrate(50);
+            }
+        },
+        onDoubleTap: (e) => {
+            // Reset state just in case
+            dragStartSnapshot.current = {};
+            hasCommittedDragHistory.current = false;
+
+            const target = e.target as HTMLElement;
+            const frameEl = target.closest(`.${styles.frame}`);
+
+            if (frameEl && frameEl instanceof HTMLElement) {
+                const frameId = frameEl.getAttribute('data-frame-id');
+                const frame = currentProject?.frames.find(f => f.id === frameId);
+                if (frame) {
+                    // Zoom to frame
+                    if (!containerRef.current) return;
+                    const container = containerRef.current.getBoundingClientRect();
+                    const frameW = frame.width * PPI;
+                    const frameH = frame.height * PPI;
+
+                    // Target scale to fit frame with padding (approx 60% of screen)
+                    const scaleX = (container.width * 0.6) / frameW;
+                    const scaleY = (container.height * 0.6) / frameH;
+                    const targetScale = Math.min(Math.max(Math.min(scaleX, scaleY), 0.5), 3);
+
+                    // Center point in World coords
+                    const cx = frame.x + frameW / 2;
+                    const cy = frame.y + frameH / 2;
+
+                    // Calculate Pan to center this point
+                    const newPanX = (container.width / 2) - (cx * targetScale);
+                    const newPanY = (container.height / 2) - (cy * targetScale);
+
+                    setScale(targetScale);
+                    setPan({ x: newPanX, y: newPanY });
+                    return;
+                }
+            }
+
+            // Background Double Tap -> Toggle Fit/100%
+            const fit = calculateFitViewport();
+            if (fit) {
+                // If scale is close to Fit, go to 100%. Otherwise go to Fit.
+                if (Math.abs(scale - fit.scale) < 0.1) {
+                    handleZoomTo100();
+                } else {
+                    handleZoomToFit();
+                }
             }
         }
     });

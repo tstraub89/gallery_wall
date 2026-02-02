@@ -23,7 +23,7 @@ interface MobileLayoutProps {
 }
 
 export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, onRedo, canUndo, canRedo }) => {
-    const { currentProject, updateProject, addProject } = useProject();
+    const { currentProject, updateProject, addProject, projects, switchProject, currentProjectId } = useProject();
     const { shareProjectImage, exportToGwall, exportShoppingList, isExporting } = useExport();
 
     const [showSwitcher, setShowSwitcher] = useState(false);
@@ -107,9 +107,82 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
         }
     };
 
+    // --- Edge Swipe Logic for Project Switching ---
+    const touchStartX = useRef<number | null>(null);
+    const touchStartY = useRef<number | null>(null);
+    const touchStartEdge = useRef<'left' | 'right' | null>(null);
+    const [swipeEdge, setSwipeEdge] = useState<'left' | 'right' | null>(null);
+
+    const handleTouchStartCapture = (e: React.TouchEvent) => {
+        const t = e.touches[0];
+        // 25px threshold for edge detection
+        if (t.clientX < 25) {
+            touchStartEdge.current = 'left';
+            touchStartX.current = t.clientX;
+            touchStartY.current = t.clientY;
+            e.stopPropagation(); // Stop Canvas Pan
+            setSwipeEdge('left');
+        } else if (t.clientX > window.innerWidth - 25) {
+            touchStartEdge.current = 'right';
+            touchStartX.current = t.clientX;
+            touchStartY.current = t.clientY;
+            e.stopPropagation(); // Stop Canvas Pan
+            setSwipeEdge('right');
+        } else {
+            touchStartEdge.current = null;
+            setSwipeEdge(null);
+        }
+    };
+
+    const handleTouchMoveCapture = (e: React.TouchEvent) => {
+        if (touchStartEdge.current) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+    };
+
+    const handleTouchEndCapture = (e: React.TouchEvent) => {
+        if (!touchStartEdge.current) return;
+
+        e.stopPropagation();
+
+        const t = e.changedTouches[0];
+        const deltaX = t.clientX - (touchStartX.current || 0);
+        const deltaY = t.clientY - (touchStartY.current || 0);
+
+        if (Math.abs(deltaX) > 60 && Math.abs(deltaY) < 50) {
+            const allIds = Object.keys(projects);
+            const currentIndex = allIds.indexOf(currentProjectId || '');
+
+            if (currentIndex !== -1) {
+                if (touchStartEdge.current === 'left' && deltaX > 0) {
+                    const newIndex = (currentIndex - 1 + allIds.length) % allIds.length;
+                    switchProject(allIds[newIndex]);
+                } else if (touchStartEdge.current === 'right' && deltaX < 0) {
+                    const newIndex = (currentIndex + 1) % allIds.length;
+                    switchProject(allIds[newIndex]);
+                }
+            }
+        }
+
+        touchStartX.current = null;
+        touchStartY.current = null;
+        touchStartEdge.current = null;
+        setSwipeEdge(null);
+    };
+
     return (
         <ViewportProvider>
-            <div className={styles.mobileContainer}>
+            <div
+                className={styles.mobileContainer}
+                onTouchStartCapture={handleTouchStartCapture}
+                onTouchMoveCapture={handleTouchMoveCapture}
+                onTouchEndCapture={handleTouchEndCapture}
+            >
+                {/* Edge Glow Visuals */}
+                <div className={`${styles.edgeOverlay} ${styles.edgeLeft} ${swipeEdge === 'left' ? styles.active : ''}`} />
+                <div className={`${styles.edgeOverlay} ${styles.edgeRight} ${swipeEdge === 'right' ? styles.active : ''}`} />
+
                 {/* Hidden Import Input */}
                 <input
                     ref={fileInputRef}

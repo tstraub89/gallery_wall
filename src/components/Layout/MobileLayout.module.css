@@ -7,6 +7,39 @@
     width: 100vw;
     overflow: hidden;
     background-color: #f5f5f5;
+    position: relative;
+    /* Ensure absolute children (overlays) position correctly */
+}
+
+/* Edge Swipe Glow Overlays */
+.edgeOverlay {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 40px;
+    /* Width of the glow area */
+    pointer-events: none;
+    /* Let clicks pass through */
+    z-index: 2000;
+    /* Above regular content, below menu overlay */
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.edgeOverlay.active {
+    opacity: 1;
+}
+
+.edgeLeft {
+    left: 0;
+    background: linear-gradient(to right, rgba(0, 122, 255, 0.3), transparent);
+    box-shadow: inset 10px 0 20px -5px rgba(0, 122, 255, 0.4);
+}
+
+.edgeRight {
+    right: 0;
+    background: linear-gradient(to left, rgba(0, 122, 255, 0.3), transparent);
+    box-shadow: inset -10px 0 20px -5px rgba(0, 122, 255, 0.4);
 }
 
 .mobileHeader {
