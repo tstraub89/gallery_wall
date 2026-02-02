@@ -66,6 +66,17 @@ A powerful, interactive web application designed to help you plan complex galler
 *   **Canvas Snapshot**: Save your layout as a PNG to share or use as a reference.
 *   **Multi-Project Support**: Create and switch between distinct gallery wall designs.
 
+### 🧠 Smart Layout Engine
+*   **AI-Assisted Arrangements**: Stuck on design? Let the engine propose layouts for you based on your selected frames.
+*   **Multiple Generators**: Choose from 5 distinct algorithms:
+    *   **Masonry**: Tightly packed, organic grid perfect for mixed sizes.
+    *   **Grid**: Strict alignment for uniform collections.
+    *   **Skyline**: Bottom-aligned "cityscape" look, great for shelves or mantels.
+    *   **Spiral**: Artistic, center-outward spiral flow.
+    *   **Monte Carlo**: Randomized exploration for finding happy accidents.
+*   **Fine-Tuning Controls**: Adjust spacing, randomness, and uniformity to dial in the perfect look.
+*   **Non-Destructive**: Generates suggestions on a virtual canvas—apply only when you're happy.
+
 ---
 
 ## ⌨️ Shortcuts & Navigation
@@ -101,6 +112,6 @@ Click the **"?"** button in the header for the in-app **Quick Start Guide**.
 
 **Tech Stack**: Built with React 19 (Vite), **TypeScript**, CSS Modules, and IndexedDB for persistent local storage.
 
-v2.1.2 Released Feb 2026. 🚀✨
+v2.2.1 Released Feb 2026. 🚀✨
 
 © 2026 Timothy Straub. All Rights Reserved.
