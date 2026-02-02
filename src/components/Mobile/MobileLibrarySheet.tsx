@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import styles from './MobileLibrarySheet.module.css';
 import { useViewport } from '../../context/ViewportContext';
 import MobileAddFrameDialog from './MobileAddFrameDialog';
+import MobileCommonFrameDialog from './MobileCommonFrameDialog';
 import { SmartLayoutProvider } from '../Library/SmartLayout/SmartLayoutContext';
 import SmartLayoutSection from '../Library/SmartLayout/SmartLayoutSection';
 
@@ -19,11 +20,13 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
     const [activeTab, setActiveTab] = useState<'frames' | 'layout' | 'photos'>('frames');
     const [isEditMode, setIsEditMode] = useState(false);
     const [showAddDialog, setShowAddDialog] = useState(false);
+    const [showCommonDialog, setShowCommonDialog] = useState(false);
 
     const {
         currentProject,
         updateProject,
-        selectedFrameIds
+        selectedFrameIds,
+        addToLibrary
     } = useProject();
 
     const viewport = useViewport();
@@ -53,8 +56,43 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
             zIndex: 0
         };
 
+        // For Manual Custom frames on mobile, we still add to library first? 
+        // Logic says: "Add Custom" -> Dialog -> Add. 
+        // Previously it called `handleAddFrame` (add to wall).
+        // Let's keep custom frames adding to wall directly as per user habit, or consistency?
+        // User asked for common frames to add to inventory. 
+        // Custom frames are a "one-off" usually? Or should we add to library too?
+        // Let's stick to previous behavior for Custom (Add to Wall) to minimize friction for single adds.
+
         handleAddFrame(template);
         setShowAddDialog(false);
+    };
+
+    const handleAddCommonFrame = (width: number, height: number, label: string) => {
+        const frame = {
+            id: uuidv4(),
+            width,
+            height,
+            label: `Common ${label}`,
+            shape: 'rect',
+            frameColor: '#111111',
+            matted: undefined,
+            borderWidth: 1.0,
+            x: 0,
+            y: 0,
+            rotation: 0,
+            zIndex: 0
+        };
+
+        addToLibrary(currentProject.id, frame);
+        // Do not close the dialog? Or close it?
+        // User might want to add multiple. 
+        // "Verify a 4x6 frame appears in the list (inventory) behind the dialog." implies dialog stays open or list is visible.
+        // Let's keep dialog open? Or maybe a toast? 
+        // For now, let's close it so they can see the list update, or keep it open for speed?
+        // "User can then drag/tap from the list to place them."
+        // Better to close it so they can interact with the list.
+        setShowCommonDialog(false);
     };
 
     const handleAddFrame = (template: Frame) => {
@@ -224,9 +262,15 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
                                         <div className={styles.addFrameActions}>
                                             <button
                                                 className={styles.addFrameBtn}
+                                                onClick={() => setShowCommonDialog(true)}
+                                            >
+                                                + Common
+                                            </button>
+                                            <button
+                                                className={`${styles.addFrameBtn} ${styles.addCustomBtn}`}
                                                 onClick={() => setShowAddDialog(true)}
                                             >
-                                                + Add Frame
+                                                + Custom
                                             </button>
                                         </div>
                                     )}
@@ -251,6 +295,13 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
                     <MobileAddFrameDialog
                         onClose={() => setShowAddDialog(false)}
                         onAdd={handleAddCustomFrame}
+                    />
+                )}
+
+                {showCommonDialog && (
+                    <MobileCommonFrameDialog
+                        onClose={() => setShowCommonDialog(false)}
+                        onAdd={handleAddCommonFrame}
                     />
                 )}
             </div>

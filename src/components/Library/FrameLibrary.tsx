@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ImportFile from './ImportFile';
+import CommonSizePicker from './CommonSizePicker';
 import ManualEntryForm from './ManualEntryForm';
 import FrameList from './FrameList';
 import PhotoLibrary from './PhotoLibrary';
@@ -11,6 +12,7 @@ import styles from './FrameLibrary.module.css';
 const FrameLibrary: React.FC = () => {
     const [openSection, setOpenSection] = useState<string | null>('frames');
     const [isImportOpen, setImportOpen] = useState(false);
+    const [isCommonOpen, setCommonOpen] = useState(false);
     const [isManualOpen, setManualOpen] = useState(false);
 
     return (
@@ -26,6 +28,16 @@ const FrameLibrary: React.FC = () => {
                     </div>
                     {openSection === 'frames' && (
                         <div className={styles.sectionContent}>
+                            <div
+                                className={styles.subHeader}
+                                onClick={() => setCommonOpen(!isCommonOpen)}
+                                style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', paddingRight: '12px' }}
+                            >
+                                <span>Common Sizes</span>
+                                <span>{isCommonOpen ? '▼' : '▶'}</span>
+                            </div>
+                            {isCommonOpen && <CommonSizePicker />}
+
                             <div
                                 className={styles.subHeader}
                                 onClick={() => setImportOpen(!isImportOpen)}

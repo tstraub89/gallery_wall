@@ -109,11 +109,13 @@
     border-bottom: 1px solid var(--border-color);
     background: var(--bg-panel);
     flex-shrink: 0;
+    display: flex;
+    gap: 12px;
 }
 
 .addFrameBtn {
-    width: 100%;
-    padding: 10px;
+    flex: 1;
+    padding: 12px;
     background: #007aff;
     color: white;
     border: none;
@@ -130,6 +132,16 @@
 .addFrameBtn:active {
     background: #0062cc;
     transform: scale(0.98);
+}
+
+.addCustomBtn {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.addCustomBtn:active {
+    background: var(--border-color);
 }
 
 /* === Shared Sheet Styles (for Edit and other sheets) === */

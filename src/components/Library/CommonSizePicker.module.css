@@ -1,0 +1,31 @@
+.container {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #eee;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.sizeBtn {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 2px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.sizeBtn:hover {
+    background: #f0f0f0;
+    border-color: #bbb;
+}
+
+.sizeBtn:active {
+    background: #e0e0e0;
+}
