@@ -99,6 +99,7 @@
 .scrollArea {
     flex: 1;
     overflow-y: auto;
+    overscroll-behavior-y: contain;
     background: var(--bg-app);
     /* Ensure padding for visual comfort */
     padding-bottom: 40px;

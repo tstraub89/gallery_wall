@@ -10,6 +10,6 @@ export default defineConfig({
   base: '/gallery_wall/',
   define: {
     __APP_VERSION__: JSON.stringify(packageJson.version),
-    __BUILD_TIME__: JSON.stringify(new Date().toLocaleString()),
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
   }
 })

@@ -51,7 +51,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                                     <h3>🎨 The Basics</h3>
                                     <ul>
                                         <li><strong>Wall Setup:</strong> Use the right sidebar to set dimensions, color, and wall type. For staircase walls, adjust the <em>Rise (%)</em> to match your slope.</li>
-                                        <li><strong>Adding Frames:</strong> Select a frame from the library (left) to add it to your wall.</li>
+                                        <li><strong>Adding Frames:</strong> Select a common size (e.g., 4x6, 5x7) from the library (left) or create a custom frame.</li>
                                         <li><strong>Photos:</strong> Drag and drop any image file from your computer directly onto a frame.</li>
                                         <li><strong>Scale & Rotate:</strong> Use the properties panel (right) to tweak dimensions or rotation.</li>
                                     </ul>
@@ -79,6 +79,8 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                                 <section>
                                     <h3>🚀 Pro Features</h3>
                                     <ul>
+                                        <li><strong>Smart Layout:</strong> Stuck on what frame goes where? Use 'Auto-Arrange' to instantly organize your wall.</li>
+                                        <li><strong>Locking:</strong> Right-click a frame to <strong>Lock</strong> it in place so it can't be moved.</li>
                                         <li><strong>Smart Duplicate:</strong> Hold <kbd>Ctrl</kbd> / <kbd>Meta</kbd> while dragging a frame to spawn an instant copy.</li>
                                         <li><strong>Layering:</strong> Right-click a frame to bring it to the front or send it to the back.</li>
                                         <li><strong>Bulk Select:</strong> Left-click and drag on the background to use the marquee selector.</li>
@@ -110,9 +112,9 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                                 <section>
                                     <h3>🎨 Touch Controls</h3>
                                     <ul>
-                                        <li><strong>Adding Frames:</strong> Tap <strong>Library</strong>, then tap the <strong>+ Custom</strong> button or select a preset.</li>
+                                        <li><strong>Adding Frames:</strong> Tap <strong>Library</strong>, then add a <strong>Common Size</strong> or <strong>+ Custom</strong> frame.</li>
                                         <li><strong>Photos:</strong> Tap <strong>Library</strong>, switch to the <strong>Photos</strong> tab, and tap <strong>Add Photos</strong>.</li>
-                                        <li><strong>Context Menu:</strong> Long press a frame to access Layering (Front/Back) and other options.</li>
+                                        <li><strong>Context Menu:</strong> Long press a frame to <strong>Lock</strong>, Layer, or Delete.</li>
                                         <li><strong>Properties:</strong> Tap any frame, then tap "Edit" to change matting, border, or rotate.</li>
                                     </ul>
                                 </section>
@@ -141,6 +143,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                                 <section>
                                     <h3>🚀 Tips</h3>
                                     <ul>
+                                        <li><strong>Smart Layout:</strong> Stuck on what frame goes where? Let Auto-Arrange instantly organize your gallery wall for you!</li>
                                         <li><strong>Landscape:</strong> Rotate your phone for a wider view of your wall.</li>
                                         <li><strong>Wall Setup:</strong> Tap "Edit" (with no frame selected) to change wall size, type, color, and slope.</li>
                                     </ul>

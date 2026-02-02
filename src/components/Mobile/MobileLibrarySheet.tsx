@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { useSwipeDismiss } from '../../hooks/useSwipeDismiss';
 import { useProject } from '../../hooks/useProject';
 import FrameList from '../Library/FrameList';
 import PhotoLibrary from '../Library/PhotoLibrary';
@@ -30,13 +31,17 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
     } = useProject();
 
     const viewport = useViewport();
+    const scrollRef = useRef<HTMLDivElement>(null);
 
-    // Swipe Dismiss Logic Removed for stability
-    // const { handlers, swipeStyle } = useSwipeDismiss({ onDismiss: onClose });
+    // Swipe Dismiss
+    const { handlers, swipeStyle, triggerDismiss } = useSwipeDismiss({
+        onDismiss: onClose,
+        scrollRef,
+        isOpen
+    });
 
     if (!isOpen || !currentProject) return null;
 
-    // -- Handlers --
     // -- Handlers --
 
     const handleAddCustomFrame = (width: number, height: number, shape: 'rect' | 'round', matted: boolean, borderWidth: number) => {
@@ -207,10 +212,12 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
 
     return (
         <SmartLayoutProvider>
-            <div className={styles.sheetOverlay} onClick={onClose}>
+            <div className={styles.sheetOverlay} onClick={triggerDismiss}>
                 <div
                     className={styles.sheetContent}
                     onClick={e => e.stopPropagation()}
+                    style={swipeStyle}
+                    {...handlers}
                 >
                     {/* Handle Bar (Visual only now) */}
                     <div className={styles.handleBar}>
@@ -252,7 +259,7 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
                         </div>
                     </div>
 
-                    <div className={styles.scrollArea}>
+                    <div className={styles.scrollArea} ref={scrollRef}>
                         {activeTab === 'frames' && (
                             <>
                                 <FrameList
