@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useProject } from './useProject';
-import { exportCanvasToBlob, generateProjectZip, exportProjectBundle, generateShoppingListBlob, saveFile } from '../utils/exportUtils';
+import { exportCanvasToBlob, generateProjectZip, exportProjectBundle, saveFile } from '../utils/exportUtils';
 
 export const useExport = () => {
     const { currentProject } = useProject();
@@ -20,7 +20,7 @@ export const useExport = () => {
 
         const fileName = getSafeFilename(overrideName || currentProject.name, 'png');
 
-        const { blob, error } = await exportCanvasToBlob(currentProject);
+        const { blob, error } = await exportCanvasToBlob(currentProject, { cropToFrames: true });
 
         if (blob) {
             await saveFile(blob, fileName);
@@ -42,7 +42,7 @@ export const useExport = () => {
         const title = currentProject.name || 'My Gallery Wall';
         const fileName = getSafeFilename(title, 'png');
 
-        const { blob, error } = await exportCanvasToBlob(currentProject);
+        const { blob, error } = await exportCanvasToBlob(currentProject, { cropToFrames: true });
 
         if (error) {
             setExportError(error);
@@ -120,17 +120,6 @@ export const useExport = () => {
         }
     };
 
-    // Export Shopping List
-    const exportShoppingList = async () => {
-        if (!currentProject) return;
-        const blob = generateShoppingListBlob(currentProject);
-        if (blob) {
-            const fileName = getSafeFilename(currentProject.name + '_shopping_list', 'txt');
-            await saveFile(blob, fileName);
-        } else {
-            setExportError('No frames to list.');
-        }
-    };
 
     return {
         isExporting,
@@ -139,7 +128,6 @@ export const useExport = () => {
         exportToPng,
         shareProjectImage,
         exportToGwall,
-        exportPhotosCrops,
-        exportShoppingList
+        exportPhotosCrops
     };
 };

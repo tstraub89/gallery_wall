@@ -1,4 +1,4 @@
-import JSZip from 'jszip';
+// import JSZip from 'jszip'; // Moved to dynamic import
 import { saveAs } from 'file-saver';
 import { PPI } from '../constants';
 import { getImage } from './imageStore';
@@ -13,12 +13,6 @@ const loadImage = (src: string): Promise<HTMLImageElement> => {
         img.src = src;
     });
 };
-
-
-
-
-
-
 
 /**
  * Robust file saving that prefers the modern File System Access API (Chrome/Edge)
@@ -58,13 +52,13 @@ export const saveFile = async (blob: Blob, suggestedName: string) => {
     }
 };
 
-
 /**
  * Generates a ZIP file containing high-resolution cropped photos from the project frames.
  * @param {Project} project - The current project object containing frames.
  */
 export const generateProjectZip = async (project: Project) => {
-    const zip = new JSZip();
+    const JSZipMod = (await import('jszip')).default;
+    const zip = new JSZipMod();
     const photoFolder = zip.folder(`${project.name || 'Gallery_Export'}_Photos`);
     if (!photoFolder) throw new Error("Failed to create zip folder");
 
@@ -89,9 +83,6 @@ export const generateProjectZip = async (project: Project) => {
             const sourceImage = await loadImage(imgUrl);
 
             // 2. Calculate Dimensions
-            // Key Fix: The UI scales the image to cover the *FRAME*, not the *MAT*.
-            // Matting is just an overlay. So we must calculate the image size relative to the FRAME.
-
             const frameW_in = frame.width;
             const frameH_in = frame.height;
 
@@ -105,18 +96,12 @@ export const generateProjectZip = async (project: Project) => {
             const BLEED_IN = 0.125; // 1/8th inch bleed
 
             // --- Smart DPI Capping ---
-            // Calculate the native PPI of the source image relative to the frame size
             const imgAspect = sourceImage.width / sourceImage.height;
             const frameAspect = frameW_in / frameH_in;
             const nativePPI = imgAspect > frameAspect
                 ? sourceImage.height / frameH_in
                 : sourceImage.width / frameW_in;
 
-            // Bleed Correction for Unmatted Frames
-            // If !matted, Frame == Visible. 
-            // The calculated drawW/drawH covers Frame, but Canvas is Frame + Bleed.
-            // We need to scale up slightly to cover the bleed (Zoom-to-Bleed).
-            // If matted, Frame usually >> Mat + Bleed, so no correction needed.
             let bleedScale = 1;
             if (!frame.matted) {
                 const bleedX = (visibleW_in + (BLEED_IN * 2)) / visibleW_in;
@@ -124,7 +109,6 @@ export const generateProjectZip = async (project: Project) => {
                 bleedScale = Math.max(bleedX, bleedY) * 1.005; // tiny safety buffer
             }
 
-            // Effective PPI is native / total zoom (user scale * bleed correction)
             const effectivePPI = nativePPI / (scale * bleedScale);
             const TARGET_PPI = Math.min(300, effectivePPI);
 
@@ -142,7 +126,7 @@ export const generateProjectZip = async (project: Project) => {
             ctx.fillStyle = '#ffffff';
             ctx.fillRect(0, 0, outputW_px, outputH_px);
 
-            // Move origin to center of canvas (which aligns with center of Visible Area)
+            // Move origin to center of canvas
             ctx.translate(outputW_px / 2, outputH_px / 2);
 
             // --- Image Drawing Math ---
@@ -157,26 +141,16 @@ export const generateProjectZip = async (project: Project) => {
 
             // Apply Transforms
             ctx.rotate((rotation * Math.PI) / 180);
-
-            // Scale (User Scale * Bleed Correction)
             ctx.scale(scale * bleedScale, scale * bleedScale);
 
             // Pan
-            // User Pan (x/y) is in Screen PPI. Convert to Target PPI.
             const screenToPrintRatio = TARGET_PPI / PPI;
             const offsetX = x * screenToPrintRatio;
             const offsetY = y * screenToPrintRatio;
-
             ctx.translate(offsetX, offsetY);
 
             // Draw Center
-            ctx.drawImage(
-                sourceImage,
-                -drawW / 2,
-                -drawH / 2,
-                drawW,
-                drawH
-            );
+            ctx.drawImage(sourceImage, -drawW / 2, -drawH / 2, drawW, drawH);
 
             // 3. Export to Blob
             const cropBlob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
@@ -189,14 +163,13 @@ export const generateProjectZip = async (project: Project) => {
             URL.revokeObjectURL(imgUrl);
 
         } catch (err: any) {
-            console.error(`Error processing frame ${i + 1}:`, err);
+            console.error(`Error processing frame ${i + 1}: `, err);
             errors.push(`Frame ${i + 1}: ${err.message || String(err)}`);
         }
     }
 
     if (errors.length > 0) {
         console.warn("Some images failed to export:", errors);
-        // We still proceed to download what we have, but maybe alert?
     }
 
     // Generate ZIP
@@ -206,53 +179,75 @@ export const generateProjectZip = async (project: Project) => {
     return { success: true, errorCount: errors.length };
 };
 
-
-
-
-
 // Replaces html-to-image with a manual Canvas 2D implementation
-// This is much more robust on iOS Safari as it avoids DOM serialization issues and memory limits
 export const exportCanvasToBlob = async (
     project: Project,
-    _canvasId?: string // Deprecated
-): Promise<{ blob: Blob | null, error: string | null }> => {
+    options: { cropToFrames?: boolean, showWatermark?: boolean } = {}
+): Promise<{ blob: Blob | null, error: string | null, cropRect?: { x: number, y: number, width: number, height: number } }> => {
+    const { showWatermark = true } = options;
     try {
-        // High Resolution Export Settings
-        // Base target is 4x native PPI (approx 40 PPI)
         const TARGET_SCALE = 4;
         let exportPPI = PPI * TARGET_SCALE;
 
-        const widthInches = project.wallConfig.width;
-        const heightInches = project.wallConfig.height;
+        let widthInches = project.wallConfig.width;
+        let heightInches = project.wallConfig.height;
+        let offsetInchesX = 0;
+        let offsetInchesY = 0;
 
-        // Safety Cap: 5 Megapixels (Area-based)
-        // 5MP is ~2236x2236 or 2700x1850. Plenty for sharing.
-        // Combined with JPEG compression, this keeps files small (approx 300-800KB).
+        let cropRect = undefined;
+        if (options.cropToFrames && project.frames.length > 0) {
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+            project.frames.forEach(f => {
+                const bW = typeof f.borderWidth === 'number' ? f.borderWidth : 0.1;
+                const fx = f.x / PPI;
+                const fy = f.y / PPI;
+                minX = Math.min(minX, fx - bW);
+                minY = Math.min(minY, fy - bW);
+                maxX = Math.max(maxX, fx + f.width + bW);
+                maxY = Math.max(maxY, fy + f.height + bW);
+            });
+
+            const PADDING = 5; // inches
+            const croppedX = Math.max(0, minX - PADDING);
+            const croppedY = Math.max(0, minY - PADDING);
+            const croppedW = Math.min(project.wallConfig.width - croppedX, (maxX - minX) + (PADDING * 2));
+            const croppedH = Math.min(project.wallConfig.height - croppedY, (maxY - minY) + (PADDING * 2));
+
+            widthInches = croppedW;
+            heightInches = croppedH;
+            offsetInchesX = croppedX;
+            offsetInchesY = croppedY;
+            cropRect = { x: croppedX, y: croppedY, width: croppedW, height: croppedH };
+        }
+
         const MAX_PIXELS = 5 * 1000 * 1000;
-
         const targetWidth = widthInches * exportPPI;
         const targetHeight = heightInches * exportPPI;
         const targetPixels = targetWidth * targetHeight;
 
         if (targetPixels > MAX_PIXELS) {
-            // Scale down to fit 10MP area while maintaining aspect ratio
             const scaleDown = Math.sqrt(MAX_PIXELS / targetPixels);
             exportPPI = exportPPI * scaleDown;
         }
 
         const widthPx = Math.ceil(widthInches * exportPPI);
         const heightPx = Math.ceil(heightInches * exportPPI);
-        const EXPORT_SCALE = exportPPI / PPI; // Recalculate scale factor for coordinate mapping
+        const EXPORT_SCALE = exportPPI / PPI;
 
         const canvas = document.createElement('canvas');
         canvas.width = widthPx;
         canvas.height = heightPx;
         const ctx = canvas.getContext('2d');
-
         if (!ctx) throw new Error('Could not create canvas context');
+
+        ctx.translate(-offsetInchesX * exportPPI, -offsetInchesY * exportPPI);
 
         // 1. Draw Wall Background
         const wallType = project.wallConfig.type;
+        const fullWallWidthPx = project.wallConfig.width * exportPPI;
+        const fullWallHeightPx = project.wallConfig.height * exportPPI;
+
         if (wallType === 'staircase-asc' || wallType === 'staircase-desc') {
             const stairAngle = project.wallConfig.stairAngle ?? 50;
             const clipPercent = Math.min(100, Math.max(10, stairAngle));
@@ -260,26 +255,24 @@ export const exportCanvasToBlob = async (
 
             ctx.beginPath();
             ctx.moveTo(0, 0);
-            ctx.lineTo(widthPx, 0);
+            ctx.lineTo(fullWallWidthPx, 0);
             if (wallType === 'staircase-asc') {
-                ctx.lineTo(widthPx, heightPx * (bottomPercent / 100)); // Right side lower
-                ctx.lineTo(0, heightPx);
+                ctx.lineTo(fullWallWidthPx, fullWallHeightPx * (bottomPercent / 100));
+                ctx.lineTo(0, fullWallHeightPx);
             } else {
-                ctx.lineTo(widthPx, heightPx);
-                ctx.lineTo(0, heightPx * (bottomPercent / 100)); // Left side lower
+                ctx.lineTo(fullWallWidthPx, fullWallHeightPx);
+                ctx.lineTo(0, fullWallHeightPx * (bottomPercent / 100));
             }
             ctx.closePath();
             ctx.clip();
         }
 
         ctx.fillStyle = project.wallConfig.backgroundColor || '#e5e5e7';
-        ctx.fillRect(0, 0, widthPx, heightPx);
+        ctx.fillRect(0, 0, fullWallWidthPx, fullWallHeightPx);
 
-
-        // 2. Draw Frames (Sorted by Z-Index)
+        // 2. Draw Frames
         const sortedFrames = [...project.frames].sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0));
 
-        // Helper to draw a rounded rect
         const drawRoundedRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => {
             ctx.beginPath();
             ctx.moveTo(x + r, y);
@@ -301,106 +294,75 @@ export const exportCanvasToBlob = async (
         };
 
         for (const frame of sortedFrames) {
-            // Frame Metrics in Export Scale
-            // frame.x/y are stored in SCREEN PIXELS (PPI=10). We must scale them.
             const frameX = frame.x * EXPORT_SCALE;
             const frameY = frame.y * EXPORT_SCALE;
-
             const bWidthInches = typeof frame.borderWidth === 'number' ? frame.borderWidth : 0.1;
             const bWidthPx = Math.round(bWidthInches * exportPPI);
             const contentW = Math.round(frame.width * exportPPI);
             const contentH = Math.round(frame.height * exportPPI);
-
             const borderX = frameX - bWidthPx;
             const borderY = frameY - bWidthPx;
             const borderW = contentW + (bWidthPx * 2);
             const borderH = contentH + (bWidthPx * 2);
-
             const isRound = frame.shape === 'round';
 
-            // A. Shadow (Scaled)
             ctx.save();
             ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
             ctx.shadowBlur = 8 * EXPORT_SCALE;
             ctx.shadowOffsetX = 2 * EXPORT_SCALE;
             ctx.shadowOffsetY = 2 * EXPORT_SCALE;
             ctx.fillStyle = frame.frameColor || '#111';
-
             if (isRound) drawCircle(ctx, borderX, borderY, borderW, borderH);
             else drawRoundedRect(ctx, borderX, borderY, borderW, borderH, 2 * EXPORT_SCALE);
-
             ctx.fill();
             ctx.restore();
 
-            // B. Border
             ctx.fillStyle = frame.frameColor || '#111';
             if (isRound) {
                 drawCircle(ctx, borderX, borderY, borderW, borderH);
                 ctx.fill();
             } else {
-                ctx.fillRect(borderX, borderY, borderW, borderH); // Basic rect for border is crisp
+                ctx.fillRect(borderX, borderY, borderW, borderH);
             }
 
-            // C. Content (Image + Mat)
-            // Save before clipping
             ctx.save();
-
-            // Clip
             ctx.beginPath();
-            if (isRound) {
-                ctx.ellipse(frameX + contentW / 2, frameY + contentH / 2, contentW / 2, contentH / 2, 0, 0, 2 * Math.PI);
-            } else {
-                ctx.rect(frameX, frameY, contentW, contentH);
-            }
+            if (isRound) ctx.ellipse(frameX + contentW / 2, frameY + contentH / 2, contentW / 2, contentH / 2, 0, 0, 2 * Math.PI);
+            else ctx.rect(frameX, frameY, contentW, contentH);
             ctx.clip();
-
-            // Background (White if no image)
             ctx.fillStyle = '#ffffff';
             ctx.fill();
 
-            // Draw Image
             if (frame.imageId) {
                 try {
                     const blob = await getImage(frame.imageId);
                     if (blob) {
                         const imgUrl = URL.createObjectURL(blob);
                         const img = await loadImage(imgUrl);
-
-                        // Transforms
-                        // frame.imageState.x/y are in Screen Pixels (PPI=10). Scale them.
                         const { scale = 1, x = 0, y = 0, rotation = 0 } = frame.imageState || {};
                         const scaledPanX = x * EXPORT_SCALE;
                         const scaledPanY = y * EXPORT_SCALE;
-
                         const centerX = frameX + contentW / 2;
                         const centerY = frameY + contentH / 2;
 
-                        // Position logic matching CSS `object-position` + `transform`
                         ctx.save();
-                        ctx.translate(centerX, centerY); // Move to center
+                        ctx.translate(centerX, centerY);
                         ctx.rotate((rotation * Math.PI) / 180);
                         ctx.scale(scale, scale);
                         ctx.translate(scaledPanX, scaledPanY);
 
-                        // Draw Image Centered (Cover Logic)
                         const imgRatio = img.width / img.height;
                         const frameRatio = contentW / contentH;
                         let drawW, drawH;
-
                         if (imgRatio > frameRatio) {
-                            // Image is wider than frame -> Height fits match, Width bleeds
                             drawH = contentH;
                             drawW = contentH * imgRatio;
                         } else {
-                            // Image is taller -> Width fits match, Height bleeds
                             drawW = contentW;
                             drawH = contentW / imgRatio;
                         }
-
-                        // High quality filter
                         ctx.imageSmoothingQuality = 'high';
                         ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
-
                         ctx.restore();
                         URL.revokeObjectURL(imgUrl);
                     }
@@ -408,129 +370,92 @@ export const exportCanvasToBlob = async (
                     console.warn(`Failed to render image for frame ${frame.id}`, err);
                 }
             } else {
-                // Empty Frame: Draw Label or Dimensions
                 const label = frame.label || `${frame.width}" x ${frame.height}"`;
-                // Match app visual: Base 10px (scaled), Dynamic 0.10 (scaled)
                 const fontSize = Math.max(10 * EXPORT_SCALE, contentW * 0.10);
-
                 ctx.save();
                 ctx.fillStyle = frame.label ? '#555555' : '#999999';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                // Use system fonts that match the app
                 ctx.font = `${frame.label ? '600' : '400'} ${fontSize}px system-ui, -apple-system, sans-serif`;
-
                 const centerX = frameX + contentW / 2;
                 const centerY = frameY + contentH / 2;
-
                 ctx.fillText(label, centerX, centerY);
                 ctx.restore();
             }
 
-            // Draw Matting Overlay
             if (frame.matted) {
                 const mattedW = frame.matted.width * exportPPI;
                 const mattedH = frame.matted.height * exportPPI;
                 const matBorderW = (contentW - mattedW) / 2;
                 const matBorderH = (contentH - mattedH) / 2;
-
-                ctx.fillStyle = '#ffffff'; // Mat color
-
-                // Top
+                ctx.fillStyle = '#ffffff';
                 ctx.fillRect(frameX, frameY, contentW, matBorderH);
-                // Bottom
                 ctx.fillRect(frameX, frameY + contentH - matBorderH, contentW, matBorderH);
-                // Left
                 ctx.fillRect(frameX, frameY + matBorderH, matBorderW, mattedH);
-                // Right
                 ctx.fillRect(frameX + contentW - matBorderW, frameY + matBorderH, matBorderW, mattedH);
-
-                // Inner Shadow for Mat (Simulated with stroke)
                 ctx.strokeStyle = 'rgba(0,0,0,0.1)';
                 ctx.lineWidth = 1 * EXPORT_SCALE;
                 ctx.strokeRect(frameX + matBorderW, frameY + matBorderH, mattedW, mattedH);
             }
-
-            // Restore from Clip
             ctx.restore();
         }
 
-        // 3. Draw Watermark (Bottom Right)
-        const wmScale = EXPORT_SCALE * 0.75; // Matches scaling nicely
-        const wmPadding = 20 * wmScale;
-        const radius = 12 * wmScale;
+        if (showWatermark) {
+            const wmScale = EXPORT_SCALE * 0.75;
+            const wmPadding = 20 * wmScale;
+            const radius = 12 * wmScale;
+            const badgeW = 180 * wmScale;
+            const badgeH = 50 * wmScale;
 
-        // Badge Dimensions
-        const badgeW = 180 * wmScale; // Reduced to 180 for very tight fit
-        const badgeH = 50 * wmScale;
-        const badgeX = widthPx - badgeW - wmPadding;
-        const badgeY = heightPx - badgeH - wmPadding;
+            const badgeX = (offsetInchesX * exportPPI) + widthPx - badgeW - wmPadding;
+            const badgeY = (offsetInchesY * exportPPI) + heightPx - badgeH - wmPadding;
 
-        ctx.save();
-        // Shadow for badge
-        ctx.shadowColor = 'rgba(0,0,0,0.15)';
-        ctx.shadowBlur = 10 * wmScale;
-        ctx.shadowOffsetY = 2 * wmScale;
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,0.15)';
+            ctx.shadowBlur = 10 * wmScale;
+            ctx.shadowOffsetY = 2 * wmScale;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            drawRoundedRect(ctx, badgeX, badgeY, badgeW, badgeH, radius);
+            ctx.fill();
+            ctx.shadowColor = 'transparent';
 
-        // Badge BG
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        drawRoundedRect(ctx, badgeX, badgeY, badgeW, badgeH, radius);
-        ctx.fill();
-        ctx.shadowColor = 'transparent'; // Clear shadow for content
+            const iconSize = 32 * wmScale;
+            const iconX = badgeX + (12 * wmScale);
+            const iconY = badgeY + (9 * wmScale);
+            ctx.strokeStyle = '#111';
+            ctx.lineWidth = 2.5 * wmScale;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            const s = iconSize / 24;
+            ctx.beginPath();
+            drawRoundedRect(ctx, iconX + 3 * s, iconY + 3 * s, 18 * s, 18 * s, 2 * s);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(iconX + 8.5 * s, iconY + 8.5 * s, 1.5 * s, 0, 2 * Math.PI);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(iconX + 21 * s, iconY + 15 * s);
+            ctx.lineTo(iconX + 16 * s, iconY + 10 * s);
+            ctx.lineTo(iconX + 5 * s, iconY + 21 * s);
+            ctx.stroke();
 
-        // Logo Icon (Vector Draw)
-        const iconSize = 32 * wmScale;
-        const iconX = badgeX + (12 * wmScale);
-        const iconY = badgeY + (9 * wmScale);
+            const fontSize = 16 * wmScale;
+            ctx.font = `600 ${fontSize}px system-ui, -apple-system, sans-serif`;
+            ctx.fillStyle = '#111';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            const textX = iconX + iconSize + (8 * wmScale);
+            const textY = badgeY + (badgeH / 2);
+            ctx.fillText("Gallery", textX, textY);
+            const textWidth = ctx.measureText("Gallery").width;
+            ctx.font = `300 ${fontSize}px system-ui, -apple-system, sans-serif`;
+            ctx.fillText("Planner", textX + textWidth, textY);
+            ctx.restore();
+        }
 
-        ctx.strokeStyle = '#111';
-        ctx.lineWidth = 2.5 * wmScale;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-
-        // Draw Rect
-        const s = iconSize / 24;
-
-        ctx.beginPath();
-        drawRoundedRect(ctx, iconX + 3 * s, iconY + 3 * s, 18 * s, 18 * s, 2 * s);
-        ctx.stroke();
-
-        // Circle
-        ctx.beginPath();
-        ctx.arc(iconX + 8.5 * s, iconY + 8.5 * s, 1.5 * s, 0, 2 * Math.PI);
-        ctx.stroke();
-
-        // Polyline
-        ctx.beginPath();
-        ctx.moveTo(iconX + 21 * s, iconY + 15 * s);
-        ctx.lineTo(iconX + 16 * s, iconY + 10 * s);
-        ctx.lineTo(iconX + 5 * s, iconY + 21 * s);
-        ctx.stroke();
-
-        // Text: GalleryPlanner
-        const fontSize = 16 * wmScale;
-        ctx.font = `600 ${fontSize}px system-ui, -apple-system, sans-serif`;
-        ctx.fillStyle = '#111';
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-
-        const textX = iconX + iconSize + (8 * wmScale);
-        const textY = badgeY + (badgeH / 2);
-
-        ctx.fillText("Gallery", textX, textY);
-
-        const textWidth = ctx.measureText("Gallery").width;
-        ctx.font = `300 ${fontSize}px system-ui, -apple-system, sans-serif`;
-        ctx.fillText("Planner", textX + textWidth, textY);
-
-        ctx.restore();
-
-        // 4. Export to Blob (JPEG for efficient sharing)
-        // JPEG 0.85 reduces file size by ~90% compared to PNG while maintaining visual fidelity.
         const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.85));
-
         if (!blob) throw new Error('Canvas toBlob failed');
-        return { blob, error: null };
+        return { blob, error: null, cropRect };
 
     } catch (err: any) {
         console.error('Manual Canvas Export failed', err);
@@ -538,18 +463,15 @@ export const exportCanvasToBlob = async (
     }
 };
 
-
 /**
  * Generates a .gwall file (ZIP) containing the project metadata and all images used in frames.
- * @param {Project} project - The current project object.
  */
 export const exportProjectBundle = async (project: Project) => {
-    const zip = new JSZip();
+    const JSZipMod = (await import('jszip')).default;
+    const zip = new JSZipMod();
 
-    // 1. Gather used image IDs
     const usedImageIds = [...new Set(project.frames.filter(f => f.imageId).map(f => f.imageId))];
 
-    // 2. Add Project JSON (Pruned to bundled images)
     const exportProject = {
         ...project,
         images: (project.images || []).filter(id => usedImageIds.includes(id))
@@ -557,7 +479,6 @@ export const exportProjectBundle = async (project: Project) => {
     const projectData = JSON.stringify(exportProject, null, 2);
     zip.file('project.json', projectData);
 
-    // 3. Add Images
     const imageFolder = zip.folder('images');
     if (!imageFolder) throw new Error("Failed to create images folder");
     const errors: string[] = [];
@@ -567,31 +488,24 @@ export const exportProjectBundle = async (project: Project) => {
             if (!imageId) continue;
             const blob = await getImage(imageId);
             if (!blob) throw new Error(`Missing in database`);
-
-            // We use the imageId as the filename
             imageFolder.file(imageId, blob);
         } catch (err: any) {
-            console.warn(`Could not bundle image ${imageId}:`, err);
+            console.warn(`Could not bundle image ${imageId}: `, err);
             errors.push(`${imageId}: ${err.message || String(err)}`);
         }
     }
 
-    // 4. Generate and Save ZIP
     const content = await zip.generateAsync({ type: "blob" });
     await saveFile(content, `${project.name || 'project'}.gwall`);
 
-    return {
-        success: true,
-        errorCount: errors.length,
-        warnings: errors
-    };
+    return { success: true, errorCount: errors.length, warnings: errors };
 };
 
 /**
  * Processes a .gwall file and returns the project metadata and image blobs.
- * @param {File|Blob} file - The .gwall ZIP file.
  */
 export const importProjectBundle = async (file: File | Blob) => {
+    const JSZip = (await import('jszip')).default;
     const zip = await JSZip.loadAsync(file);
     const projectJsonFile = zip.file('project.json');
     if (!projectJsonFile) throw new Error('Invalid .gwall file: missing project.json');
@@ -599,30 +513,18 @@ export const importProjectBundle = async (file: File | Blob) => {
     const projectText = await projectJsonFile.async('text');
     const project = JSON.parse(projectText);
 
-    // Validate required project structure
-    if (!project || typeof project !== 'object') {
-        throw new Error('Invalid .gwall file: project.json is not an object');
-    }
-    if (!Array.isArray(project.frames)) {
-        throw new Error('Invalid .gwall file: project.frames is missing or not an array');
-    }
-    if (!project.wallConfig || typeof project.wallConfig !== 'object') {
-        throw new Error('Invalid .gwall file: wallConfig is missing or invalid');
+    if (!project || typeof project !== 'object' || !Array.isArray(project.frames) || !project.wallConfig) {
+        throw new Error('Invalid .gwall file structure');
     }
 
     const images: { id: string; blob: Blob }[] = [];
-
-    // Extract images from the 'images/' folder
     const imageFolder = zip.folder('images');
-    const imageFiles: { id: string; file: JSZip.JSZipObject }[] = [];
+    const imageFiles: { id: string; file: any }[] = [];
 
     if (imageFolder) {
         imageFolder.forEach((relativePath, file) => {
             if (!file.dir) {
-                imageFiles.push({
-                    id: relativePath, // relativePath is the filename within the folder
-                    file
-                });
+                imageFiles.push({ id: relativePath, file });
             }
         });
 
@@ -633,21 +535,4 @@ export const importProjectBundle = async (file: File | Blob) => {
     }
 
     return { project, images };
-};
-
-export const generateShoppingListBlob = (project: Project): Blob | null => {
-    if (!project || !project.frames.length) return null;
-
-    const list = project.frames.map((f, i) => {
-        const hasImage = !!f.imageId;
-        let line = `Frame ${i + 1}: ${f.width}" x ${f.height}"`;
-        if (f.matted) {
-            line += ` (Matted to ${f.matted.width}" x ${f.matted.height}")`;
-        }
-        line += ` - Status: ${hasImage ? 'Filled' : 'Empty'}`;
-        return line;
-    }).join('\n');
-
-    const header = `GALLERY WALL SHOPPING LIST\nProject: ${project.name}\nTotal Frames: ${project.frames.length}\n----------------------------\n\n`;
-    return new Blob([header + list], { type: 'text/plain' });
 };

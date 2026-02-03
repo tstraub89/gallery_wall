@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useLayout } from '../../hooks/useLayout';
 import styles from './GlobalActions.module.css'; // Re-use styles for consistency
-import HelpModal from '../Common/HelpModal';
+// import HelpModal from '../Common/HelpModal';
+const HelpModal = React.lazy(() => import('../Common/HelpModal'));
 import { Github, PanelRightOpen, PanelRightClose } from 'lucide-react';
 
 const WindowControls = () => {
@@ -22,7 +23,11 @@ const WindowControls = () => {
 
             <button className={styles.helpBtn} onClick={() => setShowHelp(true)} title="Show Help Guide">?</button>
 
-            {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+            {showHelp && (
+                <React.Suspense fallback={null}>
+                    <HelpModal onClose={() => setShowHelp(false)} />
+                </React.Suspense>
+            )}
 
             <div className={styles.divider} />
 

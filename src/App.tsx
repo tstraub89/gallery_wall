@@ -9,7 +9,8 @@ import GlobalActions from './components/Header/GlobalActions';
 import Logo from './components/Header/Logo';
 import ProjectMenu from './components/Header/ProjectMenu';
 import WindowControls from './components/Header/WindowControls';
-import WelcomeModal from './components/Common/WelcomeModal';
+// import WelcomeModal from './components/Common/WelcomeModal'; // Moved to lazy load
+const WelcomeModal = React.lazy(() => import('./components/Common/WelcomeModal'));
 import { useProject } from './hooks/useProject';
 
 import { useIsMobile } from './hooks/useIsMobile';
@@ -23,10 +24,12 @@ const AppContent: React.FC = () => {
   return (
     <>
       {showWelcome && (
-        <WelcomeModal
-          onLoadDemo={importDemoProject}
-          onStartFresh={startFresh}
-        />
+        <React.Suspense fallback={null}>
+          <WelcomeModal
+            onLoadDemo={importDemoProject}
+            onStartFresh={startFresh}
+          />
+        </React.Suspense>
       )}
       {isMobile ? (
         <MobileLayout

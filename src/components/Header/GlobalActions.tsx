@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useProject } from '../../hooks/useProject';
 import { useExport } from '../../hooks/useExport';
+import { usePDFExport } from '../../hooks/usePDFExport';
 import styles from './GlobalActions.module.css';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import DropdownMenu from '../Common/DropdownMenu';
@@ -21,7 +22,29 @@ const FullScreenOverlay = ({ children }: { children: React.ReactNode }) => {
 
 const GlobalActions = () => {
     const { currentProject, updateProject, addProject } = useProject();
-    const { isExporting, exportError, setExportError, exportToPng, exportToGwall, exportPhotosCrops, exportShoppingList } = useExport();
+    const {
+        isExporting: isBusy,
+        exportError: err,
+        setExportError: setErr,
+        exportToPng,
+        exportToGwall,
+        exportPhotosCrops
+    } = useExport();
+
+    const {
+        isExporting: isPDFBusy,
+        exportError: pdfErr,
+        setExportError: setPdfErr,
+        exportToPDFGuide
+    } = usePDFExport();
+
+    // Combined states
+    const isExporting = isBusy || isPDFBusy;
+    const exportError = err || pdfErr;
+    const setExportError = (msg: string | null) => {
+        setErr(msg);
+        setPdfErr(msg);
+    };
 
     const [showClearConfirm, setShowClearConfirm] = React.useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -114,16 +137,16 @@ const GlobalActions = () => {
                 label="Export"
                 icon={<Download size={16} />}
                 items={[
-                    { label: 'Save Snapshot (JPEG)', onClick: () => exportToPng(), title: 'Save a high-res snapshot of your wall layout' },
-                    { label: 'Shopping List (.txt)', onClick: exportShoppingList, title: 'Text list of all frames for shopping' },
-                    { label: 'Export Photos (.zip)', onClick: exportPhotosCrops, title: 'High-res cropped photos ready for printing' }
+                    { label: 'Snapshot (JPEG)', onClick: () => exportToPng(), title: 'Save a high-res snapshot of your wall layout' },
+                    { label: 'Hanging Guide (PDF)', onClick: exportToPDFGuide, title: 'Download a printable guide with measurements and hang heights' },
+                    { label: 'Cropped Photos (.zip)', onClick: exportPhotosCrops, title: 'High-res cropped photos ready for printing' }
                 ]}
             />
 
             {isExporting && (
                 <FullScreenOverlay>
                     <div className={styles.spinner}></div>
-                    <p>Processing...</p>
+                    <p>{isPDFBusy ? 'Preparing Hanging Guide...' : 'Preparing...'}</p>
                 </FullScreenOverlay>
             )}
 

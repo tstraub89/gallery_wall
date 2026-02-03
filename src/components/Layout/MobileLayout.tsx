@@ -1,12 +1,14 @@
 import React, { ReactNode, useState, useRef } from 'react';
 import styles from './MobileLayout.module.css';
-import { Undo2, Redo2, Share2, ChevronDown, CircleHelp, Grid, SlidersHorizontal, Menu, Save, FileText, FolderOpen, Eraser } from 'lucide-react';
+import { Undo2, Redo2, Share2, ChevronDown, CircleHelp, Grid, SlidersHorizontal, Menu, Save, FolderOpen, Eraser, Printer } from 'lucide-react';
 import Logo from '../Header/Logo';
 import { useProject } from '../../hooks/useProject';
 import { useExport } from '../../hooks/useExport';
+import { usePDFExport } from '../../hooks/usePDFExport';
 import ProjectSwitcher from '../Mobile/ProjectSwitcher';
 import ConfirmDialog from '../Common/ConfirmDialog';
-import HelpModal from '../Common/HelpModal';
+// import HelpModal from '../Common/HelpModal';
+const HelpModal = React.lazy(() => import('../Common/HelpModal'));
 import MobileLibrarySheet from '../Mobile/MobileLibrarySheet';
 import MobileEditSheet from '../Mobile/MobileEditSheet';
 import { importProjectBundle } from '../../utils/exportUtils';
@@ -24,7 +26,10 @@ interface MobileLayoutProps {
 
 export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, onRedo, canUndo, canRedo }) => {
     const { currentProject, updateProject, addProject, projects, switchProject, currentProjectId } = useProject();
-    const { shareProjectImage, exportToGwall, exportShoppingList, isExporting } = useExport();
+    const { shareProjectImage, exportToGwall, isExporting: isBusy } = useExport();
+    const { exportToPDFGuide, isExporting: isPDFBusy, pdfReadyUrl, triggerPdfShare, clearPdfReady } = usePDFExport();
+
+    const isExporting = isBusy || isPDFBusy;
 
     const [showSwitcher, setShowSwitcher] = useState(false);
     const [showMenu, setShowMenu] = useState(false);
@@ -55,10 +60,6 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
         await exportToGwall();
     };
 
-    const handleShoppingList = () => {
-        setShowMenu(false);
-        exportShoppingList();
-    };
 
     const handleImportClick = () => {
         setShowMenu(false); // Close menu
@@ -257,15 +258,15 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                             <div className={styles.menuSectionLabel}>Export</div>
                             <div className={styles.menuItem} onClick={() => { setShowMenu(false); shareProjectImage(); }}>
                                 <Share2 size={16} style={{ marginRight: 8 }} />
-                                Share Image (JPEG)
+                                Share Snapshot
                             </div>
                             <div className={styles.menuItem} onClick={handleSaveProject}>
                                 <Save size={16} style={{ marginRight: 8 }} />
                                 Save Project File (.gwall)
                             </div>
-                            <div className={styles.menuItem} onClick={handleShoppingList}>
-                                <FileText size={16} style={{ marginRight: 8 }} />
-                                Export Shopping List
+                            <div className={styles.menuItem} onClick={() => { setShowMenu(false); exportToPDFGuide(); }}>
+                                <Printer size={16} style={{ marginRight: 8 }} />
+                                Export Hanging Guide (PDF)
                             </div>
 
                             <div className={styles.menuSectionLabel}>System</div>
@@ -298,11 +299,34 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                     />
                 )}
 
-                {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
+                {showHelp && (
+                    <React.Suspense fallback={null}>
+                        <HelpModal onClose={() => setShowHelp(false)} />
+                    </React.Suspense>
+                )}
 
                 {isExporting && (
                     <div className={styles.loadingOverlay}>
-                        Preparing...
+                        <div className={styles.spinner}></div>
+                        <p>{isPDFBusy ? 'Preparing Hanging Guide...' : 'Preparing...'}</p>
+                    </div>
+                )}
+
+                {pdfReadyUrl && (
+                    <div className={styles.loadingOverlay}>
+                        <div className={styles.readyCard}>
+                            <h3>Guide Ready!</h3>
+                            <p>Hanging guide is generated.</p>
+                            <div className={styles.readyActions}>
+                                <button className={styles.primaryBtn} onClick={triggerPdfShare}>
+                                    <Printer size={18} style={{ marginRight: 8 }} />
+                                    View / Print Guide
+                                </button>
+                                <button className={styles.secondaryBtn} onClick={clearPdfReady}>
+                                    Dismiss
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
