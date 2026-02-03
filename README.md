@@ -113,6 +113,4 @@ Click the **"?"** button in the header for the in-app **Quick Start Guide**.
 
 **Tech Stack**: Built with React 19 (Vite), **TypeScript**, CSS Modules, and IndexedDB for persistent local storage.
 
-v2.2.1 Released Feb 2026. 🚀✨
-
 © 2026 Timothy Straub. All Rights Reserved.
