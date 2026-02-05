@@ -5,7 +5,7 @@ import fs from 'node:fs'
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(() => {
   return {
     plugins: [react()],
     // Custom domain and Vercel use root base path.
