@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProjectProvider } from './context/ProjectContext';
 import { LayoutProvider } from './context/LayoutContext';
 import { ProProvider } from './context/ProContext';
@@ -10,6 +11,7 @@ import GlobalActions from './components/Header/GlobalActions';
 import Logo from './components/Header/Logo';
 import ProjectMenu from './components/Header/ProjectMenu';
 import WindowControls from './components/Header/WindowControls';
+import LandingPage from './components/Landing/LandingPage';
 // import WelcomeModal from './components/Common/WelcomeModal'; // Moved to lazy load
 const WelcomeModal = React.lazy(() => import('./components/Common/WelcomeModal'));
 import { useProject } from './hooks/useProject';
@@ -18,7 +20,7 @@ import { useIsMobile } from './hooks/useIsMobile';
 import { MobileLayout } from './components/Layout/MobileLayout';
 
 // Inner component that can use context
-const AppContent: React.FC = () => {
+const AppTool: React.FC = () => {
   const { showWelcome, importDemoProject, startFresh, undo, redo, canUndo, canRedo } = useProject();
   const isMobile = useIsMobile();
 
@@ -84,7 +86,14 @@ const App: React.FC = () => {
     <ProjectProvider>
       <LayoutProvider>
         <ProProvider>
-          <AppContent />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/app" element={<AppTool />} />
+              {/* Fallback to landing */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
         </ProProvider>
       </LayoutProvider>
     </ProjectProvider>
