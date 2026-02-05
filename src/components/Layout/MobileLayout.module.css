@@ -190,6 +190,83 @@
     border-bottom: 1px solid #f5f5f5;
     cursor: pointer;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.menuSectionLabel {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    font-weight: 600;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    padding-left: 4px;
+}
+
+.proSection {
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    opacity: 0.85;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: not-allowed;
+}
+
+.proBadge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.proLabel {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 12px;
+    text-align: center;
+    font-weight: 500;
+}
+
+.statusItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.statusInfo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.statusLabel {
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+}
+
+.statusFree {
+    font-size: 14px;
+    color: #111;
+    font-weight: 700;
+}
+
+.statusPro {
+    font-size: 14px;
+    color: #a855f7;
+    font-weight: 700;
 }
 
 .menuItem.danger {
@@ -218,7 +295,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 3000;
+    z-index: 1000000;
     font-weight: 600;
 }
 
@@ -230,7 +307,7 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 5000;
+    z-index: 1000000;
     /* Higher than other overlays */
     display: flex;
     align-items: center;

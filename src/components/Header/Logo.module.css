@@ -43,3 +43,36 @@
     color: var(--text-secondary);
     margin-left: 2px;
 }
+
+.beta, .pro, .free {
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    letter-spacing: 0.05em;
+    vertical-align: middle;
+    transition: all 0.2s;
+}
+
+.beta {
+    color: var(--text-secondary);
+    background: var(--border-color);
+}
+
+.pro {
+    color: white;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    box-shadow: 0 2px 4px rgba(168, 85, 247, 0.3);
+}
+
+.free {
+    color: var(--accent-color);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-soft);
+}
+
+.beta:hover, .pro:hover, .free:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.1);
+}

@@ -3,29 +3,37 @@ import { useLayout } from '../../hooks/useLayout';
 import styles from './GlobalActions.module.css'; // Re-use styles for consistency
 // import HelpModal from '../Common/HelpModal';
 const HelpModal = React.lazy(() => import('../Common/HelpModal'));
-import { Github, PanelRightOpen, PanelRightClose } from 'lucide-react';
+const ProUpgradeDialog = React.lazy(() => import('../Common/ProUpgradeDialog'));
+import { Sparkles, PanelRightOpen, PanelRightClose } from 'lucide-react';
 
 const WindowControls = () => {
     const { isRightSidebarOpen, toggleRightSidebar } = useLayout();
     const [showHelp, setShowHelp] = useState(false);
+    const [showPro, setShowPro] = useState(false);
 
     return (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <a
-                href="https://github.com/tstraub89/gallery_wall"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.helpBtn}
-                title="View Source on GitHub"
+            <button
+                className={styles.proButton}
+                onClick={() => setShowPro(true)}
+                title="During beta, Pro features are unlocked for free."
+                style={{ marginRight: '8px', cursor: 'pointer', opacity: 1 }}
             >
-                <Github size={14} strokeWidth={2.5} />
-            </a>
+                <Sparkles size={16} />
+                <span>Upgrade to Pro</span>
+            </button>
 
             <button className={styles.helpBtn} onClick={() => setShowHelp(true)} title="Show Help Guide">?</button>
 
             {showHelp && (
                 <React.Suspense fallback={null}>
                     <HelpModal onClose={() => setShowHelp(false)} />
+                </React.Suspense>
+            )}
+
+            {showPro && (
+                <React.Suspense fallback={null}>
+                    <ProUpgradeDialog onClose={() => setShowPro(false)} />
                 </React.Suspense>
             )}
 

@@ -4,6 +4,7 @@ import { PPI } from '../../constants';
 import ImageProperties from './ImageProperties';
 import ValidatedNumberInput from '../Common/ValidatedNumberInput';
 import RangeSlider from '../Common/RangeSlider';
+import ProBadge from '../Common/ProBadge';
 import {
     AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd,
     AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd,
@@ -420,7 +421,10 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                         </div>
 
                         <div className={styles.propGroup}>
-                            <label>Shape</label>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                <label style={{ marginBottom: 0 }}>Shape</label>
+                                <ProBadge />
+                            </div>
                             <div className={styles.row}>
                                 <select
                                     value={getValue('shape') || 'rect'}

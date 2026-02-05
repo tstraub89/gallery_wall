@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './HelpModal.module.css';
 import { useProject } from '../../hooks/useProject';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -34,7 +35,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
         }
     };
 
-    return (
+    const modalContent = (
         <div className={styles.overlay} onClick={onClose}>
             <div className={styles.modal} onClick={e => e.stopPropagation()}>
                 <header className={styles.header}>
@@ -192,14 +193,16 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                             </a>
                         </div>
                         <span style={{ fontSize: '10px', color: '#999', textAlign: 'right' }}>
-                            v{__APP_VERSION__} • {new Date(__BUILD_TIME__).toLocaleString()}
-                        </span>
-                    </div>
+                            v{__APP_VERSION__} beta
+                            <br />
+                            {new Date(__BUILD_TIME__).toLocaleString()}
+                        </span>                    </div>
                 </footer>
             </div>
         </div>
     );
+
+    return createPortal(modalContent, document.body);
 };
 
 export default HelpModal;
-

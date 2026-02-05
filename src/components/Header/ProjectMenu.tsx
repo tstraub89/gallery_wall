@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useProject } from '../../hooks/useProject';
 import styles from './ProjectMenu.module.css';
 import ConfirmDialog from '../Common/ConfirmDialog';
+import ProBadge from '../Common/ProBadge';
 import { PanelLeftOpen, PanelLeftClose } from 'lucide-react';
 import { useLayout } from '../../hooks/useLayout';
 
@@ -95,8 +96,10 @@ const ProjectMenu = () => {
                             <button
                                 className={styles.createBtn}
                                 onClick={() => setIsCreating(true)}
+                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                             >
-                                + New Project
+                                <span>+ New Project</span>
+                                <ProBadge />
                             </button>
                         )}
                     </div>

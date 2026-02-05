@@ -3,7 +3,7 @@ import styles from './DropdownMenu.module.css';
 import { ChevronDown } from 'lucide-react';
 
 export interface DropdownItem {
-    label?: string;
+    label?: ReactNode;
     onClick?: (e?: React.MouseEvent) => void;
     icon?: ReactNode;
     separator?: boolean;

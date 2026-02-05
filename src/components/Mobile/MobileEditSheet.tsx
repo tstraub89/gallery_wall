@@ -3,6 +3,7 @@ import { useProject } from '../../hooks/useProject';
 import styles from './MobileLibrarySheet.module.css';
 import { RotateCw, ImageMinus, Palette, Square, Image, Frame as FrameIcon, Trash2 } from 'lucide-react';
 import { useSwipeDismiss } from '../../hooks/useSwipeDismiss';
+import ProBadge from '../Common/ProBadge';
 
 interface MobileEditSheetProps {
     isOpen: boolean;
@@ -215,7 +216,10 @@ const MobileEditSheet: React.FC<MobileEditSheetProps> = ({ isOpen, onClose }) =>
 
                             {/* Wall Type */}
                             <div className={styles.editRow}>
-                                <label>Wall Type</label>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <label style={{ minWidth: 'auto' }}>Wall Type</label>
+                                    <ProBadge />
+                                </div>
                                 <select
                                     value={currentProject.wallConfig.type}
                                     onChange={(e) => updateProject(currentProject.id, { wallConfig: { ...currentProject.wallConfig, type: e.target.value as any } })}

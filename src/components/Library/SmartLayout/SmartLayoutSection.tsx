@@ -8,6 +8,7 @@ import { Frame } from '../../../types';
 import { PPI } from '../../../constants';
 import ValidatedNumberInput from '../../Common/ValidatedNumberInput';
 import RangeSlider from '../../Common/RangeSlider';
+import ProBadge from '../../Common/ProBadge';
 
 interface SmartLayoutSectionProps {
     maxSolutions?: number;
@@ -412,6 +413,7 @@ const SmartLayoutSection: React.FC<SmartLayoutSectionProps> = ({ maxSolutions = 
                 <div className={styles.resultsGrid}>
                     {solutions.slice(0, maxSolutions).map((sol, idx) => (
                         <div key={sol.id} className={styles.resultCard} onClick={() => applySolution(sol)}>
+                            <ProBadge isOverlay />
                             <div className={styles.preview}>
                                 {/* Mini Canvas Preview */}
                                 {(() => {

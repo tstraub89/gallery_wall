@@ -1,6 +1,7 @@
 import React from 'react';
 import { ProjectProvider } from './context/ProjectContext';
 import { LayoutProvider } from './context/LayoutContext';
+import { ProProvider } from './context/ProContext';
 import { AppLayout, Header, LeftSidebar, MainCanvas, RightSidebar } from './components/Layout/AppLayout';
 import FrameLibrary from './components/Library/FrameLibrary';
 import CanvasWorkspace from './components/Canvas/CanvasWorkspace';
@@ -82,7 +83,9 @@ const App: React.FC = () => {
   return (
     <ProjectProvider>
       <LayoutProvider>
-        <AppContent />
+        <ProProvider>
+          <AppContent />
+        </ProProvider>
       </LayoutProvider>
     </ProjectProvider>
   );

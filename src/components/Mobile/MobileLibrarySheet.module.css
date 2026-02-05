@@ -235,6 +235,17 @@
     min-width: 80px;
 }
 
+.proBadge {
+    font-size: 8px;
+    font-weight: 800;
+    color: white;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    padding: 1px 3px;
+    border-radius: 3px;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
 .sliderRow {
     flex: 1;
     display: flex;

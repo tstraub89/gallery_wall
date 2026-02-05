@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './PropertiesPanel.module.css';
 import ValidatedNumberInput from '../Common/ValidatedNumberInput';
+import ProBadge from '../Common/ProBadge';
 import { Project, WallConfig } from '../../types';
 import { ProjectContextType } from '../../context/ProjectContextCore';
 
@@ -45,7 +46,10 @@ const WallProperties: React.FC<WallPropertiesProps> = ({ currentProject, updateP
                     </div>
                 </div>
                 <div className={styles.propGroup}>
-                    <label>Wall Type</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                        <label style={{ marginBottom: 0 }}>Wall Type</label>
+                        <ProBadge />
+                    </div>
                     <select value={wall.type} onChange={(e) => handleWallChange('type', e.target.value)}>
                         <option value="flat">Flat Wall</option>
                         <option value="staircase-asc">Staircase (Ascending)</option>

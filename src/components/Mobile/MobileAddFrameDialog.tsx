@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styles from './MobileAddFrameDialog.module.css';
 import ValidatedNumberInput from '../Common/ValidatedNumberInput';
+import ProBadge from '../Common/ProBadge';
 
 interface MobileAddFrameDialogProps {
     onClose: () => void;
@@ -65,7 +66,10 @@ const MobileAddFrameDialog: React.FC<MobileAddFrameDialogProps> = ({ onClose, on
                             />
                         </div>
                         <div className={styles.field} style={{ flex: 1 }}>
-                            <label>Shape</label>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
+                                <label style={{ margin: 0 }}>Shape</label>
+                                <ProBadge />
+                            </div>
                             <select
                                 className={styles.shapeSelect}
                                 value={shape}

@@ -1,20 +1,24 @@
 import React, { ReactNode, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import styles from './MobileLayout.module.css';
-import { Undo2, Redo2, Share2, ChevronDown, CircleHelp, Grid, SlidersHorizontal, Menu, Save, FolderOpen, Eraser, Printer } from 'lucide-react';
+import { Undo2, Redo2, Share2, ChevronDown, CircleHelp, Grid, SlidersHorizontal, Menu, Save, FolderOpen, Eraser, Printer, Sparkles } from 'lucide-react';
 import Logo from '../Header/Logo';
 import { useProject } from '../../hooks/useProject';
 import { useExport } from '../../hooks/useExport';
 import { usePDFExport } from '../../hooks/usePDFExport';
 import ProjectSwitcher from '../Mobile/ProjectSwitcher';
 import ConfirmDialog from '../Common/ConfirmDialog';
+import ProBadge from '../Common/ProBadge';
 // import HelpModal from '../Common/HelpModal';
 const HelpModal = React.lazy(() => import('../Common/HelpModal'));
+const ProUpgradeDialog = React.lazy(() => import('../Common/ProUpgradeDialog'));
 import MobileLibrarySheet from '../Mobile/MobileLibrarySheet';
 import MobileEditSheet from '../Mobile/MobileEditSheet';
 import { importProjectBundle } from '../../utils/exportUtils';
 import { saveImage } from '../../utils/imageStore';
 import { v4 as uuidv4 } from 'uuid';
 import { ViewportProvider } from '../../context/ViewportContext';
+import { useProModal } from '../../context/ProContext';
 
 interface MobileLayoutProps {
     children: ReactNode;
@@ -28,6 +32,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
     const { currentProject, updateProject, addProject, projects, switchProject, currentProjectId } = useProject();
     const { shareProjectImage, exportToGwall, isExporting: isBusy } = useExport();
     const { exportToPDFGuide, isExporting: isPDFBusy, pdfReadyUrl, triggerPdfShare, clearPdfReady } = usePDFExport();
+    const { isPro, isBeta } = useProModal();
 
     const isExporting = isBusy || isPDFBusy;
 
@@ -39,6 +44,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
     // Dialog States
     const [showClearConfirm, setShowClearConfirm] = useState(false);
     const [showHelp, setShowHelp] = useState(false);
+    const [showPro, setShowPro] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // --- Menu Actions --- //
@@ -254,6 +260,33 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                     <div className={styles.menuOverlay} onClick={() => setShowMenu(false)}>
                         <div className={styles.menuSheet} onClick={e => e.stopPropagation()}>
 
+                            <div className={styles.menuSectionLabel}>Account / Plan</div>
+                            <div className={styles.statusItem}>
+                                <div className={styles.statusInfo}>
+                                    <span className={styles.statusLabel}>Current Plan:</span>
+                                    <span className={isPro ? styles.statusPro : styles.statusFree}>
+                                        {isBeta ? 'Early Beta' : (isPro ? 'Pro' : 'Free')}
+                                    </span>
+                                </div>
+                                {isPro && <Sparkles size={16} style={{ color: '#a855f7' }} />}
+                            </div>
+
+                            {!isPro && (
+                                <div 
+                                    className={styles.proSection} 
+                                    title="During beta, Pro features are unlocked for free."
+                                    onClick={() => { setShowMenu(false); setShowPro(true); }}
+                                    style={{ cursor: 'pointer', opacity: 1 }}
+                                >
+                                    <div className={styles.proBadge}>
+                                        <Sparkles size={16} />
+                                        <span>Upgrade to Pro</span>
+                                    </div>
+                                    <div className={styles.proLabel}>
+                                        {isBeta ? 'All Pro features are free during beta!' : 'Unlock premium features'}
+                                    </div>
+                                </div>
+                            )}
 
                             <div className={styles.menuSectionLabel}>Export</div>
                             <div className={styles.menuItem} onClick={() => { setShowMenu(false); shareProjectImage(); }}>
@@ -261,18 +294,27 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                                 Share Snapshot
                             </div>
                             <div className={styles.menuItem} onClick={handleSaveProject}>
-                                <Save size={16} style={{ marginRight: 8 }} />
-                                Save Project File (.gwall)
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' }}>
+                                    <Save size={16} style={{ marginRight: 8 }} />
+                                    <span>Save Project File (.gwall)</span>
+                                    <ProBadge isOverlay style={{ position: 'absolute', right: 0 }} />
+                                </div>
                             </div>
                             <div className={styles.menuItem} onClick={() => { setShowMenu(false); exportToPDFGuide(); }}>
-                                <Printer size={16} style={{ marginRight: 8 }} />
-                                Export Hanging Guide (PDF)
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' }}>
+                                    <Printer size={16} style={{ marginRight: 8 }} />
+                                    <span>Export Hanging Guide (PDF)</span>
+                                    <ProBadge isOverlay style={{ position: 'absolute', right: 0 }} />
+                                </div>
                             </div>
 
                             <div className={styles.menuSectionLabel}>System</div>
                             <div className={styles.menuItem} onClick={handleImportClick}>
-                                <FolderOpen size={16} style={{ marginRight: 8 }} />
-                                Import Project (.gwall)
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' }}>
+                                    <FolderOpen size={16} style={{ marginRight: 8 }} />
+                                    <span>Import Project (.gwall)</span>
+                                    <ProBadge isOverlay style={{ position: 'absolute', right: 0 }} />
+                                </div>
                             </div>
                             <div className={styles.menuItem} onClick={() => { setShowMenu(false); setShowHelp(true); }}>
                                 <CircleHelp size={16} style={{ marginRight: 8 }} />
@@ -305,14 +347,21 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                     </React.Suspense>
                 )}
 
-                {isExporting && (
+                {showPro && (
+                    <React.Suspense fallback={null}>
+                        <ProUpgradeDialog onClose={() => setShowPro(false)} />
+                    </React.Suspense>
+                )}
+
+                {isExporting && createPortal(
                     <div className={styles.loadingOverlay}>
                         <div className={styles.spinner}></div>
                         <p>{isPDFBusy ? 'Preparing Hanging Guide...' : 'Preparing...'}</p>
-                    </div>
+                    </div>,
+                    document.body
                 )}
 
-                {pdfReadyUrl && (
+                {pdfReadyUrl && createPortal(
                     <div className={styles.loadingOverlay}>
                         <div className={styles.readyCard}>
                             <h3>Guide Ready!</h3>
@@ -327,7 +376,8 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div>,
+                    document.body
                 )}
             </div>
         </ViewportProvider>

@@ -1,9 +1,22 @@
 import React from 'react';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { useProModal } from '../../context/ProContext';
 import styles from './Logo.module.css';
 
 const Logo: React.FC = () => {
+    const isMobile = useIsMobile();
+    const { isPro, isBeta, openProModal } = useProModal();
+
+    const getStatusInfo = () => {
+        if (isBeta) return { label: 'BETA', className: styles.beta };
+        if (isPro) return { label: 'PRO', className: styles.pro };
+        return { label: 'FREE', className: styles.free };
+    };
+
+    const status = getStatusInfo();
+
     return (
-        <div className={styles.logo}>
+        <div className={styles.logo} title="Early beta - core features are free while I build this out">
             <div className={styles.icon}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -14,6 +27,18 @@ const Logo: React.FC = () => {
             <div className={styles.text}>
                 <span className={styles.bold}>Gallery</span>
                 <span className={styles.light}>Planner</span>
+                {!isMobile && (
+                    <span 
+                        className={status.className} 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            openProModal();
+                        }}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        {status.label}
+                    </span>
+                )}
             </div>
         </div>
     );

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { ImagePlus, Sparkles } from 'lucide-react';
 import styles from './WelcomeModal.module.css';
 
@@ -23,7 +24,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onLoadDemo, onStartFresh })
         }
     };
 
-    return (
+    return createPortal(
         <div className={styles.overlay}>
             <div className={styles.modal}>
                 <div className={styles.icon}>🖼️</div>
@@ -50,7 +51,8 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onLoadDemo, onStartFresh })
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

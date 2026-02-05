@@ -6,6 +6,7 @@ import FrameList from './FrameList';
 import PhotoLibrary from './PhotoLibrary';
 import SmartLayoutSection from './SmartLayout/SmartLayoutSection';
 import { SmartLayoutProvider } from './SmartLayout/SmartLayoutContext';
+import ProBadge from '../Common/ProBadge';
 import pkg from '../../../package.json';
 import styles from './FrameLibrary.module.css';
 
@@ -43,7 +44,10 @@ const FrameLibrary: React.FC = () => {
                                 onClick={() => setImportOpen(!isImportOpen)}
                                 style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', paddingRight: '12px' }}
                             >
-                                <span>Import File</span>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span>Import File</span>
+                                    <ProBadge />
+                                </div>
                                 <span>{isImportOpen ? '▼' : '▶'}</span>
                             </div>
                             {isImportOpen && <ImportFile />}
@@ -93,8 +97,9 @@ const FrameLibrary: React.FC = () => {
                 </div>
 
                 <div className={styles.footer}>
-                    <span>Gallery Planner v{pkg.version}</span>
-                    <span style={{ marginTop: '2px', fontSize: '9px', opacity: 0.5 }}>© 2026 Timothy Straub</span>
+                    <span>Gallery Planner v{pkg.version} beta</span>
+                    <span style={{ fontSize: '10px', marginTop: '4px', color: 'var(--text-secondary)' }}>Core features are free during beta</span>
+                    <span style={{ marginTop: '6px', fontSize: '9px', opacity: 0.5 }}>© 2026 Timothy Straub</span>
                 </div>
             </div>
         </SmartLayoutProvider>

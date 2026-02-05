@@ -2,6 +2,7 @@ import React, { useState, FormEvent } from 'react';
 import { useProject } from '../../hooks/useProject';
 import styles from './ManualEntryForm.module.css';
 import ValidatedNumberInput from '../Common/ValidatedNumberInput';
+import ProBadge from '../Common/ProBadge';
 
 const ManualEntryForm: React.FC = () => {
     const { currentProject, addToLibrary } = useProject();
@@ -84,7 +85,10 @@ const ManualEntryForm: React.FC = () => {
                     />
                 </div>
                 <div className={styles.field} style={{ flex: 2 }}>
-                    <label>Shape</label>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <label style={{ margin: 0 }}>Shape</label>
+                        <ProBadge />
+                    </div>
                     <select value={shape} onChange={e => setShape(e.target.value as 'rect' | 'round')} className={styles.select}>
                         <option value="rect">Rectangle</option>
                         <option value="round">Round / Oval</option>

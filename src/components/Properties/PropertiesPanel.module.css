@@ -77,6 +77,17 @@
     font-weight: 500;
 }
 
+.proBadge {
+    font-size: 9px;
+    font-weight: 800;
+    color: white;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    padding: 2px 4px;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+    line-height: 1;
+}
+
 .propGroup input:not([type="range"]),
 .propGroup select {
     padding: var(--spacing-xs) var(--spacing-sm);

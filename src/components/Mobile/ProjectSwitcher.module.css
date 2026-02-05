@@ -125,9 +125,18 @@
     font-size: 1rem;
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    justify-content: space-between;
     cursor: pointer;
+}
+
+.proBadge {
+    font-size: 10px;
+    font-weight: 800;
+    color: white;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    padding: 3px 6px;
+    border-radius: 4px;
+    line-height: 1;
 }
 
 .newBtn:active {

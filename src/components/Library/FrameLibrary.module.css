@@ -61,6 +61,18 @@
     letter-spacing: 0.5px;
 }
 
+.proBadge {
+    font-size: 9px;
+    font-weight: 800;
+    color: white;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    padding: 2px 4px;
+    border-radius: 4px;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: normal;
+}
+
 .footer {
     padding: var(--spacing-sm);
     text-align: center;

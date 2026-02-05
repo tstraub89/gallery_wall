@@ -6,6 +6,7 @@ import { usePDFExport } from '../../hooks/usePDFExport';
 import styles from './GlobalActions.module.css';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import DropdownMenu from '../Common/DropdownMenu';
+import ProBadge from '../Common/ProBadge';
 import { importProjectBundle } from '../../utils/exportUtils';
 import { saveImage } from '../../utils/imageStore';
 import { v4 as uuidv4 } from 'uuid';
@@ -117,8 +118,26 @@ const GlobalActions = () => {
                 label="Project"
                 icon={<FolderOpen size={16} />}
                 items={[
-                    { label: 'Import Project (.gwall)', onClick: triggerImport, title: 'Load a saved project including all photos' },
-                    { label: 'Export Project (.gwall)', onClick: exportToGwall, title: 'Save project with all photos for backup or sharing' },
+                    { 
+                        label: (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
+                                <span>Import Project (.gwall)</span>
+                                <ProBadge />
+                            </div>
+                        ), 
+                        onClick: triggerImport, 
+                        title: 'Load a saved project including all photos' 
+                    },
+                    { 
+                        label: (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
+                                <span>Export Project (.gwall)</span>
+                                <span style={{ fontSize: '9px', fontWeight: 800, color: 'white', background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', padding: '2px 4px', borderRadius: '4px', lineHeight: 1 }}>PRO</span>
+                            </div>
+                        ), 
+                        onClick: exportToGwall, 
+                        title: 'Save project with all photos for backup or sharing' 
+                    },
                     { separator: true },
                     { label: 'Reset / Clear Canvas', onClick: handleClearCanvas, danger: true, title: 'Remove all frames from canvas' }
                 ]}
@@ -138,8 +157,36 @@ const GlobalActions = () => {
                 icon={<Download size={16} />}
                 items={[
                     { label: 'Snapshot (JPEG)', onClick: () => exportToPng(), title: 'Save a high-res snapshot of your wall layout' },
-                    { label: 'Hanging Guide (PDF)', onClick: exportToPDFGuide, title: 'Download a printable guide with measurements and hang heights' },
-                    { label: 'Cropped Photos (.zip)', onClick: exportPhotosCrops, title: 'High-res cropped photos ready for printing' }
+                    { 
+                        label: (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
+                                <span>Hanging Guide (PDF)</span>
+                                <ProBadge />
+                            </div>
+                        ), 
+                        onClick: exportToPDFGuide, 
+                        title: 'Download a printable guide with measurements and hang heights' 
+                    },
+                    { 
+                        label: (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
+                                <span>Export Project (.gwall)</span>
+                                <ProBadge />
+                            </div>
+                        ), 
+                        onClick: exportToGwall, 
+                        title: 'Save project with all photos for backup or sharing' 
+                    },
+                    { 
+                        label: (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
+                                <span>Cropped Photos (.zip)</span>
+                                <ProBadge />
+                            </div>
+                        ), 
+                        onClick: exportPhotosCrops, 
+                        title: 'High-res cropped photos ready for printing' 
+                    }
                 ]}
             />
 

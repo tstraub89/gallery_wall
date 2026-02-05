@@ -10,7 +10,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10000;
+    z-index: 1000000;
     animation: fadeIn 0.2s ease-out;
 }
 
@@ -97,6 +97,18 @@
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.05em;
+}
+
+.proBadge {
+    font-size: 8px;
+    font-weight: 800;
+    color: white;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    padding: 1px 3px;
+    border-radius: 3px;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: normal;
 }
 
 .inputWrapper {

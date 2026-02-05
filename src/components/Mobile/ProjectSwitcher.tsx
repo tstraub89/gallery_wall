@@ -3,6 +3,7 @@ import styles from './ProjectSwitcher.module.css';
 import { useProject } from '../../hooks/useProject';
 import { Plus, Trash2, Check, X } from 'lucide-react';
 import ConfirmDialog from '../Common/ConfirmDialog';
+import ProBadge from '../Common/ProBadge';
 
 interface ProjectSwitcherProps {
     onClose: () => void;
@@ -75,8 +76,11 @@ const ProjectSwitcher: React.FC<ProjectSwitcherProps> = ({ onClose }) => {
 
                 <div className={styles.footer}>
                     <button className={styles.newBtn} onClick={handleNew}>
-                        <Plus size={18} />
-                        New Project
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <Plus size={18} />
+                            <span>New Project</span>
+                        </div>
+                        <ProBadge />
                     </button>
                 </div>
             </div>
