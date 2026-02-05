@@ -4,6 +4,7 @@ import { saveProjectData, loadProjectData, cleanUpOrphanedImages, saveImage, cle
 import { ProjectContext, LibraryState } from './ProjectContextCore';
 import { Project, Frame, WallConfig, LibraryItem } from '../types';
 import { importProjectBundle } from '../utils/exportUtils';
+import { trackEvent, APP_EVENTS } from '../utils/analytics';
 
 interface ProjectData {
     projects: Record<string, Project>;
@@ -129,6 +130,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     }, [data, isLoaded]);
 
     const addProject = (name: string) => {
+        trackEvent(APP_EVENTS.SAVE_PROJECT); // Tracking project creation as a save event or similar
         const newProject = createNewProject(name);
         setData(prev => ({
             ...prev,
@@ -411,6 +413,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
 
     // Import demo project from bundled example.gwall
     const importDemoProject = async () => {
+        trackEvent(APP_EVENTS.LOAD_PROJECT);
         try {
             // Use import.meta.env.BASE_URL to respect vite's base config
             const baseUrl = import.meta.env.BASE_URL || '/';
@@ -468,6 +471,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
 
     // Start with a fresh empty project
     const startFresh = () => {
+        trackEvent(APP_EVENTS.SAVE_PROJECT);
         const fresh = createNewProject('Untitled Project');
         const freshData = {
             ...initialData,

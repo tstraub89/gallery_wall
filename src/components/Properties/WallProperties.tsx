@@ -4,6 +4,7 @@ import ValidatedNumberInput from '../Common/ValidatedNumberInput';
 import ProBadge from '../Common/ProBadge';
 import { Project, WallConfig } from '../../types';
 import { ProjectContextType } from '../../context/ProjectContextCore';
+import { trackEvent, PRO_EVENTS } from '../../utils/analytics';
 
 interface WallPropertiesProps {
     currentProject: Project;
@@ -13,6 +14,9 @@ interface WallPropertiesProps {
 const WallProperties: React.FC<WallPropertiesProps> = ({ currentProject, updateProject }) => {
     const wall = currentProject.wallConfig;
     const handleWallChange = <K extends keyof WallConfig>(field: K, value: WallConfig[K]) => {
+        if (field === 'type' && (value === 'staircase-asc' || value === 'staircase-desc')) {
+            trackEvent(PRO_EVENTS.STAIRCASE_MODE);
+        }
         updateProject(currentProject.id, { wallConfig: { ...wall, [field]: value } });
     };
 

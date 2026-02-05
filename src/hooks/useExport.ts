@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useProject } from './useProject';
 import { exportCanvasToBlob, generateProjectZip, exportProjectBundle, saveFile } from '../utils/exportUtils';
+import { trackEvent, PRO_EVENTS } from '../utils/analytics';
 
 export const useExport = () => {
     const { currentProject } = useProject();
@@ -15,6 +16,7 @@ export const useExport = () => {
     // Export as PNG (Download)
     const exportToPng = async (overrideName?: string) => {
         if (!currentProject) return;
+        trackEvent(PRO_EVENTS.PNG_EXPORT);
         setIsExporting(true);
         setExportError(null);
 
@@ -91,6 +93,7 @@ export const useExport = () => {
     // Export .gwall Project File
     const exportToGwall = async () => {
         if (!currentProject) return;
+        trackEvent(PRO_EVENTS.GWALL_EXPORT);
         setIsExporting(true);
         try {
             // Note: exportProjectBundle handles saveAs internally, we should probably verify it uses the name
@@ -110,6 +113,7 @@ export const useExport = () => {
     // Export Photos ZIP
     const exportPhotosCrops = async () => {
         if (!currentProject) return;
+        trackEvent(PRO_EVENTS.ZIP_EXPORT);
         setIsExporting(true);
         try {
             await generateProjectZip(currentProject);

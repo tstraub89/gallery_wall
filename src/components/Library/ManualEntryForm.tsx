@@ -3,6 +3,7 @@ import { useProject } from '../../hooks/useProject';
 import styles from './ManualEntryForm.module.css';
 import ValidatedNumberInput from '../Common/ValidatedNumberInput';
 import ProBadge from '../Common/ProBadge';
+import { trackEvent, APP_EVENTS } from '../../utils/analytics';
 
 const ManualEntryForm: React.FC = () => {
     const { currentProject, addToLibrary } = useProject();
@@ -19,6 +20,7 @@ const ManualEntryForm: React.FC = () => {
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
         if (!currentProject) return;
+        trackEvent(APP_EVENTS.ADD_FRAME);
 
         const frameDims = {
             width: width,

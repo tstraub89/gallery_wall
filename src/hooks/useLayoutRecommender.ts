@@ -1,6 +1,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { RecommenderInput, LayoutSolution, WorkerResponse, WorkerMessage } from '../recommender/types';
+import { trackEvent, PRO_EVENTS } from '../utils/analytics';
 
 export function useLayoutRecommender() {
     const [isGenerating, setIsGenerating] = useState(false);
@@ -34,6 +35,7 @@ export function useLayoutRecommender() {
     }, []);
 
     const generateLayouts = useCallback((input: RecommenderInput) => {
+        trackEvent(PRO_EVENTS.SMART_LAYOUT);
         setIsGenerating(true);
         setSolutions([]);
         setProgress(0);

@@ -8,6 +8,7 @@ import styles from './PhotoLibrary.module.css';
 import DeleteConfirmDialog from './DeleteConfirmDialog';
 import FilterBar from './FilterBar';
 import { Frame } from '../../types';
+import { trackEvent, APP_EVENTS } from '../../utils/analytics';
 
 const EMPTY_STRINGS: string[] = [];
 const EMPTY_FRAMES: Frame[] = [];
@@ -137,6 +138,7 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
         const files = Array.from(e.target.files || []);
         if (files.length === 0) return;
 
+        trackEvent(APP_EVENTS.IMPORT_IMAGE);
         if (!currentProject) return;
 
         setIsProcessing(true);
@@ -311,6 +313,7 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
         const files = Array.from(e.dataTransfer.files);
         if (files.length === 0) return;
 
+        trackEvent(APP_EVENTS.IMPORT_IMAGE);
         setIsProcessing(true);
         setProcessingProgress({ current: 0, total: files.length });
 

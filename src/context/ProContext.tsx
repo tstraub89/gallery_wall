@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { trackEvent, PRO_EVENTS } from '../utils/analytics';
 // import ProUpgradeDialog from '../components/Common/ProUpgradeDialog'; 
 const ProUpgradeDialog = React.lazy(() => import('../components/Common/ProUpgradeDialog'));
 
@@ -19,7 +20,10 @@ export const ProProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const isPro = false; 
     const isBeta = true;
 
-    const openProModal = () => setShowUpgradeModal(true);
+    const openProModal = () => {
+        trackEvent(PRO_EVENTS.OPEN_PRO_MODAL);
+        setShowUpgradeModal(true);
+    };
     const closeProModal = () => setShowUpgradeModal(false);
 
     return (

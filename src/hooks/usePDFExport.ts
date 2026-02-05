@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useProject } from './useProject';
 import { exportCanvasToBlob, saveFile } from '../utils/exportUtils';
 import { PPI } from '../constants';
+import { trackEvent, PRO_EVENTS } from '../utils/analytics';
 import type { Frame } from '../types';
 import type { jsPDF } from 'jspdf';
 
@@ -31,6 +32,7 @@ export const usePDFExport = () => {
 
     const exportToPDFGuide = async () => {
         if (!currentProject) return;
+        trackEvent(PRO_EVENTS.PDF_EXPORT);
         setIsExporting(true);
         setExportError(null);
         clearPdfReady();

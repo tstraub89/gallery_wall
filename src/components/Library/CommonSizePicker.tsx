@@ -2,6 +2,7 @@ import React from 'react';
 import { COMMON_SIZES } from '../../constants/commonFrames';
 import { useProject } from '../../hooks/useProject';
 import { v4 as uuidv4 } from 'uuid';
+import { trackEvent, APP_EVENTS } from '../../utils/analytics';
 import styles from './CommonSizePicker.module.css';
 
 const CommonSizePicker: React.FC = () => {
@@ -9,6 +10,7 @@ const CommonSizePicker: React.FC = () => {
 
     const handleAddSize = (width: number, height: number, label: string) => {
         if (!currentProjectId) return;
+        trackEvent(APP_EVENTS.ADD_FRAME);
 
         const frame = {
             id: uuidv4(),
