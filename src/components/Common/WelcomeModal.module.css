@@ -28,6 +28,13 @@
     justify-content: center;
     margin-bottom: 24px;
     transform: scale(1.5);
+    background: white;
+    width: max-content;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 8px 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .title {

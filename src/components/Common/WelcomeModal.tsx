@@ -31,7 +31,7 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onLoadDemo, onStartFresh })
                 <div className={styles.logoContainer}>
                     <Logo hideStatus />
                 </div>
-                <h1 className={styles.title}>Welcome to GalleryPlanner</h1>
+                <h1 className={styles.title}>Welcome</h1>
                 <p className={styles.subtitle}>
                     Design your perfect gallery wall arrangement before you start hammering nails.
                 </p>
