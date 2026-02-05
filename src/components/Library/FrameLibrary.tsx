@@ -71,7 +71,10 @@ const FrameLibrary: React.FC = () => {
                         className={`${styles.sectionHeader} ${openSection === 'smart' ? styles.active : ''}`}
                         onClick={() => setOpenSection(openSection === 'smart' ? null : 'smart')}
                     >
-                        <h3>✨ Smart Layout</h3>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <h3>✨ Smart Layout</h3>
+                            <ProBadge />
+                        </div>
                         <span>{openSection === 'smart' ? '▼' : '▶'}</span>
                     </div>
                     {openSection === 'smart' && (
