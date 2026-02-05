@@ -17,14 +17,17 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
     padding: 48px;
+    width: 90%;
     max-width: 500px;
     text-align: center;
     box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
 }
 
-.icon {
-    font-size: 48px;
-    margin-bottom: 16px;
+.logoContainer {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+    transform: scale(1.5);
 }
 
 .title {
@@ -39,6 +42,31 @@
     color: rgba(255, 255, 255, 0.6);
     margin: 0 0 32px 0;
     line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+    .modal {
+        padding: 32px 24px;
+    }
+
+    .logoContainer {
+        transform: scale(1.2);
+        margin-bottom: 16px;
+    }
+
+    .title {
+        font-size: 22px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+        margin-bottom: 24px;
+    }
+
+    .primaryBtn, .secondaryBtn {
+        padding: 14px 20px;
+        font-size: 15px;
+    }
 }
 
 .actions {

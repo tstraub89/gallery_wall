@@ -3,7 +3,11 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 import { useProModal } from '../../context/ProContext';
 import styles from './Logo.module.css';
 
-const Logo: React.FC = () => {
+interface LogoProps {
+    hideStatus?: boolean;
+}
+
+const Logo: React.FC<LogoProps> = ({ hideStatus = false }) => {
     const isMobile = useIsMobile();
     const { isPro, isBeta, openProModal } = useProModal();
 
@@ -27,7 +31,7 @@ const Logo: React.FC = () => {
             <div className={styles.text}>
                 <span className={styles.bold}>Gallery</span>
                 <span className={styles.light}>Planner</span>
-                {!isMobile && (
+                {!isMobile && !hideStatus && (
                     <span 
                         className={status.className} 
                         onClick={(e) => {

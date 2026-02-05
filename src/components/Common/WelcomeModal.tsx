@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ImagePlus, Sparkles } from 'lucide-react';
+import Logo from '../Header/Logo';
 import styles from './WelcomeModal.module.css';
 
 interface WelcomeModalProps {
@@ -27,7 +28,9 @@ const WelcomeModal: React.FC<WelcomeModalProps> = ({ onLoadDemo, onStartFresh })
     return createPortal(
         <div className={styles.overlay}>
             <div className={styles.modal}>
-                <div className={styles.icon}>🖼️</div>
+                <div className={styles.logoContainer}>
+                    <Logo hideStatus />
+                </div>
                 <h1 className={styles.title}>Welcome to GalleryPlanner</h1>
                 <p className={styles.subtitle}>
                     Design your perfect gallery wall arrangement before you start hammering nails.
