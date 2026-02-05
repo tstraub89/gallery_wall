@@ -2,7 +2,7 @@
 
 **Visualize your perfect gallery wall before you hang a single nail.**
 
-![GalleryPlanner Preview](./example.jpg)
+![GalleryPlanner Preview](./public/example.jpg)
 
 > [!IMPORTANT]
 > **GalleryPlanner is currently in Early Beta.** During this period, all **PRO features** (AI Auto-Layout, PDF Guides, Project Exports, etc.) are **completely free** to use while I refine the experience.
