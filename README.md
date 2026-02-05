@@ -2,12 +2,19 @@
 
 **Visualize your perfect gallery wall before you hang a single nail.**
 
-![GalleryPlanner Preview](./public/example.jpg)
+![GalleryPlanner Workspace](./public/gallery-planner.png)
 
 > [!IMPORTANT]
 > **GalleryPlanner is currently in Early Beta.** During this period, all **PRO features** (AI Auto-Layout, PDF Guides, Project Exports, etc.) are **completely free** to use while I refine the experience.
 
 A powerful, interactive web application designed to help you plan complex gallery layouts with real frames and personal photos. Transition from a pile of frames on the floor to a perfectly aligned wall with confidence.
+
+---
+
+### Create designs, then export snapshots:
+![Export Example](./public/example.jpg)
+
+---
 
 <a href="https://www.buymeacoffee.com/tstraub89" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" height="60" width="217"></a>
 
