@@ -264,11 +264,11 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                             <div className={styles.statusItem}>
                                 <div className={styles.statusInfo}>
                                     <span className={styles.statusLabel}>Current Plan:</span>
-                                    <span className={isPro ? styles.statusPro : styles.statusFree}>
+                                    <span className={(isPro || isBeta) ? styles.statusPro : styles.statusFree}>
                                         {isBeta ? 'Early Beta' : (isPro ? 'Pro' : 'Free')}
                                     </span>
                                 </div>
-                                {isPro && <Sparkles size={16} style={{ color: '#a855f7' }} />}
+                                {(isPro || isBeta) && <Sparkles size={16} style={{ color: '#a855f7' }} />}
                             </div>
 
                             {!isPro && (

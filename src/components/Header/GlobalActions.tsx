@@ -132,7 +132,7 @@ const GlobalActions = () => {
                         label: (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
                                 <span>Export Project (.gwall)</span>
-                                <span style={{ fontSize: '9px', fontWeight: 800, color: 'white', background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', padding: '2px 4px', borderRadius: '4px', lineHeight: 1 }}>PRO</span>
+                                <ProBadge />
                             </div>
                         ), 
                         onClick: exportToGwall, 

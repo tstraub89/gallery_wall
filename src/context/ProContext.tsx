@@ -11,6 +11,7 @@ interface ProContextType {
     closeProModal: () => void;
     isPro: boolean;
     isBeta: boolean;
+    featuresUnlocked: boolean;
     userProfile: UserProfile | null;
     upgradeToPro: () => Promise<void>;
 }
@@ -46,10 +47,9 @@ export const ProProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }, []);
 
     // In the future, these would be dynamic
-    // During beta, we might want isPro to be true for everyone, 
-    // but the underlying profile tracks if they "paid" or "joined".
     const isBeta = true;
-    const isPro = isBeta || (userProfile?.isPro ?? false);
+    const isPro = userProfile?.isPro ?? false;
+    const featuresUnlocked = isBeta || isPro;
 
     const openProModal = () => {
         trackEvent(PRO_EVENTS.OPEN_PRO_MODAL);
@@ -83,6 +83,7 @@ export const ProProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             closeProModal, 
             isPro, 
             isBeta, 
+            featuresUnlocked,
             userProfile,
             upgradeToPro
         }}>
