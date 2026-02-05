@@ -1,6 +1,8 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { trackEvent, PRO_EVENTS } from '../utils/analytics';
-// import ProUpgradeDialog from '../components/Common/ProUpgradeDialog'; 
+import { UserProfile } from '../types';
+import { v4 as uuidv4 } from 'uuid';
+
 const ProUpgradeDialog = React.lazy(() => import('../components/Common/ProUpgradeDialog'));
 
 interface ProContextType {
@@ -9,25 +11,81 @@ interface ProContextType {
     closeProModal: () => void;
     isPro: boolean;
     isBeta: boolean;
+    userProfile: UserProfile | null;
+    upgradeToPro: () => Promise<void>;
 }
+
+const STORAGE_KEY = 'gallery_planner_user_profile';
 
 const ProContext = createContext<ProContextType | undefined>(undefined);
 
 export const ProProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+    const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
     
+    // Load profile from storage on mount
+    useEffect(() => {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try {
+                setUserProfile(JSON.parse(stored));
+            } catch (e) {
+                console.error("Failed to parse user profile", e);
+            }
+        } else {
+            // Initialize anonymous profile
+            const newProfile: UserProfile = {
+                id: uuidv4(),
+                isPro: false,
+                isBetaContributor: true, // Everyone in beta gets this flag
+                subscriptionStatus: 'none',
+            };
+            setUserProfile(newProfile);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(newProfile));
+        }
+    }, []);
+
     // In the future, these would be dynamic
-    const isPro = false; 
+    // During beta, we might want isPro to be true for everyone, 
+    // but the underlying profile tracks if they "paid" or "joined".
     const isBeta = true;
+    const isPro = isBeta || (userProfile?.isPro ?? false);
 
     const openProModal = () => {
         trackEvent(PRO_EVENTS.OPEN_PRO_MODAL);
         setShowUpgradeModal(true);
     };
+    
     const closeProModal = () => setShowUpgradeModal(false);
 
+    const upgradeToPro = async () => {
+        // This is where the payment gateway (Stripe etc) integration would happen
+        console.log("Upgrading to Pro...");
+        
+        // Mocking successful upgrade
+        if (userProfile) {
+            const updatedProfile: UserProfile = {
+                ...userProfile,
+                isPro: true,
+                subscriptionStatus: 'active',
+                purchaseDate: Date.now()
+            };
+            setUserProfile(updatedProfile);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedProfile));
+            trackEvent('pro_upgrade_success');
+        }
+    };
+
     return (
-        <ProContext.Provider value={{ showUpgradeModal, openProModal, closeProModal, isPro, isBeta }}>
+        <ProContext.Provider value={{ 
+            showUpgradeModal, 
+            openProModal, 
+            closeProModal, 
+            isPro, 
+            isBeta, 
+            userProfile,
+            upgradeToPro
+        }}>
             {children}
             {showUpgradeModal && (
                 <React.Suspense fallback={null}>

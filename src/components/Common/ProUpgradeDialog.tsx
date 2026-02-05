@@ -2,12 +2,16 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import styles from './ProUpgradeDialog.module.css';
 import { Sparkles, Check, X } from 'lucide-react';
+import { useProModal } from '../../context/ProContext';
 
 interface ProUpgradeDialogProps {
     onClose: () => void;
 }
 
 const ProUpgradeDialog: React.FC<ProUpgradeDialogProps> = ({ onClose }) => {
+    const { upgradeToPro, userProfile } = useProModal();
+    const isAlreadyPro = userProfile?.isPro;
+
     const features = [
         "Smart Layout AI - Auto-arrange your gallery",
         "Save & Load Projects - Backup your walls to files",
@@ -16,6 +20,11 @@ const ProUpgradeDialog: React.FC<ProUpgradeDialogProps> = ({ onClose }) => {
         "Unlimited Custom Frames & Sizes",
         "Priority Support & Early Access"
     ];
+
+    const handleUpgrade = async () => {
+        await upgradeToPro();
+        onClose();
+    };
 
     const content = (
         <div className={styles.overlay} onClick={onClose}>
@@ -46,18 +55,22 @@ const ProUpgradeDialog: React.FC<ProUpgradeDialogProps> = ({ onClose }) => {
                         ))}
                     </div>
 
-                    <button className={styles.proButton} disabled>
-                        Unlock Pro – $3.99
+                    <button 
+                        className={styles.proButton} 
+                        onClick={handleUpgrade}
+                        disabled={isAlreadyPro}
+                    >
+                        {isAlreadyPro ? 'Pro Unlocked' : 'Claim Free Beta Access – $0.00'}
                     </button>
 
                     <div className={styles.betaNote}>
-                        During beta, all Pro features are unlocked for free!
+                        Early beta users get free lifetime access to core Pro features!
                     </div>
                 </div>
 
                 <footer className={styles.footer}>
                     <button className={styles.secondaryBtn} onClick={onClose}>
-                        Maybe Later
+                        {isAlreadyPro ? 'Close' : 'Maybe Later'}
                     </button>
                 </footer>
             </div>

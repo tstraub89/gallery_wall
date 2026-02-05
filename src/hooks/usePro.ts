@@ -1,18 +1,15 @@
-import { useState } from 'react';
+import { useProModal } from '../context/ProContext';
 
 /**
  * Hook to manage Pro feature status.
- * During Beta, all features are unlocked by default.
  */
 export const usePro = () => {
-    // In a real app, this would check a user profile or license key
-    const [isProUser] = useState(true); 
-    const isBeta = true;
+    const { isPro, isBeta, userProfile } = useProModal();
 
     return {
-        // Everyone is "Pro" during Beta
-        isPro: isBeta || isProUser,
+        isPro,
         isBeta,
+        userProfile,
         // Helper to check if a feature SHOULD be restricted if not for Beta
         isPremiumFeature: (featureName: string) => {
             const premiumFeatures = [

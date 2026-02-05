@@ -56,3 +56,14 @@ export interface Project {
     updatedAt?: number;
     version?: number;
 }
+
+export interface UserProfile {
+    id: string;
+    email?: string;
+    isPro: boolean;
+    isBetaContributor: boolean;
+    subscriptionStatus: 'active' | 'inactive' | 'trial' | 'none';
+    purchaseDate?: number;
+    expiryDate?: number;
+    lastSyncedAt?: number;
+}
