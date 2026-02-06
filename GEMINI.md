@@ -23,8 +23,12 @@ It features a "Pro" tier (currently free in beta) that includes AI-assisted auto
 *   `npm run preview`: Preview the production build locally.
 *   `npm run lint`: Run ESLint checks.
 *   `npm run type-check`: Run TypeScript type checking.
+*   `npm run type-check`: Run TypeScript type checking.
 
-## Architecture
+## Versioning & Release Policy
+*   **Patch versions (x.x.Y)**: Bump ONLY for functionality changes to the main application (`/app`) or significant architectural updates to the website.
+*   **Minor Website Changes**: Tweaks to the landing page, footer, or copy should **NOT** trigger a version bump. Bundle these changes with the next app release or commit them without a tag.
+
 
 ### State Management
 The application uses React Context for global state management:
