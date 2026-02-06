@@ -44,3 +44,11 @@ export const APP_EVENTS = {
     SAVE_PROJECT: 'project_save_local',
     LOAD_PROJECT: 'project_load_local',
 };
+
+export const LANDING_EVENTS = {
+    HERO_CTA: 'landing_hero_cta_click',
+    NAV_LAUNCH: 'landing_nav_launch_click',
+    PRO_SECTION_CTA: 'landing_pro_cta_click',
+    VIEW_FEATURES: 'landing_view_features',
+    VIEW_PRO: 'landing_view_pro_section',
+};

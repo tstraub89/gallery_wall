@@ -1,10 +1,23 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './LandingPage.module.css';
 import Logo from '../Header/Logo';
 import { Sparkles, LayoutGrid, CheckCircle2, Image } from 'lucide-react';
+import { trackEvent, LANDING_EVENTS } from '../../utils/analytics';
+import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 
 const LandingPage: React.FC = () => {
+    const [featuresRef, featuresVisible] = useIntersectionObserver({ threshold: 0.2 });
+    const [proRef, proVisible] = useIntersectionObserver({ threshold: 0.2 });
+
+    useEffect(() => {
+        if (featuresVisible) trackEvent(LANDING_EVENTS.VIEW_FEATURES);
+    }, [featuresVisible]);
+
+    useEffect(() => {
+        if (proVisible) trackEvent(LANDING_EVENTS.VIEW_PRO);
+    }, [proVisible]);
+
     return (
         <div className={styles.container}>
             {/* Header */}
@@ -15,7 +28,13 @@ const LandingPage: React.FC = () => {
                 <nav className={styles.nav}>
                     <a href="#features">Features</a>
                     <a href="#pro">Pro</a>
-                    <Link to="/app" className={styles.ctaBtn}>Launch App</Link>
+                    <Link 
+                        to="/app" 
+                        className={styles.ctaBtn}
+                        onClick={() => trackEvent(LANDING_EVENTS.NAV_LAUNCH)}
+                    >
+                        Launch App
+                    </Link>
                 </nav>
             </header>
 
@@ -28,7 +47,13 @@ const LandingPage: React.FC = () => {
                     Get instant measurements and professional hanging guides.
                 </p>
                 <div className={styles.heroActions}>
-                    <Link to="/app" className={`${styles.ctaBtn} ${styles.mainCta}`}>Start Designing Free</Link>
+                    <Link 
+                        to="/app" 
+                        className={`${styles.ctaBtn} ${styles.mainCta}`}
+                        onClick={() => trackEvent(LANDING_EVENTS.HERO_CTA)}
+                    >
+                        Start Designing Free
+                    </Link>
                 </div>
                 <img
                     src="/gallery-planner.png"
@@ -38,7 +63,7 @@ const LandingPage: React.FC = () => {
             </section>
 
             {/* Features */}
-            <section className={styles.features} id="features">
+            <section className={styles.features} id="features" ref={featuresRef as any}>
                 <div className={styles.sectionHeader}>
                     <h2>Professional tools for your home.</h2>
                     <p>Stop guessing and start planning with precision.</p>
@@ -79,7 +104,7 @@ const LandingPage: React.FC = () => {
             </section>
 
             {/* Pro Section */}
-            <section className={styles.proSection} id="pro">
+            <section className={styles.proSection} id="pro" ref={proRef as any}>
                 <div className={styles.proCard}>
                     <h2>Unlock Pro features for free.</h2>
                     <p>We are currently in early beta. Claim free lifetime access to core premium features while we build out the platform.</p>
@@ -93,7 +118,13 @@ const LandingPage: React.FC = () => {
                         <div className={styles.checkItem}><CheckCircle2 className={styles.checkIcon} /> Custom Frame Shapes</div>
                     </div>
 
-                    <Link to="/app" className={`${styles.ctaBtn} ${styles.mainCta}`}>Get Started Now</Link>
+                    <Link 
+                        to="/app" 
+                        className={`${styles.ctaBtn} ${styles.mainCta}`}
+                        onClick={() => trackEvent(LANDING_EVENTS.PRO_SECTION_CTA)}
+                    >
+                        Get Started Now
+                    </Link>
                 </div>
             </section>
 
