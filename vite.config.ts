@@ -15,18 +15,7 @@ export default defineConfig(() => {
       __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
     },
     build: {
-      chunkSizeWarningLimit: 1000, // Increase slightly for the heavy PDF worker if needed
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-            'vendor-pdf': ['jspdf', 'jspdf-autotable', 'html2canvas'],
-            'vendor-ui': ['lucide-react', 'clsx', 'react-markdown'],
-            'vendor-utils': ['jszip', 'file-saver', 'uuid'],
-            'vendor-analytics': ['posthog-js', '@vercel/speed-insights']
-          }
-        }
-      }
+      chunkSizeWarningLimit: 1000,
     }
   };
 });
