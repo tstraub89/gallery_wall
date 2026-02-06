@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.3] - 2026-02-06
+
+### 🐛 Bug Fixes
+- **Project Menu**: The project dropdown now correctly closes when clicking outside of it.
+
 ## [0.2.2] - 2026-02-06
 
 ### 🛠️ Stability & Layout Fixes

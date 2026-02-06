@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useProject } from '../../hooks/useProject';
+import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import styles from './ProjectMenu.module.css';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import ProBadge from '../Common/ProBadge';
@@ -22,6 +23,12 @@ const ProjectMenu = () => {
     const [newName, setNewName] = useState('');
     const [projectToDelete, setProjectToDelete] = useState<{ id: string; name: string } | null>(null);
 
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useOnClickOutside(containerRef, () => {
+        if (isExpanded) setIsExpanded(false);
+    });
+
     const projectList = Object.values(projects).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
     const currentProjectData = currentProjectId ? projects[currentProjectId] : null;
     const currentName = currentProjectData?.name || 'Select Project';
@@ -37,7 +44,7 @@ const ProjectMenu = () => {
     };
 
     return (
-        <div className={styles.container}>
+        <div className={styles.container} ref={containerRef}>
             <button
                 onClick={toggleLeftSidebar}
                 className={styles.iconBtn}
