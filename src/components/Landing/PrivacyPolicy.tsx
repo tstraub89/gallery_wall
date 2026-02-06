@@ -10,7 +10,7 @@ const PrivacyPolicy: React.FC = () => {
 
             <main className={styles.hero} style={{ textAlign: 'left', maxWidth: '800px', minHeight: '60vh' }}>
                 <h1 style={{ fontSize: '42px' }}>Privacy Policy</h1>
-                <p style={{ fontSize: '16px', marginBottom: '40px' }}>Last Updated: February 5, 2026</p>
+                <p style={{ fontSize: '16px', marginBottom: '40px' }}>Last Updated: February 6, 2026</p>
                 <p style={{ lineHeight: '1.6', color: '#48484a', marginBottom: '24px' }}>
                     This Privacy Policy explains how GalleryPlanner (“GalleryPlanner”, “we”, “us”, or “our”) handles information when you use our website and gallery wall planning tools (the “Service”). By using the Service, you agree to this Policy.
                 </p>
@@ -45,10 +45,10 @@ const PrivacyPolicy: React.FC = () => {
                     </p>
                     <ul style={{ listStyleType: 'disc', paddingLeft: '20px', lineHeight: '1.6', color: '#48484a' }}>
                         <li style={{ marginBottom: '16px' }}>
-                            <strong>Cloudflare Web Analytics:</strong> Cloudflare’s lightweight script (beacon.min.js) measures page views, performance (including Core Web Vitals), and general information such as browser type, operating system, device type (mobile vs. desktop), and country derived from IP address. We also use URL hash-based “virtual page views” (for example, #event=clicked_button) to track specific in-app actions as custom events. Cloudflare does not store IP addresses or use them to track individual users over time; fingerprinting identifiers are rotated or anonymized.
+                            <strong>PostHog:</strong> We use PostHog to understand how our features are used (for example, "Export PDF" or "Launch App"). PostHog captures anonymized usage data including button clicks, page views, and errors to help us improve the application.
                         </li>
                         <li style={{ marginBottom: '16px' }}>
-                            <strong>Vercel Analytics:</strong> Vercel Analytics records anonymized visitor counts, referrers (such as search engines or social platforms), pages viewed, and custom events that we explicitly track (for example, “Export PDF” or “Launch App” via va.track). It is cookie-free by default and generates a random visitor identifier that resets daily, so it cannot be used to trace a specific session back to a specific person.
+                            <strong>Cloudflare Web Analytics:</strong> Cloudflare’s lightweight script (beacon.min.js) measures page views, performance (including Core Web Vitals), and general information such as browser type, operating system, device type (mobile vs. desktop), and country derived from IP address. Cloudflare does not store IP addresses or use them to track individual users over time; fingerprinting identifiers are rotated or anonymized.
                         </li>
                         <li style={{ marginBottom: '16px' }}>
                             <strong>Vercel Speed Insights:</strong> Vercel Speed Insights collects technical performance metrics, such as how long it takes to render content (for example, Largest Contentful Paint) and layout shifts (CLS). This telemetry is focused on performance and does not include user behavior or identifying information.

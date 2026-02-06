@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.6] - 2026-02-06
+
+### 📊 Analytics
+- **PostHog**: Migrated all analytics to PostHog for unified event tracking and rich usage insights (funnels, sessions).
+- **Privacy**: Removed Vercel Analytics and the Cloudflare "hash hack" (which cluttered the URL bar). Privacy Policy updated to reflect these changes.
+
 ## [0.2.5] - 2026-02-06
 
 ### 🐛 Bug Fixes

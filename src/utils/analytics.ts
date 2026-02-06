@@ -1,31 +1,15 @@
-import { track } from '@vercel/analytics';
+import posthog from 'posthog-js';
 
 /**
  * Utility for tracking events.
- * 1. Uses Vercel Analytics for formal event tracking.
- * 2. Uses URL hashes for Cloudflare Web Analytics (virtual page views).
+ * Uses PostHog for all event tracking.
  */
 export const trackEvent = (eventName: string, properties?: any) => {
-    // 1. Vercel Track (Formal Custom Event)
     try {
-        track(eventName, properties);
+        posthog.capture(eventName, properties);
     } catch (e) {
-        console.error("Vercel track failed", e);
+        console.error("PostHog capture failed", e);
     }
-
-    // 2. Cloudflare Hash (Virtual Page View)
-    // We use a prefix to avoid collision with any potential actual anchor links
-    const hash = `event=${eventName}`;
-    
-    // Update the hash to trigger the analytics beacon
-    window.location.hash = hash;
-    
-    // Optional: Clear the hash after a short delay to keep the URL clean
-    setTimeout(() => {
-        if (window.location.hash === `#${hash}`) {
-            window.history.replaceState(null, '', window.location.pathname + window.location.search);
-        }
-    }, 500);
 };
 
 export const PRO_EVENTS = {
