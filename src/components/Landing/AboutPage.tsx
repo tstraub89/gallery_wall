@@ -25,15 +25,30 @@ const AboutPage: React.FC = () => {
                 </div>
 
                 <div className={styles.card} style={{ marginBottom: '40px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
                         <Microscope size={28} className={styles.checkIcon} />
                         <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>The Scientist Behind The Code</h2>
                     </div>
-                    <p style={{ lineHeight: '1.7', color: '#48484a', fontSize: '17px' }}>
-                        Hi, I'm Timothy Straub. By day, I'm a data scientist at <strong>Tiny Health</strong>, working on computational biology
-                        and machine learning to decode the human microbiome. I've spent over a decade in the scientific space,
-                        where precision and data integrity are everything.
-                    </p>
+
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', alignItems: 'center', flexDirection: 'row-reverse' }}>
+                        <img
+                            src="/tim-straub.jpeg"
+                            alt="Timothy Straub"
+                            style={{
+                                width: '120px',
+                                height: '120px',
+                                borderRadius: '50%',
+                                objectFit: 'cover',
+                                border: '4px solid #f2f2f7',
+                                flexShrink: 0
+                            }}
+                        />
+                        <p style={{ lineHeight: '1.7', color: '#48484a', fontSize: '17px', flex: '1 1 300px', margin: 0 }}>
+                            Hi, I'm Timothy Straub. By day, I'm a data scientist at <strong>Tiny Health</strong>, working on computational biology
+                            and machine learning to decode the human microbiome. I've spent over a decade in the scientific space,
+                            where precision and data integrity are everything.
+                        </p>
+                    </div>
                 </div>
 
                 <div className={styles.card} style={{ marginBottom: '40px' }}>
