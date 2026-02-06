@@ -201,4 +201,4 @@ const FrameContent: React.FC<FrameContentProps> = ({ frame, ppi }) => {
     );
 };
 
-export default FrameContent;
+export default React.memo(FrameContent);

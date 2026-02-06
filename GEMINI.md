@@ -51,7 +51,7 @@ The "Auto-Layout" feature runs in a separate Web Worker (`src/recommender/recomm
 ## Directory Structure
 *   `src/components/`: React components grouped by feature (e.g., `Canvas/`, `Library/`, `Properties/`).
 *   `src/context/`: Context providers and hooks.
-*   `src/hooks/`: Custom React hooks (e.g., `useCanvasInteraction`, `useProject`).
+*   `src/hooks/`: Custom React hooks (e.g., `useCanvasDrag`, `useCanvasSelection`, `useCanvasDrop`, `useProject`).
 *   `src/recommender/`: Worker code and layout algorithms.
 *   `src/utils/`: Helper functions for geometry, export, and image handling.
 *   `public/`: Static assets and example files.
