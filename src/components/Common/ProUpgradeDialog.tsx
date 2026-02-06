@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import styles from './ProUpgradeDialog.module.css';
 import { Sparkles, Check, X } from 'lucide-react';
 import { useProModal } from '../../context/ProContext';
+import { trackEvent } from '../../utils/analytics';
 
 interface ProUpgradeDialogProps {
     onClose: () => void;
@@ -22,6 +23,7 @@ const ProUpgradeDialog: React.FC<ProUpgradeDialogProps> = ({ onClose }) => {
     ];
 
     const handleUpgrade = async () => {
+        trackEvent('claim_beta_access');
         await upgradeToPro();
         onClose();
     };
@@ -32,7 +34,7 @@ const ProUpgradeDialog: React.FC<ProUpgradeDialogProps> = ({ onClose }) => {
                 <header className={styles.header}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <Sparkles size={20} style={{ color: '#a855f7' }} />
-                        <h2 style={{ margin: 0 }}>Upgrade to Pro</h2>
+                        <h2 style={{ margin: 0 }}>{isAlreadyPro ? "Pro Unlocked!" : "Upgrade to Pro"}</h2>
                     </div>
                     <button className={styles.closeBtn} onClick={onClose}>
                         <X size={20} />
@@ -41,7 +43,10 @@ const ProUpgradeDialog: React.FC<ProUpgradeDialogProps> = ({ onClose }) => {
 
                 <div className={styles.content}>
                     <p style={{ marginBottom: '20px', color: '#636366', fontSize: '15px', lineHeight: '1.5' }}>
-                        Unlock the full potential of GalleryPlanner and create your dream wall with ease.
+                        {isAlreadyPro
+                            ? "Thank you for testing the beta! You have fully unlocked all Pro features."
+                            : "Unlock the full potential of GalleryPlanner and create your dream wall with ease."
+                        }
                     </p>
 
                     <div className={styles.featureList}>

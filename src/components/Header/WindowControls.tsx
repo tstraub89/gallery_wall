@@ -4,25 +4,31 @@ import styles from './GlobalActions.module.css'; // Re-use styles for consistenc
 // import HelpModal from '../Common/HelpModal';
 const HelpModal = React.lazy(() => import('../Common/HelpModal'));
 const ProUpgradeDialog = React.lazy(() => import('../Common/ProUpgradeDialog'));
-import { Sparkles, PanelRightOpen, PanelRightClose, Bug } from 'lucide-react';
+import { Bug, PanelRightClose, PanelRightOpen, Sparkles } from 'lucide-react';
+import { useProModal } from '../../context/ProContext';
 import { useBugReporter } from '../../hooks/useBugReporter';
+import { trackEvent } from '../../utils/analytics';
 
 const WindowControls = () => {
     const { isRightSidebarOpen, toggleRightSidebar } = useLayout();
     const [showHelp, setShowHelp] = useState(false);
     const [showPro, setShowPro] = useState(false);
     const { reportBug } = useBugReporter();
+    const { isPro } = useProModal();
 
     return (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <button
                 className={styles.proButton}
-                onClick={() => setShowPro(true)}
-                title="During beta, Pro features are unlocked for free."
+                onClick={() => {
+                    if (!isPro) trackEvent('click_upgrade_header');
+                    setShowPro(true);
+                }}
+                title={isPro ? "Pro Unlocked" : "During beta, Pro features are unlocked for free."}
                 style={{ marginRight: '8px', cursor: 'pointer', opacity: 1 }}
             >
                 <Sparkles size={16} />
-                <span>Upgrade to Pro</span>
+                <span>{isPro ? "Pro Unlocked!" : "Upgrade to Pro"}</span>
             </button>
 
             <button className={styles.helpBtn} onClick={reportBug} title="Report an Issue">
