@@ -2,12 +2,20 @@
 
 **Visualize your perfect gallery wall before you hang a single nail.**
 
+**🎨 Live App:** [gallery-planner.com](https://gallery-planner.com)
+
 ![GalleryPlanner Workspace](./public/gallery-planner.png)
 
 > [!IMPORTANT]
 > **GalleryPlanner is currently in Early Beta.** During this period, all **PRO features** (AI Auto-Layout, PDF Guides, Project Exports, etc.) are **completely free** to use while I refine the experience.
 
 A powerful, interactive web application designed to help you plan complex gallery layouts with real frames and personal photos. Transition from a pile of frames on the floor to a perfectly aligned wall with confidence.
+
+### 🔒 Local-First & Privacy Focused
+GalleryPlanner runs entirely in your browser.
+*   **No Cloud Uploads**: Your personal photos and frame inventory never leave your device.
+*   **Offline Capable**: Works without an internet connection once loaded.
+*   **Private**: Your home data stays in your home.
 
 ---
 
@@ -52,7 +60,9 @@ A powerful, interactive web application designed to help you plan complex galler
 
 ## 📚 Documentation
 
-For a deep dive into all features, advanced workspace interactions, and power-user shortcuts, visit the [GalleryPlanner Wiki](https://github.com/tstraub89/gallery_wall/wiki).
+For a deep dive into feature guides, "how-to" videos, and advanced shortcuts, check out the live structure:
+*   [**Help Center & Manual**](https://gallery-planner.com/help)
+*   [Privacy Policy](https://gallery-planner.com/privacy)
 
 ---
 
