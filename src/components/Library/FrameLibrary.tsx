@@ -101,7 +101,7 @@ const FrameLibrary: React.FC = () => {
 
                 <div className={styles.footer}>
                     <span>Gallery Planner v{pkg.version} beta</span>
-                    <span style={{ fontSize: '10px', marginTop: '4px', color: 'var(--text-secondary)' }}>Core features are free during beta</span>
+                    <span style={{ fontSize: '10px', marginTop: '4px', color: 'var(--text-secondary)' }}>Pro features are free during beta</span>
                     <span style={{ marginTop: '6px', fontSize: '9px', opacity: 0.5 }}>© 2026 Timothy Straub</span>
                 </div>
             </div>
