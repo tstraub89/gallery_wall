@@ -6,9 +6,10 @@ import styles from './Logo.module.css';
 
 interface LogoProps {
     hideStatus?: boolean;
+    scale?: number;
 }
 
-const Logo: React.FC<LogoProps> = ({ hideStatus = false }) => {
+const Logo: React.FC<LogoProps> = ({ hideStatus = false, scale = 1 }) => {
     const isMobile = useIsMobile();
     const navigate = useNavigate();
     const { isPro, isBeta, openProModal } = useProModal();
@@ -22,7 +23,14 @@ const Logo: React.FC<LogoProps> = ({ hideStatus = false }) => {
     const status = getStatusInfo();
 
     return (
-        <div className={styles.logo} title="Early beta - core features are free while I build this out">
+        <div
+            className={styles.logo}
+            title="Early beta - core features are free while I build this out"
+            style={{
+                transform: `scale(${scale})`,
+                transformOrigin: 'left center'
+            }}
+        >
             <div className={styles.icon} onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -35,8 +43,8 @@ const Logo: React.FC<LogoProps> = ({ hideStatus = false }) => {
                 <span className={styles.light}>Planner</span>
             </div>
             {!isMobile && !hideStatus && (
-                <span 
-                    className={status.className} 
+                <span
+                    className={status.className}
                     onClick={(e) => {
                         e.stopPropagation();
                         openProModal();

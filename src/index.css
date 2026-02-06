@@ -45,7 +45,7 @@ body {
   height: 100vh;
   /* Fallback */
   height: 100dvh;
-  overflow: hidden;
+  /* overflow: hidden; Removed for landing page scrolling */
   -webkit-font-smoothing: antialiased;
 }
 
