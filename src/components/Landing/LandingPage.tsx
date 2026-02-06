@@ -59,6 +59,8 @@ const LandingPage: React.FC = () => {
                 </div>
                 <img
                     src="/gallery-planner.jpeg"
+                    srcSet="/gallery-planner_mobile.jpeg 800w, /gallery-planner.jpeg 1200w"
+                    sizes="(max-width: 768px) 100vw, 800px"
                     alt="GalleryPlanner Workspace"
                     className={styles.heroScreenshot}
                 />
@@ -119,6 +121,8 @@ const LandingPage: React.FC = () => {
                     <div className={styles.featureImage} style={{ flex: 1, boxShadow: '0 20px 50px rgba(0,0,0,0.1)' }}>
                         <img
                             src="/hanging_guide.jpeg"
+                            srcSet="/hanging_guide_mobile.jpeg 800w, /hanging_guide.jpeg 1200w"
+                            sizes="(max-width: 768px) 100vw, 500px"
                             alt="Hanging Guide PDF Example"
                             style={{ width: '100%', borderRadius: '12px', display: 'block' }}
                         />
@@ -141,7 +145,13 @@ const LandingPage: React.FC = () => {
                             propose the perfect arrangement based on your frame inventory.
                         </p>
                     </div>
-                    <img src="/smart_layout.jpeg" alt="AI Layout Engine" className={styles.featureImage} />
+                    <img
+                        src="/smart_layout.jpeg"
+                        srcSet="/smart_layout_mobile.jpeg 800w, /smart_layout.jpeg 1200w"
+                        sizes="(max-width: 768px) 100vw, 500px"
+                        alt="AI Layout Engine"
+                        className={styles.featureImage}
+                    />
                 </div>
 
                 <div className={styles.featureRow}>
@@ -152,7 +162,13 @@ const LandingPage: React.FC = () => {
                             like 8x10 and 5x7, or create custom dimensions for your unique pieces.
                         </p>
                     </div>
-                    <img src="/frames_library.jpeg" alt="Frame Inventory Library" className={styles.featureImage} />
+                    <img
+                        src="/frames_library.jpeg"
+                        srcSet="/frames_library_mobile.jpeg 800w, /frames_library.jpeg 1200w"
+                        sizes="(max-width: 768px) 100vw, 500px"
+                        alt="Frame Inventory Library"
+                        className={styles.featureImage}
+                    />
                 </div>
 
                 <div className={styles.featureRow}>
@@ -163,7 +179,13 @@ const LandingPage: React.FC = () => {
                             but visual harmony of the art inside them.
                         </p>
                     </div>
-                    <img src="/photo_library.jpeg" alt="Photo Management" className={styles.featureImage} />
+                    <img
+                        src="/photo_library.jpeg"
+                        srcSet="/photo_library_mobile.jpeg 800w, /photo_library.jpeg 1200w"
+                        sizes="(max-width: 768px) 100vw, 500px"
+                        alt="Photo Management"
+                        className={styles.featureImage}
+                    />
                 </div>
             </section>
 

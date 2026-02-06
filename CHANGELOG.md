@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.4] - 2026-02-06
+
+### ⚡ Performance
+- **Mobile Assets**: Generated and implemented mobile-optimized variants (800px width) for all landing page images.
+- **Responsive Loading**: Added `srcset` attributes to serve lighter images specifically to mobile devices.
+
 ## [0.2.3] - 2026-02-06
 
 ### 🐛 Bug Fixes
