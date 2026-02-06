@@ -58,7 +58,7 @@ const LandingPage: React.FC = () => {
                     </Link>
                 </div>
                 <img
-                    src="/gallery-planner.png"
+                    src="/gallery-planner.jpeg"
                     alt="GalleryPlanner Workspace"
                     className={styles.heroScreenshot}
                 />
@@ -118,7 +118,7 @@ const LandingPage: React.FC = () => {
 
                     <div className={styles.featureImage} style={{ flex: 1, boxShadow: '0 20px 50px rgba(0,0,0,0.1)' }}>
                         <img
-                            src="/hanging_guide.png"
+                            src="/hanging_guide.jpeg"
                             alt="Hanging Guide PDF Example"
                             style={{ width: '100%', borderRadius: '12px', display: 'block' }}
                         />
@@ -141,7 +141,7 @@ const LandingPage: React.FC = () => {
                             propose the perfect arrangement based on your frame inventory.
                         </p>
                     </div>
-                    <img src="/smart_layout.png" alt="AI Layout Engine" className={styles.featureImage} />
+                    <img src="/smart_layout.jpeg" alt="AI Layout Engine" className={styles.featureImage} />
                 </div>
 
                 <div className={styles.featureRow}>
@@ -152,7 +152,7 @@ const LandingPage: React.FC = () => {
                             like 8x10 and 5x7, or create custom dimensions for your unique pieces.
                         </p>
                     </div>
-                    <img src="/frames_library.png" alt="Frame Inventory Library" className={styles.featureImage} />
+                    <img src="/frames_library.jpeg" alt="Frame Inventory Library" className={styles.featureImage} />
                 </div>
 
                 <div className={styles.featureRow}>
@@ -163,7 +163,7 @@ const LandingPage: React.FC = () => {
                             but visual harmony of the art inside them.
                         </p>
                     </div>
-                    <img src="/photo_library.png" alt="Photo Management" className={styles.featureImage} />
+                    <img src="/photo_library.jpeg" alt="Photo Management" className={styles.featureImage} />
                 </div>
             </section>
 
