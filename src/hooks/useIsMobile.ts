@@ -8,19 +8,14 @@ import { useState, useEffect } from 'react';
  * This ensures landscape mode on phones still shows mobile layout.
  */
 export const useIsMobile = (): boolean => {
-    const [isMobile, setIsMobile] = useState(() => {
+    const [isMobile] = useState(() => {
         if (typeof window === 'undefined') return false;
         return checkIsMobile();
     });
 
     useEffect(() => {
-        // Re-check on resize (for dev tools device emulation)
-        const handleResize = () => {
-            setIsMobile(checkIsMobile());
-        };
-
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        // We no longer re-check on resize to prevent jarring layout swaps.
+        // Determining the layout at load time is more stable for the user.
     }, []);
 
     return isMobile;

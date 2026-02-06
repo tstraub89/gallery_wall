@@ -35,7 +35,16 @@ export const useImage = (imageId: string | null, type: 'full' | 'preview' | 'thu
             // Check preload cache first
             const cached = getPreloadedUrl(imageId);
             if (cached) {
-                setState({ url: cached, metadata: null, status: 'loaded' });
+                // Even if cached, we need metadata for PPI warnings
+                try {
+                    const metaMap = await getImageMetadata([imageId]);
+                    if (active) {
+                        setState({ url: cached, metadata: metaMap[imageId] || null, status: 'loaded' });
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch metadata for cached image", err);
+                    if (active) setState({ url: cached, metadata: null, status: 'loaded' });
+                }
                 return;
             }
 

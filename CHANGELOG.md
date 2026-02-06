@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2] - 2026-02-06
+
+### 🛠️ Stability & Layout Fixes
+- **Persistent PPI Warnings**: Fixed a bug where quality warnings would disappear during layout transitions. Metadata is now reliably fetched even for cached images.
+- **Layout Locking**: The app now locks into Desktop or Mobile layout upon initial load. This prevents jarring UI swaps when resizing the browser window on desktop.
+
 ## [0.2.1] - 2026-02-06
 
 ### 🖼️ Image Optimization (Balanced Pro)
