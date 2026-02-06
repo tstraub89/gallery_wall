@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowUp } from 'lucide-react';
-import styles from '../Landing/LandingPage.module.css'; // Utilizing existing variables if possible, or inline styles
 
 const BackToTop: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
