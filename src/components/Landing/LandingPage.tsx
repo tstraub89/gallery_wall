@@ -63,6 +63,10 @@ const LandingPage: React.FC = () => {
                     sizes="(max-width: 768px) 100vw, 800px"
                     alt="GalleryPlanner Workspace"
                     className={styles.heroScreenshot}
+                    fetchPriority="high"
+                    loading="eager"
+                    width="1200"
+                    height="800"
                 />
             </section>
 
@@ -125,6 +129,9 @@ const LandingPage: React.FC = () => {
                             sizes="(max-width: 768px) 100vw, 500px"
                             alt="Hanging Guide PDF Example"
                             style={{ width: '100%', borderRadius: '12px', display: 'block' }}
+                            loading="lazy"
+                            width="1200"
+                            height="800"
                         />
                     </div>
                 </div>
@@ -151,6 +158,9 @@ const LandingPage: React.FC = () => {
                         sizes="(max-width: 768px) 100vw, 500px"
                         alt="AI Layout Engine"
                         className={styles.featureImage}
+                        loading="lazy"
+                        width="1200"
+                        height="800"
                     />
                 </div>
 
@@ -168,6 +178,9 @@ const LandingPage: React.FC = () => {
                         sizes="(max-width: 768px) 100vw, 500px"
                         alt="Frame Inventory Library"
                         className={styles.featureImage}
+                        loading="lazy"
+                        width="1200"
+                        height="800"
                     />
                 </div>
 
@@ -185,6 +198,9 @@ const LandingPage: React.FC = () => {
                         sizes="(max-width: 768px) 100vw, 500px"
                         alt="Photo Management"
                         className={styles.featureImage}
+                        loading="lazy"
+                        width="1200"
+                        height="800"
                     />
                 </div>
             </section>
