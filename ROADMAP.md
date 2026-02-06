@@ -7,6 +7,12 @@
     - **Privacy**: 100% local execution. No photo uploads. "Privacy First."
 - [ ] **Gallery Wall Template Packs**: Pre-designed layouts for users who don't have frames yet (e.g., "The Grid", "The Spiral", "Staircase Special").
 
+## 🎨 UX & Interface
+- [ ] **Library View Options**: Enhanced viewing modes for photos and frames.
+    - **Frame Tiles/Icons**: Grid view for frames showing shape and size overlay, mirroring the canvas appearance.
+    - **Flexible Photo Grid**: Toggle between small, medium, and large previews (e.g., 1, 2, or 3 columns).
+    - **Detailed List View**: Alternative row-based view for photos/frames showing metadata like name, resolution (MP), and aspect ratio.
+
 ## 💰 Monetization & Pro
 - [ ] **Stripe Integration**:
     - *Decision needed*: Build a custom checkout page vs. integrating into the new website structure.
