@@ -4,19 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [0.2.0] - 2026-02-05
 
-### Performance Optimizations (Major Overhaul)
-- **Modularized Interaction Hooks**: Refactored the monolithic `useCanvasInteraction` into specialized hooks:
-  - `useCanvasSelection`: Handles marquee selection and hit testing.
-  - `useCanvasDrag`: Manages frame dragging logic.
-  - `useCanvasDrop`: Handles file and library item drops.
-- **Local State Dragging**: Drag operations now update a local state (`dragDelta`) instead of the global Redux/Context store on every frame. This eliminates full-canvas re-renders during interactions, resulting in smooth 60fps performance even with complex layouts.
-- **Memoization**: `FrameContent` component is now memoized to prevent re-renders of frame internals when unrelated state changes.
+### 🚀 New Web Platform
+- **Full Site Launch**: GalleryPlanner is no longer just a canvas. We’ve added a dedicated **Landing Page**, **Help Center**, **About Page**, and **Privacy Policy** to support a growing user base.
+- **Vercel Migration**: We’ve moved our hosting to Vercel for faster load times, better global caching, and improved routing.
 
-### Features & Improvements
-- **Rigid Group Snapping**: When dragging multiple frames, the group now maintains its relative arrangement perfectly. The *bounding box* of the group snaps to the grid, rather than individual frames snapping independently.
-- **Throttled Selection**: Marquee selection calculations are now throttled for better responsiveness.
-- **Touch Interaction**: Optimized touch gestures to utilize the new local state pattern for smoother mobile performance.
+### 🏆 GalleryPlanner Pro
+- **Pro Architecture**: The foundation for GalleryPlanner Pro is now live, including secure feature gating, persistent status, and a premium visual identity.
+- **PDF Hanging Guide**: *The flagship Pro feature.* You can now generate a professional, print-ready "Installation Guide" that includes your layout snapshot and precise measurements for hanging your frames in the real world.
 
-### Fixes
-- Fixed an issue where context menu props caused TypeScript errors.
-- Resolved various lint warnings and unused variables.
+### ⚡️ Core Experience
+- **Performance Improvements**: A major overhaul of the interaction engine ensures butter-smooth performance, even on complex walls with dozens of frames.
+- **Rigid Group Snapping**: Multi-selected frames now move as a rigid unit. The group's bounding box snaps to the grid, ensuring your carefully spaced arrangements are preserved perfectly during moves.
