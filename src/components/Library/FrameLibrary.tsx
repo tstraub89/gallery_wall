@@ -101,7 +101,12 @@ const FrameLibrary: React.FC = () => {
                 </div>
 
                 <div className={styles.footer}>
-                    <Link to="/changelog" style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Link
+                        to="/changelog"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: 'none', color: 'inherit' }}
+                    >
                         <span>Gallery Planner v{pkg.version} beta</span>
                     </Link>
                     <span style={{ fontSize: '10px', marginTop: '4px', color: 'var(--text-secondary)' }}>Pro features are free during beta</span>

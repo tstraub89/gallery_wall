@@ -332,6 +332,8 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                             <div style={{ textAlign: 'center', marginTop: '16px', marginBottom: '8px' }}>
                                 <Link
                                     to="/changelog"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
                                     onClick={() => setShowMenu(false)}
                                     style={{ textDecoration: 'none', color: '#8e8e93', fontSize: '11px', opacity: 0.7 }}
                                 >
