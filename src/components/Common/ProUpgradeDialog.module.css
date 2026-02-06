@@ -30,6 +30,7 @@
         transform: translateY(20px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
@@ -110,10 +111,30 @@
     border: none;
     font-weight: 700;
     font-size: 16px;
-    cursor: not-allowed;
-    opacity: 0.8;
+    cursor: pointer;
+    opacity: 1;
     margin-bottom: 16px;
     box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.proButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(168, 85, 247, 0.4);
+}
+
+.proButton:active {
+    transform: translateY(0);
+}
+
+.proButton:disabled {
+    cursor: default;
+    opacity: 0.6;
+    background: #e5e5e7;
+    color: #8e8e93;
+    pointer-events: none;
+    box-shadow: none;
+    transform: none;
 }
 
 .betaNote {
@@ -154,11 +175,11 @@
     .overlay {
         padding: 16px;
     }
-    
+
     .modal {
         max-width: none;
     }
-    
+
     .content {
         padding: 20px;
     }

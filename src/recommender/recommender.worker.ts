@@ -1,23 +1,26 @@
 
-import { WorkerMessage, RecommenderInput } from './types';
+import { WorkerMessage, WorkerResponse, RecommenderInput } from './types';
 import { MonteCarloGenerator } from './generators/MonteCarloGenerator';
 import { GridGenerator } from './generators/GridGenerator';
 import { SpiralGenerator } from './generators/SpiralGenerator';
 import { MasonryGenerator } from './generators/MasonryGenerator';
 import { SkylineGenerator } from './generators/SkylineGenerator';
+import { isPhysicallyImpossible } from './utils/heuristics';
 
-const ctx: Worker = self as any;
+// Type the global worker scope
+const ctx = self as unknown as Worker;
 
 ctx.onmessage = (event: MessageEvent<WorkerMessage>) => {
     const { type } = event.data;
 
     if (type === 'GENERATE') {
-        const input = (event.data as any).payload as RecommenderInput;
+        const payload = event.data.payload;
         try {
-            runGeneration(input);
+            runGeneration(payload);
         } catch (e) {
             console.error('Worker Error:', e);
-            ctx.postMessage({ type: 'ERROR', message: (e as Error).message });
+            const errorResponse: WorkerResponse = { type: 'ERROR', message: (e as Error).message };
+            ctx.postMessage(errorResponse);
         }
     }
 };
@@ -25,6 +28,13 @@ ctx.onmessage = (event: MessageEvent<WorkerMessage>) => {
 function runGeneration(input: RecommenderInput) {
     // Optimization: If no items to place, return 0 solutions immediately
     if (!input.inventory || input.inventory.length === 0) {
+        ctx.postMessage({ type: 'DONE', count: 0 });
+        return;
+    }
+
+    // Fail Fast: If requiring all frames but they simply don't fit
+    if (input.config.forceAll && isPhysicallyImpossible(input)) {
+        // 0 solutions implies "None found".
         ctx.postMessage({ type: 'DONE', count: 0 });
         return;
     }
@@ -53,14 +63,14 @@ function runGeneration(input: RecommenderInput) {
     }
 
     // Generate solutions
-    // We can stream them or return all at once.
-    // For now, let's generate a batch and return the top ones.
     const solutions = generator.generate(input); // Generate attempts internally
 
     // Send back top 10 unique solutions
     solutions.slice(0, 10).forEach(solution => {
-        ctx.postMessage({ type: 'SOLUTION_FOUND', payload: solution });
+        const response: WorkerResponse = { type: 'SOLUTION_FOUND', payload: solution };
+        ctx.postMessage(response);
     });
 
-    ctx.postMessage({ type: 'DONE', count: solutions.length });
+    const doneResponse: WorkerResponse = { type: 'DONE', count: solutions.length };
+    ctx.postMessage(doneResponse);
 }

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import styles from './SmartLayout.module.css';
 import { useProject } from '../../../hooks/useProject';
 import { useSmartLayout } from './SmartLayoutContext';
+import { useProModal } from '../../../context/ProContext';
 import { RecommenderFrame, LayoutSolution } from '../../../recommender/types';
 import { Frame } from '../../../types';
 import { PPI } from '../../../constants';
@@ -18,6 +19,7 @@ interface SmartLayoutSectionProps {
 
 const SmartLayoutSection: React.FC<SmartLayoutSectionProps> = ({ maxSolutions = 4, onComplete, isMobile = false }) => {
     const { currentProject, updateProject } = useProject();
+    const { isPro, openProModal } = useProModal();
     const {
         config, setConfig,
         generateLayouts, isGenerating, solutions,
@@ -191,10 +193,10 @@ const SmartLayoutSection: React.FC<SmartLayoutSectionProps> = ({ maxSolutions = 
 
     return (
         <div className={styles.container}>
-            {/* --- VIBE --- */}
+            {/* --- LAYOUT --- */}
             {isMobile ? (
                 <div className={styles.mobileConfigRow}>
-                    <label className={styles.mobileLabel}>Vibe</label>
+                    <label className={styles.mobileLabel}>Layout</label>
                     <div style={{ flex: 1 }}>
                         <select
                             value={config.algorithm}
@@ -212,7 +214,7 @@ const SmartLayoutSection: React.FC<SmartLayoutSectionProps> = ({ maxSolutions = 
                 </div>
             ) : (
                 <div className={styles.configRow}>
-                    <label>Vibe</label>
+                    <label>Layout</label>
                     <div className={styles.row}>
                         <select
                             value={config.algorithm}
@@ -412,7 +414,17 @@ const SmartLayoutSection: React.FC<SmartLayoutSectionProps> = ({ maxSolutions = 
             {solutions.length > 0 && (
                 <div className={styles.resultsGrid}>
                     {solutions.slice(0, maxSolutions).map((sol, idx) => (
-                        <div key={sol.id} className={styles.resultCard} onClick={() => applySolution(sol)}>
+                        <div
+                            key={sol.id}
+                            className={styles.resultCard}
+                            onClick={() => {
+                                if (!isPro) {
+                                    openProModal();
+                                    return;
+                                }
+                                applySolution(sol);
+                            }}
+                        >
                             <ProBadge isOverlay />
                             <div className={styles.preview}>
                                 {/* Mini Canvas Preview */}
@@ -459,7 +471,7 @@ const SmartLayoutSection: React.FC<SmartLayoutSectionProps> = ({ maxSolutions = 
                                     );
                                 })()}
                             </div>
-                            <span>Option {idx + 1} ({sol.frames.length} frames)</span>
+                            <span className={styles.resultLabel}>Option {idx + 1} ({sol.frames.length} frames)</span>
                         </div>
                     ))}
                 </div>

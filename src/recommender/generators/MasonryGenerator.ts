@@ -1,6 +1,7 @@
 
 import { RecommenderInput, LayoutSolution, PlacedFrame, RecommenderFrame } from '../types';
 import { hasCollision } from '../utils/geometry';
+import { estimateMaxCapacity } from '../utils/heuristics';
 
 interface Rect {
     x: number;
@@ -39,18 +40,42 @@ export class MasonryGenerator {
         let attempts = 0;
 
         // Check how many "good enough" solutions we already have
-        const desiredSolutions = 4;
-        const passingThreshold = input.config.forceAll ? totalFrames : Math.max(1, Math.floor(totalFrames * 0.9));
+        const desiredSolutions = 10;
+
+        const maxCap = estimateMaxCapacity(input);
+        const passingThreshold = input.config.forceAll ? totalFrames : Math.max(1, Math.min(Math.floor(totalFrames * 0.9), maxCap));
 
         let satisfactoryCount = solutions.filter(s => s.frames.length >= passingThreshold).length;
+
+        // Deduplication Helper
+        const getSignature = (frames: PlacedFrame[]) => {
+            // Sort frames by position to ensure order doesn't affect signature
+            const sorted = [...frames].sort((a, b) => {
+                const dy = Math.round(a.y) - Math.round(b.y);
+                if (Math.abs(dy) > 1) return dy;
+                return Math.round(a.x) - Math.round(b.x);
+            });
+            // Round to avoid float precision issues
+            return sorted.map(f =>
+                `${Math.round(f.x)},${Math.round(f.y)},${Math.round(f.width)},${Math.round(f.height)}`
+            ).join('|');
+        };
+
+        const signatures = new Set<string>();
+        solutions.forEach(s => signatures.add(getSignature(s.frames)));
 
         while (satisfactoryCount < desiredSolutions && (performance.now() - startTime < timeLimit) && attempts < maxAttempts) {
             attempts++;
             const randomSol = this.createSolution(input, [...expandedInventory].sort(() => Math.random() - 0.5));
+
             if (randomSol.frames.length > 0) {
-                solutions.push(randomSol);
-                if (randomSol.frames.length >= passingThreshold) {
-                    satisfactoryCount++;
+                const sig = getSignature(randomSol.frames);
+                if (!signatures.has(sig)) {
+                    signatures.add(sig);
+                    solutions.push(randomSol);
+                    if (randomSol.frames.length >= passingThreshold) {
+                        satisfactoryCount++;
+                    }
                 }
             }
         }

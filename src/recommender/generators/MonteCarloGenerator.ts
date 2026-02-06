@@ -6,6 +6,7 @@ import {
     RecommenderFrame
 } from '../types';
 import { isWithinBounds, hasCollision } from '../utils/geometry';
+import { estimateMaxCapacity } from '../utils/heuristics';
 
 export class MonteCarloGenerator {
 
@@ -19,18 +20,43 @@ export class MonteCarloGenerator {
         let attempts = 0;
 
         // Target
-        const desiredPerfectSolutions = 4;
+        const desiredPerfectSolutions = 10;
         const totalFrames = input.inventory.reduce((sum, f) => sum + f.count, 0);
+
+        const maxCap = estimateMaxCapacity(input);
+        // Monte Carlo (Random) is inefficient at packing. We relax the target to 75% of max capacity
+        // to ensure we find "good enough" solutions instantly rather than timing out trying to be perfect.
+        const relaxedCap = Math.floor(maxCap * 0.75);
+        const targetCount = input.config.forceAll ? totalFrames : Math.max(1, Math.min(totalFrames, relaxedCap));
+
         let perfectCount = 0;
+
+        // Deduplication Helper
+        const getSignature = (frames: PlacedFrame[]) => {
+            const sorted = [...frames].sort((a, b) => {
+                const dy = Math.round(a.y) - Math.round(b.y);
+                if (Math.abs(dy) > 1) return dy;
+                return Math.round(a.x) - Math.round(b.x);
+            });
+            return sorted.map(f =>
+                `${Math.round(f.x)},${Math.round(f.y)},${Math.round(f.width)},${Math.round(f.height)}`
+            ).join('|');
+        };
+
+        const signatures = new Set<string>();
 
         while (perfectCount < desiredPerfectSolutions && (performance.now() - startTime < timeLimit) && attempts < maxAttempts) {
             attempts++;
             const solution = this.createSingleSolution(input);
 
             if (solution) {
-                solutions.push(solution);
-                if (solution.frames.length === totalFrames) {
-                    perfectCount++;
+                const sig = getSignature(solution.frames);
+                if (!signatures.has(sig)) {
+                    signatures.add(sig);
+                    solutions.push(solution);
+                    if (solution.frames.length >= targetCount) {
+                        perfectCount++;
+                    }
                 }
             }
         }
@@ -55,7 +81,6 @@ export class MonteCarloGenerator {
         framesToPlace = framesToPlace.sort(() => Math.random() - 0.5);
 
         for (const frame of framesToPlace) {
-            let placedFrame = false;
             // Try N times to place this frame
             for (let attempt = 0; attempt < 50; attempt++) {
                 // Determine rotation (randomly 0 or 90)
@@ -94,52 +119,20 @@ export class MonteCarloGenerator {
 
                 // Success
                 placed.push(candidate);
-                placedFrame = true;
                 break;
-            }
-
-            // If forceAll is true and we failed to place, this solution is invalid
-            if (config.forceAll && !placedFrame) {
-                return null;
             }
         }
 
-        // Calculate a basic score
-        const score = this.calculateScore(placed, wallRect);
+        // Calculate a score?
+        // Score = Number of frames placed (higher is better)
+        const score = placed.length;
+
+        if (score === 0) return null;
 
         return {
             id: crypto.randomUUID(),
             frames: placed,
-            score,
-            metadata: {
-                coverage: 0, // TODO
-                alignment: 0,
-                balance: 0
-            }
+            score
         };
-    }
-
-    private calculateScore(placed: PlacedFrame[], wall: any): number {
-        // Simple score: Number of frames placed + some centrality bonus
-        if (placed.length === 0) return 0;
-
-        let score = placed.length * 100;
-
-        // Centrality: Negative penalty for distance from center
-        const cx = wall.width / 2;
-        const cy = wall.height / 2;
-
-        let totalDist = 0;
-        placed.forEach(f => {
-            const fx = f.x + f.width / 2;
-            const fy = f.y + f.height / 2;
-            const dist = Math.sqrt(Math.pow(fx - cx, 2) + Math.pow(fy - cy, 2));
-            totalDist += dist;
-        });
-
-        const avgDist = totalDist / placed.length;
-        score -= avgDist; // Penalty
-
-        return score;
     }
 }

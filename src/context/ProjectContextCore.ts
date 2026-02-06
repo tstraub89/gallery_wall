@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 import { Project, Frame } from '../types';
+import { SelectionContextType } from './SelectionContext';
 
 export interface LibraryState {
     searchTerm: string;
@@ -7,14 +8,15 @@ export interface LibraryState {
     sortBy: string;
 }
 
-export interface ProjectContextType {
+// Data-only interface
+export interface ProjectDataContextType {
     projects: Record<string, Project>;
     currentProject: Project | null;
     currentProjectId: string | null;
-    selectedFrameIds: string[];
-    selectedImageIds: string[];
-    selectedFrameTemplateIds: string[]; // Library templates
-    focusedArea: 'canvas' | 'library' | null;
+
+    // Removed selection properties from Data Context
+    // selectedFrameIds: string[]; ... etc
+
     isLoaded: boolean;
     isProjectLoading: boolean;
     showWelcome: boolean;
@@ -29,12 +31,6 @@ export interface ProjectContextType {
     addToLibrary: (projectId: string, frameDimensions: Partial<Frame>) => void;
     removeFromLibrary: (projectId: string, templateId: string) => void;
     addImageToLibrary: (projectId: string, imageId: string) => void;
-
-    selectFrame: (frameId: string, multi?: boolean) => void;
-    setSelection: (ids: string[]) => void;
-    setSelectedImages: (ids: string[]) => void;
-    setSelectedFrameTemplates: (ids: string[]) => void;
-    setFocusedArea: (area: 'canvas' | 'library' | null) => void;
 
     libraryState: LibraryState;
     frameState: LibraryState;
@@ -51,4 +47,7 @@ export interface ProjectContextType {
     startFresh: () => void;
 }
 
-export const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
+// Combined type for legacy compatibility in useProject
+export type ProjectContextType = ProjectDataContextType & SelectionContextType;
+
+export const ProjectContext = createContext<ProjectDataContextType | undefined>(undefined);

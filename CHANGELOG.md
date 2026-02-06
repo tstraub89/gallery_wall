@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.7] - 2026-02-06
+
+### ✨ Beta Experience & Pro Gating
+- **Pro Features**: Core premium features (Smart Layouts, Hanging Guides) are now properly gated. Users can unlock them immediately for **free** during the beta period.
+- **Improved UI**: The "PRO" badge is now more readable, and "Vibe" has been renamed to "Layout" for clarity.
+- **Fail Fast**: The Auto-Layout engine now fails instantly if a request is physically impossible (e.g., "Use All Images" on a tiny wall), rather than timing out.
+
+### 🛡 Infrastructure
+- **Bug Reporter**: Added a built-in "Report Issue" tool that generates a pre-filled email with diagnostic info. Found in the Header, Help Menu, and Mobile App.
+- **Error Boundary**: The entire application is now wrapped in a global error handler to prevent "white screen" crashes.
+- **Mobile Polish**: Fixed an annoyance where double-tapping the mobile menu would trigger a browser zoom.
+
 ## [0.2.6] - 2026-02-06
 
 ### 📊 Analytics

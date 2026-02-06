@@ -55,8 +55,8 @@ const ProUpgradeDialog: React.FC<ProUpgradeDialogProps> = ({ onClose }) => {
                         ))}
                     </div>
 
-                    <button 
-                        className={styles.proButton} 
+                    <button
+                        className={styles.proButton}
                         onClick={handleUpgrade}
                         disabled={isAlreadyPro}
                     >
@@ -64,7 +64,7 @@ const ProUpgradeDialog: React.FC<ProUpgradeDialogProps> = ({ onClose }) => {
                     </button>
 
                     <div className={styles.betaNote}>
-                        Early beta users get free lifetime access to core Pro features!
+                        All Pro features are completely free to use during the beta period.
                     </div>
                 </div>
 

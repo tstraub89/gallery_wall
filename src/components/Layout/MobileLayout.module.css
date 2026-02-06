@@ -100,6 +100,7 @@
     justify-content: center;
     padding: 8px;
     cursor: pointer;
+    touch-action: manipulation;
 }
 
 .iconBtn:active {
@@ -138,6 +139,9 @@
     color: #666;
     font-size: 0.75rem;
     gap: 4px;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .navItem.active {
@@ -169,6 +173,7 @@
     display: flex;
     align-items: flex-end;
     animation: fadeIn 0.15s ease-out;
+    touch-action: manipulation;
 }
 
 .menuSheet {
@@ -181,6 +186,7 @@
     flex-direction: column;
     gap: 8px;
     animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    touch-action: manipulation;
 }
 
 .menuItem {

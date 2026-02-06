@@ -8,6 +8,7 @@ export function useLayoutRecommender() {
     const [solutions, setSolutions] = useState<LayoutSolution[]>([]);
     const [progress, setProgress] = useState(0);
     const workerRef = useRef<Worker | null>(null);
+    const pendingBuffer = useRef<LayoutSolution[]>([]);
 
     useEffect(() => {
         // Initialize worker
@@ -20,8 +21,10 @@ export function useLayoutRecommender() {
 
             if (type === 'SOLUTION_FOUND') {
                 const solution = (event.data as any).payload;
-                setSolutions(prev => [...prev, solution].sort((a, b) => b.score - a.score));
+                pendingBuffer.current.push(solution);
             } else if (type === 'DONE') {
+                // Done! Swap the buffer into state all at once
+                setSolutions(pendingBuffer.current.sort((a, b) => b.score - a.score));
                 setIsGenerating(false);
             } else if (type === 'ERROR') {
                 console.error('Recommender Error:', (event.data as any).message);
@@ -37,7 +40,11 @@ export function useLayoutRecommender() {
     const generateLayouts = useCallback((input: RecommenderInput) => {
         trackEvent(PRO_EVENTS.SMART_LAYOUT);
         setIsGenerating(true);
-        setSolutions([]);
+        // Do NOT clear solutions here. Keep the old ones visible until new ones are ready.
+        // setSolutions([]); 
+
+        // Reset Buffer
+        pendingBuffer.current = [];
         setProgress(0);
 
         // Post message to worker

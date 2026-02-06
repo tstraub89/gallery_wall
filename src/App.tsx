@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import ErrorBoundary from './components/ErrorBoundary';
 import { ProjectProvider } from './context/ProjectContext';
+import { SelectionProvider } from './context/SelectionContext';
 import { LayoutProvider } from './context/LayoutContext';
 import { ProProvider } from './context/ProContext';
 import { AppLayout, Header, LeftSidebar, MainCanvas, RightSidebar } from './components/Layout/AppLayout';
@@ -25,6 +27,8 @@ import { useIsMobile } from './hooks/useIsMobile';
 import { MobileLayout } from './components/Layout/MobileLayout';
 import ScrollToTop from './components/Common/ScrollToTop';
 
+import LoadingOverlay from './components/Common/LoadingOverlay';
+
 // Inner component that can use context
 const AppTool: React.FC = () => {
   const { showWelcome, importDemoProject, startFresh, undo, redo, canUndo, canRedo, isProjectLoading } = useProject();
@@ -33,10 +37,7 @@ const AppTool: React.FC = () => {
   return (
     <>
       {isProjectLoading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
-          <p>Optimizing Project...</p>
-        </div>
+        <LoadingOverlay message="Optimizing Project..." />
       )}
       {showWelcome && (
         <React.Suspense fallback={null}>
@@ -95,47 +96,50 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <ProjectProvider>
-      <LayoutProvider>
-        <ProProvider>
-          <BrowserRouter>
-            <ScrollToTop />
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/privacy" element={
-                <React.Suspense fallback={null}>
-                  <PrivacyPolicy />
-                </React.Suspense>
-              } />
-              <Route path="/about" element={
-                <React.Suspense fallback={null}>
-                  <AboutPage />
-                </React.Suspense>
-              } />
-              <Route path="/help" element={
-                <React.Suspense fallback={null}>
-                  <HelpPage />
-                </React.Suspense>
-              } />
-              <Route path="/changelog" element={
-                <React.Suspense fallback={null}>
-                  <ChangelogPage />
-                </React.Suspense>
-              } />
-              <Route path="/app" element={<AppTool />} />
-              {/* Fallback to NotFound */}
-              <Route path="*" element={
-                <React.Suspense fallback={null}>
-                  <NotFound />
-                </React.Suspense>
-              } />
-            </Routes>
-          </BrowserRouter>
-        </ProProvider>
-      </LayoutProvider>
-    </ProjectProvider>
+    <ErrorBoundary>
+      <ProjectProvider>
+        <SelectionProvider>
+          <LayoutProvider>
+            <ProProvider>
+              <BrowserRouter>
+                <ScrollToTop />
+                <Routes>
+                  <Route path="/" element={<LandingPage />} />
+                  <Route path="/privacy" element={
+                    <React.Suspense fallback={null}>
+                      <PrivacyPolicy />
+                    </React.Suspense>
+                  } />
+                  <Route path="/about" element={
+                    <React.Suspense fallback={null}>
+                      <AboutPage />
+                    </React.Suspense>
+                  } />
+                  <Route path="/help" element={
+                    <React.Suspense fallback={null}>
+                      <HelpPage />
+                    </React.Suspense>
+                  } />
+                  <Route path="/changelog" element={
+                    <React.Suspense fallback={null}>
+                      <ChangelogPage />
+                    </React.Suspense>
+                  } />
+                  <Route path="/app" element={<AppTool />} />
+                  {/* Fallback to NotFound */}
+                  <Route path="*" element={
+                    <React.Suspense fallback={null}>
+                      <NotFound />
+                    </React.Suspense>
+                  } />
+                </Routes>
+              </BrowserRouter>
+            </ProProvider>
+          </LayoutProvider>
+        </SelectionProvider>
+      </ProjectProvider>
+    </ErrorBoundary>
   );
 };
 
 export default App;
-

@@ -4,12 +4,14 @@ import styles from './GlobalActions.module.css'; // Re-use styles for consistenc
 // import HelpModal from '../Common/HelpModal';
 const HelpModal = React.lazy(() => import('../Common/HelpModal'));
 const ProUpgradeDialog = React.lazy(() => import('../Common/ProUpgradeDialog'));
-import { Sparkles, PanelRightOpen, PanelRightClose } from 'lucide-react';
+import { Sparkles, PanelRightOpen, PanelRightClose, Bug } from 'lucide-react';
+import { useBugReporter } from '../../hooks/useBugReporter';
 
 const WindowControls = () => {
     const { isRightSidebarOpen, toggleRightSidebar } = useLayout();
     const [showHelp, setShowHelp] = useState(false);
     const [showPro, setShowPro] = useState(false);
+    const { reportBug } = useBugReporter();
 
     return (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
@@ -21,6 +23,10 @@ const WindowControls = () => {
             >
                 <Sparkles size={16} />
                 <span>Upgrade to Pro</span>
+            </button>
+
+            <button className={styles.helpBtn} onClick={reportBug} title="Report an Issue">
+                <Bug size={18} />
             </button>
 
             <button className={styles.helpBtn} onClick={() => setShowHelp(true)} title="Show Help Guide">?</button>

@@ -9,10 +9,6 @@ import { trackEvent, APP_EVENTS } from '../utils/analytics';
 interface ProjectData {
     projects: Record<string, Project>;
     currentProjectId: string | null;
-    selectedFrameIds: string[];
-    selectedImageIds: string[];
-    selectedFrameTemplateIds: string[];
-    focusedArea: 'canvas' | 'library' | null;
     libraryState: LibraryState;
     frameState: LibraryState;
 }
@@ -30,10 +26,6 @@ interface HistoryState {
 const initialData: ProjectData = {
     projects: {}, // { [id]: Project }
     currentProjectId: null,
-    selectedFrameIds: [], // Array of frame IDs
-    selectedImageIds: [], // Array of image IDs (photo library)
-    selectedFrameTemplateIds: [], // Array of frame template IDs (frame library)
-    focusedArea: null, // 'canvas' | 'library' | null
     libraryState: { searchTerm: '', activeFilters: {}, sortBy: 'newest' },
     frameState: { searchTerm: '', activeFilters: {}, sortBy: 'newest' },
 };
@@ -49,7 +41,7 @@ const createNewProject = (name?: string): Project => ({
         height: 72, // inches, default 6ft
         backgroundColor: '#e0e0e0',
         stairAngle: 50, // default rise percentage for staircase walls
-    } as WallConfig, // Cast to ensure it matches strict WallConfig if needed (e.g. strict string literals)
+    } as WallConfig,
     frames: [], // Array of Frame objects
     library: [], // Array of available Frame templates
     images: [], // Array of image IDs
@@ -72,18 +64,22 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             try {
                 const idbData = await loadProjectData();
                 if (idbData && Object.keys(idbData.projects || {}).length > 0) {
-                    setData(idbData);
+                    // Filter out legacy selection fields if they exist in IDB
+                    const cleanData: ProjectData = {
+                        projects: idbData.projects,
+                        currentProjectId: idbData.currentProjectId,
+                        libraryState: idbData.libraryState || initialData.libraryState,
+                        frameState: idbData.frameState || initialData.frameState
+                    };
+                    setData(cleanData);
                 } else {
-                    // Brand new install - show welcome modal
                     setShowWelcome(true);
                 }
             } catch (err) {
                 console.error("Failed to load data from IndexedDB", err);
-                // Show welcome on error too
                 setShowWelcome(true);
             } finally {
                 setIsLoaded(true);
-                // Garbage Collect Orphaned Images (Async, don't block UI)
                 setTimeout(async () => {
                     try {
                         const allData = await loadProjectData();
@@ -92,14 +88,9 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                         const activeImageIds = new Set<string>();
 
                         Object.values(allData.projects).forEach((proj: any) => {
-                            // Check Frame images
                             proj.frames?.forEach((f: Frame) => {
                                 if (f.imageId) activeImageIds.add(f.imageId);
                             });
-                            // Check Library images (unused in frames but present in library)
-                            // Library items are frames, so they might have imageIds? 
-                            // Project structure has 'images' array for "Project Media Library".
-                            // This is the source of truth.
                             proj.images?.forEach((imgId: string) => activeImageIds.add(imgId));
                         });
 
@@ -108,7 +99,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                     } catch (e) {
                         console.warn("GC Failed", e);
                     }
-                }, 2000); // Wait 2s for app to settle
+                }, 2000);
             }
         };
         init();
@@ -120,6 +111,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
 
         const save = async () => {
             try {
+                // Save complete object, ignoring selection fields for persistence
                 await saveProjectData(data);
             } catch (err) {
                 console.warn("Failed to auto-save to IndexedDB", err);
@@ -131,7 +123,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     }, [data, isLoaded]);
 
     const addProject = (name: string) => {
-        trackEvent(APP_EVENTS.SAVE_PROJECT); // Tracking project creation as a save event or similar
+        trackEvent(APP_EVENTS.SAVE_PROJECT);
         const newProject = createNewProject(name);
         setData(prev => ({
             ...prev,
@@ -144,41 +136,23 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     const switchProject = async (id: string) => {
         if (data.projects[id]) {
             setIsProjectLoading(true);
-            // Small timeout to allow the loading UI to mount and clear up any glitches
             setTimeout(() => {
-                // Free memory from previous project's images
                 clearImageCache();
-                setData(prev => ({ ...prev, currentProjectId: id, selectedFrameIds: [] }));
+                setData(prev => ({ ...prev, currentProjectId: id }));
                 setIsProjectLoading(false);
             }, 300);
         }
     };
 
-    const selectFrame = (frameId: string, multi = false) => {
-        setData(prev => {
-            if (multi) {
-                const current = prev.selectedFrameIds || [];
-                if (current.includes(frameId)) {
-                    return { ...prev, selectedFrameIds: current.filter(id => id !== frameId) };
-                }
-                return { ...prev, selectedFrameIds: [...current, frameId] };
-            }
-            return { ...prev, selectedFrameIds: frameId ? [frameId] : [] };
-        });
-    };
-
     const deleteProject = (id: string) => {
-        // Calculate potential remaining projects to determine if this is the last one
         const remainingIds = Object.keys(data.projects).filter(pid => pid !== id);
 
         if (remainingIds.length === 0) {
-            // Deleting the last project - Reset to empty state and show Welcome Modal
             clearImageCache();
             setData(prev => ({
                 ...prev,
                 projects: {},
                 currentProjectId: null,
-                selectedFrameIds: []
             }));
             setShowWelcome(true);
             return;
@@ -191,10 +165,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             let newCurrentId = prev.currentProjectId;
 
             if (prev.currentProjectId === id) {
-                // If deleting current project, clear cache before switching to the next available
                 clearImageCache();
-                // remainingIds calculation above is based on current state, 
-                // but inside setData properly uses newProjects keys
                 newCurrentId = Object.keys(newProjects)[0] || null;
             }
 
@@ -202,7 +173,6 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                 ...prev,
                 projects: newProjects,
                 currentProjectId: newCurrentId,
-                selectedFrameIds: []
             };
         });
     };
@@ -211,7 +181,6 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
 
     const addToLibrary = (projectId: string, frameDimensions: Partial<Frame>) => {
         const libraryItem: LibraryItem = {
-            // Default Frame properties to satisfy type (LibraryItem extends Frame)
             id: uuidv4(),
             x: 0,
             y: 0,
@@ -221,9 +190,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             zIndex: 0,
             shape: 'rect',
             frameColor: '#111',
-            // Override with provided partial dimensions
             ...frameDimensions,
-            // LibraryItem specific properties
             count: 1,
             createdAt: Date.now()
         };
@@ -303,22 +270,6 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
         wallConfig: currentProjectRaw.wallConfig || createNewProject().wallConfig
     } : null;
 
-    const setSelection = (ids: string[]) => {
-        setData(prev => ({ ...prev, selectedFrameIds: ids }));
-    };
-
-    const setSelectedImages = (ids: string[]) => {
-        setData(prev => ({ ...prev, selectedImageIds: ids }));
-    };
-
-    const setSelectedFrameTemplates = (ids: string[]) => {
-        setData(prev => ({ ...prev, selectedFrameTemplateIds: ids }));
-    };
-
-    const setFocusedArea = (area: 'canvas' | 'library' | null) => {
-        setData(prev => ({ ...prev, focusedArea: area }));
-    };
-
     const updateLibraryState = (updates: Partial<LibraryState>) => {
         setData(prev => ({
             ...prev,
@@ -361,14 +312,15 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
 
             const newPast = [...prev.past];
             const previousState = newPast.pop();
-            // previousState is HistoryItem | undefined, but length check ensures it's defined
             if (!previousState) return prev;
 
             const { projectId, data: oldProjectData } = previousState;
 
-            const currentProjectData = data.projects[projectId];
+            // const currentProjectData = data.projects[projectId]; 
+            // We need to push CURRENT state to future before restoring OLD state
+            const currentMemento = data.projects[projectId];
 
-            const newFuture = [...prev.future, { projectId, data: structuredClone(currentProjectData) }];
+            const newFuture = [...prev.future, { projectId, data: structuredClone(currentMemento) }];
 
             setData(d => ({
                 ...d,
@@ -392,9 +344,9 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
 
             const { projectId, data: nextProjectData } = nextState;
 
-            const currentProjectData = data.projects[projectId];
+            const currentMemento = data.projects[projectId];
 
-            const newPast = [...prev.past, { projectId, data: structuredClone(currentProjectData) }];
+            const newPast = [...prev.past, { projectId, data: structuredClone(currentMemento) }];
 
             setData(d => ({
                 ...d,
@@ -421,12 +373,10 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
         }));
     };
 
-    // Import demo project from bundled example.gwall
     const importDemoProject = async () => {
         trackEvent(APP_EVENTS.LOAD_PROJECT);
         setIsProjectLoading(true);
         try {
-            // Use import.meta.env.BASE_URL to respect vite's base config
             const baseUrl = import.meta.env.BASE_URL || '/';
             const response = await fetch(`${baseUrl}example.gwall`);
             if (!response.ok) throw new Error('Failed to fetch demo project');
@@ -453,7 +403,6 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                 .map((id: any) => idMap.get(id)) : [];
 
             for (const img of remappedImages) {
-                // Import assumes images are already optimized in the bundle
                 await saveImage(img.id, img.blob, { skipOptimization: true });
             }
 
@@ -483,7 +432,6 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    // Start with a fresh empty project
     const startFresh = () => {
         trackEvent(APP_EVENTS.SAVE_PROJECT);
         const fresh = createNewProject('Untitled Project');
@@ -502,10 +450,6 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             projects: data.projects,
             currentProject,
             currentProjectId: data.currentProjectId,
-            selectedFrameIds: data.selectedFrameIds || [],
-            selectedImageIds: data.selectedImageIds || [],
-            selectedFrameTemplateIds: data.selectedFrameTemplateIds || [],
-            focusedArea: data.focusedArea,
             isLoaded,
             isProjectLoading,
             addProject,
@@ -516,11 +460,6 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             addToLibrary,
             removeFromLibrary,
             addImageToLibrary,
-            selectFrame,
-            setSelection,
-            setSelectedImages,
-            setSelectedFrameTemplates,
-            setFocusedArea,
             libraryState: data.libraryState || initialData.libraryState,
             frameState: data.frameState || initialData.frameState,
             updateLibraryState,

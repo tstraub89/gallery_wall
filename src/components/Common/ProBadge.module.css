@@ -1,13 +1,14 @@
 .badge {
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 800;
-    color: white;
-    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-    padding: 2px 4px;
+    color: #fff;
+    background: #7c3aed;
+    /* Solid Violet-600 for better readability */
+    padding: 4px 6px;
     border-radius: 4px;
     line-height: 1;
     text-transform: uppercase;
-    letter-spacing: normal;
+    letter-spacing: 0.05em;
     cursor: pointer;
     display: inline-block;
     transition: transform 0.1s, box-shadow 0.1s;
@@ -30,7 +31,8 @@
     right: 10px;
     z-index: 10;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    pointer-events: auto !important; /* Override pointer-events: none if parent has it */
+    pointer-events: auto !important;
+    /* Override pointer-events: none if parent has it */
 }
 
 /* Mobile specific tweaks if needed */

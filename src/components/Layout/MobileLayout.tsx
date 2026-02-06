@@ -2,7 +2,7 @@ import React, { ReactNode, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import styles from './MobileLayout.module.css';
-import { Undo2, Redo2, Share2, ChevronDown, CircleHelp, Grid, SlidersHorizontal, Menu, Save, FolderOpen, Eraser, Printer, Sparkles } from 'lucide-react';
+import { Undo2, Redo2, Share2, ChevronDown, CircleHelp, Grid, SlidersHorizontal, Menu, Save, FolderOpen, Eraser, Printer, Sparkles, Bug } from 'lucide-react';
 import Logo from '../Header/Logo';
 import pkg from '../../../package.json';
 import { useProject } from '../../hooks/useProject';
@@ -21,6 +21,7 @@ import { saveImage } from '../../utils/imageStore';
 import { v4 as uuidv4 } from 'uuid';
 import { ViewportProvider } from '../../context/ViewportContext';
 import { useProModal } from '../../context/ProContext';
+import { useBugReporter } from '../../hooks/useBugReporter';
 
 interface MobileLayoutProps {
     children: ReactNode;
@@ -35,6 +36,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
     const { shareProjectImage, exportToGwall, isExporting: isBusy } = useExport();
     const { exportToPDFGuide, isExporting: isPDFBusy, pdfReadyUrl, triggerPdfShare, clearPdfReady } = usePDFExport();
     const { isPro, isBeta } = useProModal();
+    const { reportBug } = useBugReporter();
 
     const isExporting = isBusy || isPDFBusy;
 
@@ -319,6 +321,10 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                                     <span>Import Project (.gwall)</span>
                                     <ProBadge isOverlay style={{ position: 'absolute', right: 0 }} />
                                 </div>
+                            </div>
+                            <div className={styles.menuItem} onClick={() => { setShowMenu(false); reportBug(); }}>
+                                <Bug size={16} style={{ marginRight: 8 }} />
+                                Report an Issue (Beta)
                             </div>
                             <div className={styles.menuItem} onClick={() => { setShowMenu(false); setShowHelp(true); }}>
                                 <CircleHelp size={16} style={{ marginRight: 8 }} />

@@ -1,5 +1,6 @@
 import { RecommenderInput, LayoutSolution, PlacedFrame, RecommenderFrame } from '../types';
 import { hasCollision, isWithinBounds } from '../utils/geometry';
+import { estimateMaxCapacity } from '../utils/heuristics';
 
 // Fisher-Yates shuffle
 function shuffle<T>(array: T[]): T[] {
@@ -39,18 +40,58 @@ export class SkylineGenerator {
         let attempts = 0;
 
         // Check how many "good enough" solutions we already have
-        const desiredSolutions = 4;
-        const passingThreshold = input.config.forceAll ? totalFrames : Math.max(1, Math.floor(totalFrames * 0.9));
+        const desiredSolutions = 10;
+
+        // 1. Area Capacity (Standard)
+        const areaCap = estimateMaxCapacity(input);
+
+        // 2. Linear Capacity (Specific to Skyline)
+        const shelfCount = (input.config as any).shelfCount || 1;
+        const availableWidthPerShelf = input.wall.width - ((input.config.margin || 0) * 2);
+        const totalLinearSpace = availableWidthPerShelf * shelfCount;
+
+        // Calculate average frame width + spacing
+        let totalFrameWidth = 0;
+        expandedInventory.forEach(f => totalFrameWidth += f.width);
+        const avgFrameWidth = totalFrames > 0 ? (totalFrameWidth / totalFrames) : 10;
+        const spacing = input.config.spacing || 0;
+
+        // Conservative linear capacity: How many avg frames fit side-by-side on all shelves?
+        const linearCap = Math.floor(totalLinearSpace / (avgFrameWidth + spacing));
+
+        // Use the strictest limit
+        const maxCap = Math.min(areaCap, linearCap);
+
+        const passingThreshold = input.config.forceAll ? totalFrames : Math.max(1, Math.min(Math.floor(totalFrames * 0.9), maxCap));
 
         let satisfactoryCount = solutions.filter(s => s.frames.length >= passingThreshold).length;
+
+        // Deduplication Helper
+        const getSignature = (frames: PlacedFrame[]) => {
+            const sorted = [...frames].sort((a, b) => {
+                const dy = Math.round(a.y) - Math.round(b.y);
+                if (Math.abs(dy) > 1) return dy;
+                return Math.round(a.x) - Math.round(b.x);
+            });
+            return sorted.map(f =>
+                `${Math.round(f.x)},${Math.round(f.y)},${Math.round(f.width)},${Math.round(f.height)}`
+            ).join('|');
+        };
+
+        const signatures = new Set<string>();
+        solutions.forEach(s => signatures.add(getSignature(s.frames)));
 
         while (satisfactoryCount < desiredSolutions && (performance.now() - startTime < timeLimit) && attempts < maxAttempts) {
             attempts++;
             const randomSol = this.createSolution(input, shuffle(expandedInventory));
             if (randomSol.frames.length > 0) {
-                solutions.push(randomSol);
-                if (randomSol.frames.length >= passingThreshold) {
-                    satisfactoryCount++;
+                const sig = getSignature(randomSol.frames);
+                if (!signatures.has(sig)) {
+                    signatures.add(sig);
+                    solutions.push(randomSol);
+                    if (randomSol.frames.length >= passingThreshold) {
+                        satisfactoryCount++;
+                    }
                 }
             }
         }
@@ -214,6 +255,11 @@ export class SkylineGenerator {
         // BUT, SkylineGenerator logic uses 'solutions' loop.
         // Wait, 'createSolution' takes 'sortedFrames' (which IS the flattened inventory).
         // So we can check if validPlaced.length < sortedFrames.length.
+
+        // Wait, sortedFrames is expanded, so it has correct total count.
+        // We need to compare to THAT.
+        // But 'createSolution' signature above accepts sortedFrames.
+        // So we are good.
 
         if (config.forceAll && validPlaced.length < sortedFrames.length) {
             return {

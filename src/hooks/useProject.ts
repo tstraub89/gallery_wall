@@ -1,10 +1,19 @@
 import { useContext } from 'react';
-import { ProjectContext, ProjectContextType } from '../context/ProjectContextCore';
+import { ProjectContext } from '../context/ProjectContextCore';
+import { useSelection } from '../context/SelectionContext';
+import { ProjectContextType } from '../context/ProjectContextCore';
 
 export const useProject = (): ProjectContextType => {
-    const context = useContext(ProjectContext);
-    if (context === undefined) {
+    const projectContext = useContext(ProjectContext);
+    const selectionContext = useSelection();
+
+    if (projectContext === undefined) {
         throw new Error('useProject must be used within a ProjectProvider');
     }
-    return context;
+
+    // Merge the contexts to maintain the original API
+    return {
+        ...projectContext,
+        ...selectionContext
+    };
 };
