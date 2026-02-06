@@ -41,7 +41,73 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
             <div className={styles.modal} onClick={e => e.stopPropagation()}>
                 <header className={styles.header}>
                     <h2>{isMobile ? 'Mobile Guide' : 'Quick Start Guide'}</h2>
-                    <button className={styles.closeBtn} onClick={onClose}>&times;</button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        {!isMobile ? (
+                            /* DESKTOP HEADER ACTIONS */
+                            <>
+                                <button
+                                    className={styles.secondaryBtn}
+                                    onClick={handleLoadDemo}
+                                    disabled={isLoadingDemo}
+                                    style={{ padding: '6px 12px', fontSize: '13px' }}
+                                >
+                                    <Sparkles size={14} />
+                                    {isLoadingDemo ? 'Loading...' : 'Load Demo Wall'}
+                                </button>
+                                <div style={{ width: '1px', height: '20px', background: 'var(--border-color)' }}></div>
+                                <Link
+                                    to="/help"
+                                    target="_blank"
+                                    className={styles.textLinkBtn}
+                                    style={{ fontSize: '12px' }}
+                                >
+                                    <span>Full Manual</span>
+                                    <ExternalLink size={12} />
+                                </Link>
+                                <a
+                                    href="https://github.com/tstraub89/gallery_wall"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={styles.githubLink}
+                                    title="View Source on GitHub"
+                                    style={{ display: 'flex', alignItems: 'center', color: 'var(--text-secondary)' }}
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+                                        <path d="M9 18c-4.51 2-5-2-7-2" />
+                                    </svg>
+                                </a>
+                                <div style={{ width: '1px', height: '20px', background: 'var(--border-color)' }}></div>
+                            </>
+                        ) : (
+                            /* MOBILE HEADER ACTIONS */
+                            <>
+                                <Link
+                                    to="/help"
+                                    target="_blank"
+                                    className={styles.textLinkBtn}
+                                    style={{ fontSize: '12px', padding: '4px 8px' }}
+                                >
+                                    <span>Manual</span>
+                                    <ExternalLink size={12} />
+                                </Link>
+                                <a
+                                    href="https://github.com/tstraub89/gallery_wall"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={styles.githubLink}
+                                    title="GitHub"
+                                    style={{ display: 'flex', alignItems: 'center', color: 'var(--text-secondary)' }}
+                                >
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+                                        <path d="M9 18c-4.51 2-5-2-7-2" />
+                                    </svg>
+                                </a>
+                            </>
+                        )}
+                        <button className={styles.closeBtn} onClick={onClose}>&times;</button>
+                    </div>
                 </header>
 
                 <div className={styles.content}>
@@ -156,71 +222,30 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                 </div>
 
                 <footer className={styles.footer}>
-                    <div className={styles.footerActions}>
-                        {!isMobile && (
-                            <Link
-                                to="/help"
-                                target="_blank"
-                                className={styles.textLinkBtn}
+                    {isMobile && (
+                        <div className={styles.footerActions} style={{ justifyContent: 'center' }}>
+                            <button
+                                className={styles.secondaryBtn}
+                                onClick={handleLoadDemo}
+                                disabled={isLoadingDemo}
+                                style={{ minWidth: '200px', justifyContent: 'center' }}
                             >
-                                <span>View Full User Manual</span>
-                                <ExternalLink size={14} />
-                            </Link>
-                        )}
-
-                        <button
-                            className={styles.secondaryBtn}
-                            onClick={handleLoadDemo}
-                            disabled={isLoadingDemo}
-                        >
-                            <Sparkles size={16} />
-                            {isLoadingDemo ? 'Loading...' : 'Load Demo Wall'}
-                        </button>
-
-                        {isMobile && (
-                            <Link
-                                to="/help"
-                                target="_blank"
-                                className={styles.textLinkBtn}
-                            >
-                                <span>View Full User Manual</span>
-                                <ExternalLink size={14} />
-                            </Link>
-                        )}
-                    </div>
-
-                    <div className={styles.footerMeta}>
-                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                            <a
-                                href="https://github.com/tstraub89/gallery_wall"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={styles.githubLink}
-                                title="View Source on GitHub"
-                                style={{ display: 'flex', alignItems: 'center', color: 'var(--text-secondary)', padding: '4px' }}
-                            >
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-                                    <path d="M9 18c-4.51 2-5-2-7-2" />
-                                </svg>
-                            </a>
-                            <a
-                                href="https://www.buymeacoffee.com/tstraub89"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <img
-                                    src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-                                    alt="Buy Me A Coffee"
-                                    style={{ height: '30px', width: 'auto', display: 'block' }}
-                                />
-                            </a>
+                                <Sparkles size={16} />
+                                {isLoadingDemo ? 'Loading...' : 'Load Demo Wall'}
+                            </button>
                         </div>
-                        <span style={{ fontSize: '10px', color: '#999', textAlign: 'right' }}>
-                            v{__APP_VERSION__} beta
-                            <br />
-                            {new Date(__BUILD_TIME__).toLocaleString()}
-                        </span>
+                    )}
+
+                    <div style={{
+                        marginTop: isMobile ? '12px' : '0',
+                        paddingTop: isMobile ? '12px' : '0',
+                        borderTop: isMobile ? '1px solid rgba(0,0,0,0.05)' : 'none',
+                        fontSize: '11px',
+                        color: '#8e8e93',
+                        textAlign: 'center',
+                        lineHeight: '1.5'
+                    }}>
+                        GalleryPlanner runs locally in your browser, keeps your photos and layouts on your device, and only collects anonymous, cookie-free usage metrics.
                     </div>
                 </footer>
             </div>

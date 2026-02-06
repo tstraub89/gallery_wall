@@ -178,14 +178,14 @@
 .featureText strong {
     color: #1c1c1e;
     font-weight: 600;
-    display: block;
-    margin-bottom: 4px;
 }
 
 .featureText span {
     color: #636366;
     font-size: 15px;
     line-height: 1.5;
+    display: block;
+    margin-top: 4px;
 }
 
 /* Table */

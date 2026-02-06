@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProjectProvider } from './context/ProjectContext';
 import { LayoutProvider } from './context/LayoutContext';
 import { ProProvider } from './context/ProContext';
@@ -15,10 +15,14 @@ import LandingPage from './components/Landing/LandingPage';
 // import WelcomeModal from './components/Common/WelcomeModal'; // Moved to lazy load
 const WelcomeModal = React.lazy(() => import('./components/Common/WelcomeModal'));
 const HelpPage = React.lazy(() => import('./components/Help/HelpPage'));
+const PrivacyPolicy = React.lazy(() => import('./components/Landing/PrivacyPolicy'));
+const AboutPage = React.lazy(() => import('./components/Landing/AboutPage'));
+const NotFound = React.lazy(() => import('./components/Common/NotFound'));
 import { useProject } from './hooks/useProject';
 
 import { useIsMobile } from './hooks/useIsMobile';
 import { MobileLayout } from './components/Layout/MobileLayout';
+import ScrollToTop from './components/Common/ScrollToTop';
 
 // Inner component that can use context
 const AppTool: React.FC = () => {
@@ -88,16 +92,31 @@ const App: React.FC = () => {
       <LayoutProvider>
         <ProProvider>
           <BrowserRouter>
+            <ScrollToTop />
             <Routes>
               <Route path="/" element={<LandingPage />} />
+              <Route path="/privacy" element={
+                <React.Suspense fallback={null}>
+                  <PrivacyPolicy />
+                </React.Suspense>
+              } />
+              <Route path="/about" element={
+                <React.Suspense fallback={null}>
+                  <AboutPage />
+                </React.Suspense>
+              } />
               <Route path="/help" element={
                 <React.Suspense fallback={null}>
                   <HelpPage />
                 </React.Suspense>
               } />
               <Route path="/app" element={<AppTool />} />
-              {/* Fallback to landing */}
-              <Route path="*" element={<Navigate to="/" replace />} />
+              {/* Fallback to NotFound */}
+              <Route path="*" element={
+                <React.Suspense fallback={null}>
+                  <NotFound />
+                </React.Suspense>
+              } />
             </Routes>
           </BrowserRouter>
         </ProProvider>

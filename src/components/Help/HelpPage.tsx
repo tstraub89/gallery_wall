@@ -1,35 +1,31 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import styles from './HelpPage.module.css';
-import Logo from '../Header/Logo';
 import {
     Grid3x3,
     Image,
     MousePointer2,
-    Sparkles,
     Keyboard,
+    ArrowRight,
     CheckCircle2,
-    ArrowRight
+    Sparkles,
+    Smartphone
 } from 'lucide-react';
+import WebsiteHeader from '../Layout/WebsiteHeader';
+import WebsiteFooter from '../Layout/WebsiteFooter';
+import BackToTop from '../Common/BackToTop';
 
 const HelpPage: React.FC = () => {
     return (
         <div className={styles.container}>
-            <header className={styles.header}>
-                <div className={styles.logoArea}>
-                    <Logo />
-                </div>
-                <nav className={styles.nav}>
-                    <Link to="/" className={styles.navLink}>Home</Link>
-                    <Link to="/app" className={styles.ctaBtn}>Launch App</Link>
-                </nav>
-            </header>
+            <WebsiteHeader />
 
+            {/* Main Content */}
             <main className={styles.content}>
                 <div className={styles.hero}>
-                    <h1>User Manual & Guide</h1>
+                    <h1>Help & Resources</h1>
                     <p className={styles.intro}>
-                        Master the powerful layout tools in GalleryPlanner. From inventory management to smart algorithms, here is everything you need to know.
+                        Everything you need to know about creating your perfect gallery wall.
+                        Learn how to manage inventory, arrange layouts, and export for installation.
                     </p>
                 </div>
 
@@ -189,6 +185,42 @@ const HelpPage: React.FC = () => {
                         </div>
                     </section>
 
+                    {/* Mobile Experience */}
+                    <section id="mobile" className={styles.card}>
+                        <div className={styles.cardHeader}>
+                            <div className={styles.iconWrapper}>
+                                <Smartphone size={24} />
+                            </div>
+                            <h2>Mobile Experience</h2>
+                        </div>
+                        <div className={styles.cardContent}>
+                            <p>The mobile web app is optimized for planning on the go. While it features a streamlined set of tools compared to the desktop version, it remains fully capable.</p>
+                            <ul className={styles.featureList}>
+                                <li className={styles.featureItem}>
+                                    <CheckCircle2 size={18} className={styles.checkIcon} />
+                                    <div className={styles.featureText}>
+                                        <strong>Touch-Optimized Gestures</strong>
+                                        <span>Pinch to zoom, drag to pan, and tap to select. Long-press any frame to access the context menu (Lock, Delete, Layer).</span>
+                                    </div>
+                                </li>
+                                <li className={styles.featureItem}>
+                                    <CheckCircle2 size={18} className={styles.checkIcon} />
+                                    <div className={styles.featureText}>
+                                        <strong>Focused Feature Set</strong>
+                                        <span>Includes all essential planning tools: Smart Layouts, Wall Setup, and Photo Management. Shortcuts and advanced bulk selection are desktop-exclusive.</span>
+                                    </div>
+                                </li>
+                                <li className={styles.featureItem}>
+                                    <CheckCircle2 size={18} className={styles.checkIcon} />
+                                    <div className={styles.featureText}>
+                                        <strong>Seamless Handoff</strong>
+                                        <span>Export your project file (.gwall) from desktop and open it on mobile to view your plan in the actual room.</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </section>
+
                     {/* Shortcuts */}
                     <section id="shortcuts" className={styles.card}>
                         <div className={styles.cardHeader}>
@@ -260,9 +292,8 @@ const HelpPage: React.FC = () => {
                     </section>
                 </div>
 
-                <footer className={styles.footer}>
-                    © 2026 Timothy Straub. Built with precision for beautiful homes.
-                </footer>
+                <WebsiteFooter />
+                <BackToTop />
             </main>
         </div>
     );

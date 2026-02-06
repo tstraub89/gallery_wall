@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './LandingPage.module.css';
 import Logo from '../Header/Logo';
+import WebsiteFooter from '../Layout/WebsiteFooter';
+import BackToTop from '../Common/BackToTop';
 import { Sparkles, LayoutGrid, CheckCircle2, Image } from 'lucide-react';
 import { trackEvent, LANDING_EVENTS } from '../../utils/analytics';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
@@ -60,6 +62,68 @@ const LandingPage: React.FC = () => {
                     alt="GalleryPlanner Workspace"
                     className={styles.heroScreenshot}
                 />
+            </section>
+
+            {/* How It Works */}
+            <section className={styles.features} style={{ background: '#fff', paddingBottom: '0' }}>
+                <div className={styles.sectionHeader}>
+                    <h2>How it Works</h2>
+                    <p>Go from pile-of-frames to perfect wall in minutes.</p>
+                </div>
+
+                <div className={styles.featureRow} style={{ alignItems: 'flex-start', maxWidth: '1000px' }}>
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '40px' }}>
+                        <div style={{ display: 'flex', gap: '20px' }}>
+                            <div style={{
+                                background: '#f2f2f7', color: '#1c1c1e', width: '40px', height: '40px',
+                                borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontWeight: 'bold', fontSize: '18px', flexShrink: 0
+                            }}>1</div>
+                            <div>
+                                <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>Upload & Measure</h3>
+                                <p style={{ color: '#636366', lineHeight: '1.5' }}>
+                                    Input your wall dimensions and add your frames. Use our presets or enter custom sizes.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '20px' }}>
+                            <div style={{
+                                background: '#f2f2f7', color: '#1c1c1e', width: '40px', height: '40px',
+                                borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontWeight: 'bold', fontSize: '18px', flexShrink: 0
+                            }}>2</div>
+                            <div>
+                                <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>Design & Arrange</h3>
+                                <p style={{ color: '#636366', lineHeight: '1.5' }}>
+                                    Drag, drop, and align. Use AI layouts to find the perfect fit for your collection.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '20px' }}>
+                            <div style={{
+                                background: '#007aff', color: 'white', width: '40px', height: '40px',
+                                borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                fontWeight: 'bold', fontSize: '18px', flexShrink: 0
+                            }}>3</div>
+                            <div>
+                                <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>Hang with Confidence</h3>
+                                <p style={{ color: '#636366', lineHeight: '1.5' }}>
+                                    Export a PDF guide with exact coordinates for every nail. No more Swiss-cheese walls.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className={styles.featureImage} style={{ flex: 1, boxShadow: '0 20px 50px rgba(0,0,0,0.1)' }}>
+                        <img
+                            src="/hanging_guide.png"
+                            alt="Hanging Guide PDF Example"
+                            style={{ width: '100%', borderRadius: '12px', display: 'block' }}
+                        />
+                    </div>
+                </div>
             </section>
 
             {/* Features */}
@@ -129,17 +193,8 @@ const LandingPage: React.FC = () => {
             </section>
 
             {/* Footer */}
-            <footer className={styles.footer}>
-                <div className={styles.footerContent}>
-                    <Logo hideStatus />
-                    <div className={styles.footerLinks}>
-                        <Link to="/help" style={{ color: '#8e8e93', textDecoration: 'none', marginRight: '20px' }}>Help & Resources</Link>
-                    </div>
-                    <div className={styles.copyright}>
-                        © 2026 Timothy Straub. Built with precision for beautiful homes.
-                    </div>
-                </div>
-            </footer>
+            <WebsiteFooter />
+            <BackToTop />
         </div>
     );
 };
