@@ -255,6 +255,35 @@
     color: #8e8e93;
 }
 
+.footerLinks {
+    display: flex;
+    gap: 32px;
+    text-align: left;
+}
+
+.footerColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.footerColumnTitle {
+    color: #1c1c1e;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.footerLink {
+    color: #636366;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.footerLink:hover {
+    color: #007aff;
+}
+
 @media (max-width: 850px) {
     .hero h1 {
         font-size: 40px;
@@ -288,5 +317,38 @@
         height: auto;
         max-height: 400px;
         object-fit: contain;
+    }
+
+    .footerContent {
+        flex-direction: column;
+        align-items: center;
+        gap: 40px;
+        text-align: center;
+    }
+
+    .footerLinks {
+        width: 100%;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 40px 20px;
+        text-align: left;
+    }
+}
+
+@media (max-width: 480px) {
+    .footerLinks {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 40px;
+    }
+
+    .footerContent {
+        align-items: center;
+        text-align: center;
+    }
+
+    /* Ensure flex start alignment is overridden or handled */
+    .footerContent>div:first-child {
+        align-items: center !important;
     }
 }

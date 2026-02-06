@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.5] - 2026-02-06
+
+### 💅 UI Improvements
+- **Mobile Footer**: Refactored the website footer into a responsive grid. The link columns now stack vertically on small screens, preventing overcrowding and improving touch targets.
+
 ## [0.2.4] - 2026-02-06
 
 ### ⚡ Performance
