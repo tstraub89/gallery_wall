@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import ImportFile from './ImportFile';
 import CommonSizePicker from './CommonSizePicker';
 import ManualEntryForm from './ManualEntryForm';
@@ -100,7 +101,9 @@ const FrameLibrary: React.FC = () => {
                 </div>
 
                 <div className={styles.footer}>
-                    <span>Gallery Planner v{pkg.version} beta</span>
+                    <Link to="/changelog" style={{ textDecoration: 'none', color: 'inherit' }}>
+                        <span>Gallery Planner v{pkg.version} beta</span>
+                    </Link>
                     <span style={{ fontSize: '10px', marginTop: '4px', color: 'var(--text-secondary)' }}>Pro features are free during beta</span>
                     <span style={{ marginTop: '6px', fontSize: '9px', opacity: 0.5 }}>© 2026 Timothy Straub</span>
                 </div>
