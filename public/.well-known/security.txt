@@ -1,0 +1,16 @@
+# Security Policy
+
+# Contact
+# Use this contact channel to report security vulnerabilities
+Contact: https://github.com/tstraub89/gallery_wall/security/advisories/new
+
+# Policy
+# We prefer that you use GitHub Security Advisories for reporting.
+Policy: https://github.com/tstraub89/gallery_wall/security/policy
+
+# Expires
+# Date when this file should be reviewed
+Expires: 2027-01-01T00:00:00.000Z
+
+# Languages
+Preferred-Languages: en

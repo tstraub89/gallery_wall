@@ -29,26 +29,19 @@ const HelpPage: React.FC = () => {
                         Everything you need to know about creating your perfect gallery wall.
                         Learn how to manage inventory, arrange layouts, and export for installation.
                     </p>
-                    <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+                    <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
                         <button
-                            className={styles.secondaryBtn} // Use existing or inline style if needed
+                            className={styles.actionBtn}
                             onClick={reportBug}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                background: '#f5f5f7',
-                                border: '1px solid #e1e1e6',
-                                borderRadius: '8px',
-                                padding: '8px 16px',
-                                fontSize: '14px',
-                                fontWeight: 500,
-                                color: '#1d1d1f',
-                                cursor: 'pointer'
-                            }}
                         >
                             <span role="img" aria-label="bug">🐞</span> Report an Issue
                         </button>
+                        <a
+                            href="mailto:hello@gallery-planner.com"
+                            className={styles.actionBtn}
+                        >
+                            <span role="img" aria-label="email">✉️</span> Contact Us
+                        </a>
                     </div>
                 </div>
 

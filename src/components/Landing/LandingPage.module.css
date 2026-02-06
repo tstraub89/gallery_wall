@@ -171,18 +171,27 @@
     line-height: 1.6;
 }
 
-.featureImage {
+.featureImageWrapper {
     flex: 1.2;
-    max-width: 100%;
-    height: auto;
-    border-radius: 16px;
+    position: relative;
+    border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
     border: 1px solid rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s ease;
+    overflow: hidden;
+    /* Aspect Ratio 3:2 enforcement */
+    aspect-ratio: 3/2;
+    background: #f2f2f7;
+}
+
+.featureImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
 }
 
 .featureRow:hover .featureImage {
-    transform: scale(1.02);
+    transform: scale(1.03);
 }
 
 /* Pro / Beta Section */
@@ -311,12 +320,13 @@
         padding: 0 20px;
     }
 
-    .featureImage {
+    .featureImageWrapper {
         flex: none;
         width: 100%;
-        height: auto;
-        max-height: 400px;
-        object-fit: contain;
+        max-height: 500px;
+        aspect-ratio: auto;
+        /* Allow natural height on mobile if needed, or keep 3/2 */
+        aspect-ratio: 3/2;
     }
 
     .footerContent {

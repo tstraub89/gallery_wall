@@ -34,6 +34,8 @@ const AboutPage: React.FC = () => {
                         <img
                             src="/tim-straub.jpeg"
                             alt="Timothy Straub"
+                            width="120"
+                            height="120"
                             style={{
                                 width: '120px',
                                 height: '120px',

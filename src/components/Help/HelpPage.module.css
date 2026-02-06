@@ -34,16 +34,6 @@
 }
 
 .navLink:hover {
-    color: #1c1c1e;
-}
-
-.ctaBtn {
-    background: #1c1c1e;
-    color: white !important;
-    padding: 8px 18px;
-    border-radius: 99px;
-    font-size: 14px;
-    font-weight: 600;
     text-decoration: none;
     transition: transform 0.2s, background-color 0.2s;
 }
@@ -228,6 +218,32 @@
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-size: 13px;
     box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+.actionBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    border-radius: 99px;
+    padding: 16px 32px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1c1c1e;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    /* Removed margins/centering properties because the parent container handles layout now */
+}
+
+.actionBtn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #007aff;
+    border-color: #007aff;
 }
 
 .footer {
