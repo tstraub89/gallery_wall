@@ -162,30 +162,34 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const deleteProject = (id: string) => {
+        // Calculate potential remaining projects to determine if this is the last one
+        const remainingIds = Object.keys(data.projects).filter(pid => pid !== id);
+
+        if (remainingIds.length === 0) {
+            // Deleting the last project - Reset to empty state and show Welcome Modal
+            clearImageCache();
+            setData(prev => ({
+                ...prev,
+                projects: {},
+                currentProjectId: null,
+                selectedFrameIds: []
+            }));
+            setShowWelcome(true);
+            return;
+        }
+
         setData(prev => {
             const newProjects = { ...prev.projects };
             delete newProjects[id];
 
-            const remainingIds = Object.keys(newProjects);
-            let newCurrentId = null;
-
-            if (remainingIds.length === 0) {
-                // If it was the last project, create a new one immediately
-                const fresh = createNewProject('Untitled Project');
-                return {
-                    ...prev,
-                    projects: { [fresh.id]: fresh },
-                    currentProjectId: fresh.id,
-                    selectedFrameIds: []
-                };
-            }
+            let newCurrentId = prev.currentProjectId;
 
             if (prev.currentProjectId === id) {
-                // If deleting current project, clear cache before switching
+                // If deleting current project, clear cache before switching to the next available
                 clearImageCache();
-                newCurrentId = remainingIds[0];
-            } else {
-                newCurrentId = prev.currentProjectId;
+                // remainingIds calculation above is based on current state, 
+                // but inside setData properly uses newProjects keys
+                newCurrentId = Object.keys(newProjects)[0] || null;
             }
 
             return {

@@ -28,8 +28,8 @@ const LandingPage: React.FC = () => {
                 <nav className={styles.nav}>
                     <a href="#features">Features</a>
                     <a href="#pro">Pro</a>
-                    <Link 
-                        to="/app" 
+                    <Link
+                        to="/app"
                         className={styles.ctaBtn}
                         onClick={() => trackEvent(LANDING_EVENTS.NAV_LAUNCH)}
                     >
@@ -47,8 +47,8 @@ const LandingPage: React.FC = () => {
                     Get instant measurements and professional hanging guides.
                 </p>
                 <div className={styles.heroActions}>
-                    <Link 
-                        to="/app" 
+                    <Link
+                        to="/app"
                         className={`${styles.ctaBtn} ${styles.mainCta}`}
                         onClick={() => trackEvent(LANDING_EVENTS.HERO_CTA)}
                     >
@@ -118,8 +118,8 @@ const LandingPage: React.FC = () => {
                         <div className={styles.checkItem}><CheckCircle2 className={styles.checkIcon} /> Custom Frame Shapes</div>
                     </div>
 
-                    <Link 
-                        to="/app" 
+                    <Link
+                        to="/app"
                         className={`${styles.ctaBtn} ${styles.mainCta}`}
                         onClick={() => trackEvent(LANDING_EVENTS.PRO_SECTION_CTA)}
                     >
@@ -132,6 +132,9 @@ const LandingPage: React.FC = () => {
             <footer className={styles.footer}>
                 <div className={styles.footerContent}>
                     <Logo hideStatus />
+                    <div className={styles.footerLinks}>
+                        <Link to="/help" style={{ color: '#8e8e93', textDecoration: 'none', marginRight: '20px' }}>Help & Resources</Link>
+                    </div>
                     <div className={styles.copyright}>
                         © 2026 Timothy Straub. Built with precision for beautiful homes.
                     </div>

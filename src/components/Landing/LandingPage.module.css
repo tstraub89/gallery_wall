@@ -85,6 +85,7 @@
     line-height: 1.1;
     margin-bottom: 24px;
     background: linear-gradient(to bottom, #1c1c1e, #636366);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -279,5 +280,13 @@
 
     .header {
         padding: 0 20px;
+    }
+
+    .featureImage {
+        flex: none;
+        width: 100%;
+        height: auto;
+        max-height: 400px;
+        object-fit: contain;
     }
 }

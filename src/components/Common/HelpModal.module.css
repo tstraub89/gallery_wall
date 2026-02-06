@@ -170,10 +170,25 @@
     padding: var(--spacing-lg) var(--spacing-xl);
     border-top: 1px solid var(--border-color);
     display: flex;
-    justify-content: flex-end;
+    flex-direction: column;
+    gap: 16px;
+    background: #fcfcfc;
+}
+
+.footerActions {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: var(--spacing-md);
-    flex-wrap: wrap;
+    width: 100%;
+}
+
+.footerMeta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    border-top: 1px solid var(--border-color);
+    padding-top: 12px;
 }
 
 .githubLink {
@@ -186,19 +201,22 @@
 }
 
 @media (max-width: 600px) {
-    .footer {
-        justify-content: center;
-    }
-
-    .footer>* {
-        flex: 1 1 auto;
-        justify-content: center;
+    .footerActions {
+        flex-direction: column-reverse;
+        gap: 12px;
     }
 
     .secondaryBtn,
-    .primaryBtn {
+    .textLinkBtn {
         width: 100%;
         justify-content: center;
+    }
+
+    .footerMeta {
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        text-align: center;
     }
 
     .shortcutsSection {
@@ -243,4 +261,21 @@
 .secondaryBtn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+.textLinkBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--accent-color);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.textLinkBtn:hover {
+    background: rgba(0, 0, 0, 0.04);
 }

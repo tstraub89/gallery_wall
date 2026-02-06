@@ -14,6 +14,7 @@ import WindowControls from './components/Header/WindowControls';
 import LandingPage from './components/Landing/LandingPage';
 // import WelcomeModal from './components/Common/WelcomeModal'; // Moved to lazy load
 const WelcomeModal = React.lazy(() => import('./components/Common/WelcomeModal'));
+const HelpPage = React.lazy(() => import('./components/Help/HelpPage'));
 import { useProject } from './hooks/useProject';
 
 import { useIsMobile } from './hooks/useIsMobile';
@@ -89,6 +90,11 @@ const App: React.FC = () => {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<LandingPage />} />
+              <Route path="/help" element={
+                <React.Suspense fallback={null}>
+                  <HelpPage />
+                </React.Suspense>
+              } />
               <Route path="/app" element={<AppTool />} />
               {/* Fallback to landing */}
               <Route path="*" element={<Navigate to="/" replace />} />

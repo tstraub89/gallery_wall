@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
 import styles from './HelpModal.module.css';
 import { useProject } from '../../hooks/useProject';
 import { useIsMobile } from '../../hooks/useIsMobile';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, ExternalLink } from 'lucide-react';
 
 interface HelpModalProps {
     onClose: () => void;
@@ -154,18 +155,41 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                     )}
                 </div>
 
-                <footer className={styles.footer} style={{ flexDirection: 'column', gap: '16px', alignItems: 'center' }}>
-                    <button
-                        className={styles.secondaryBtn}
-                        onClick={handleLoadDemo}
-                        disabled={isLoadingDemo}
-                        style={{ width: '100%', maxWidth: '300px', justifyContent: 'center', background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}
-                    >
-                        <Sparkles size={16} />
-                        {isLoadingDemo ? 'Loading...' : 'Load Demo Wall'}
-                    </button>
+                <footer className={styles.footer}>
+                    <div className={styles.footerActions}>
+                        {!isMobile && (
+                            <Link
+                                to="/help"
+                                target="_blank"
+                                className={styles.textLinkBtn}
+                            >
+                                <span>View Full User Manual</span>
+                                <ExternalLink size={14} />
+                            </Link>
+                        )}
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', borderTop: '1px solid var(--border-color)', paddingTop: '12px' }}>
+                        <button
+                            className={styles.secondaryBtn}
+                            onClick={handleLoadDemo}
+                            disabled={isLoadingDemo}
+                        >
+                            <Sparkles size={16} />
+                            {isLoadingDemo ? 'Loading...' : 'Load Demo Wall'}
+                        </button>
+
+                        {isMobile && (
+                            <Link
+                                to="/help"
+                                target="_blank"
+                                className={styles.textLinkBtn}
+                            >
+                                <span>View Full User Manual</span>
+                                <ExternalLink size={14} />
+                            </Link>
+                        )}
+                    </div>
+
+                    <div className={styles.footerMeta}>
                         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                             <a
                                 href="https://github.com/tstraub89/gallery_wall"
@@ -196,7 +220,8 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                             v{__APP_VERSION__} beta
                             <br />
                             {new Date(__BUILD_TIME__).toLocaleString()}
-                        </span>                    </div>
+                        </span>
+                    </div>
                 </footer>
             </div>
         </div>
