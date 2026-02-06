@@ -17,6 +17,7 @@ const WelcomeModal = React.lazy(() => import('./components/Common/WelcomeModal')
 const HelpPage = React.lazy(() => import('./components/Help/HelpPage'));
 const PrivacyPolicy = React.lazy(() => import('./components/Landing/PrivacyPolicy'));
 const AboutPage = React.lazy(() => import('./components/Landing/AboutPage'));
+const ChangelogPage = React.lazy(() => import('./components/Landing/ChangelogPage'));
 const NotFound = React.lazy(() => import('./components/Common/NotFound'));
 import { useProject } from './hooks/useProject';
 
@@ -108,6 +109,11 @@ const App: React.FC = () => {
               <Route path="/help" element={
                 <React.Suspense fallback={null}>
                   <HelpPage />
+                </React.Suspense>
+              } />
+              <Route path="/changelog" element={
+                <React.Suspense fallback={null}>
+                  <ChangelogPage />
                 </React.Suspense>
               } />
               <Route path="/app" element={<AppTool />} />

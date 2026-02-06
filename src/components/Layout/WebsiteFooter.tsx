@@ -28,6 +28,7 @@ const WebsiteFooter: React.FC = () => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         <strong style={{ color: '#1c1c1e', fontSize: '14px' }}>Resources</strong>
                         <Link to="/help" style={{ color: '#636366', textDecoration: 'none', fontSize: '14px' }}>Help Center</Link>
+                        <Link to="/changelog" style={{ color: '#636366', textDecoration: 'none', fontSize: '14px' }}>What's New</Link>
                         <Link to="/about" style={{ color: '#636366', textDecoration: 'none', fontSize: '14px' }}>About</Link>
                         <Link to="/privacy" style={{ color: '#636366', textDecoration: 'none', fontSize: '14px' }}>Privacy</Link>
                     </div>
