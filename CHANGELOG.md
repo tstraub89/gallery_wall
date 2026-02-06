@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.5] - 2026-02-06
+
+### 🐛 Bug Fixes
+- **Export Menu**: Removed duplicate "Export Project" entry from the Export dropdown menu. It is now exclusively located in the Project menu.
+
 ## [0.2.4] - 2026-02-06
 
 ### ⚡ Performance
