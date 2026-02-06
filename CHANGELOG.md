@@ -2,21 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.2.6] - 2026-02-06
-
-### 🐛 Bug Fixes
-- **Website Navigation**: The "What's New" link in the footer now opens in the same tab, keeping you within the site flow.
-
-## [0.2.5] - 2026-02-06
-
-### 💅 UI Improvements
-- **Mobile Footer**: Refactored the website footer into a responsive grid. The link columns now stack vertically on small screens, preventing overcrowding and improving touch targets.
-
 ## [0.2.4] - 2026-02-06
 
 ### ⚡ Performance
 - **Mobile Assets**: Generated and implemented mobile-optimized variants (800px width) for all landing page images.
 - **Responsive Loading**: Added `srcset` attributes to serve lighter images specifically to mobile devices.
+
+### 💅 Website Improvements
+- **Mobile Footer**: Refactored the website footer into a responsive grid. The link columns now stack vertically on small screens.
+- **Navigation**: The "What's New" link in the footer now opens in the same tab.
 
 ## [0.2.3] - 2026-02-06
 
