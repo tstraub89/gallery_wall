@@ -174,16 +174,6 @@ const GlobalActions = () => {
                     {
                         label: (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
-                                <span>Export Project (.gwall)</span>
-                                <ProBadge />
-                            </div>
-                        ),
-                        onClick: exportToGwall,
-                        title: 'Save project with all photos for backup or sharing'
-                    },
-                    {
-                        label: (
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
                                 <span>Cropped Photos (.zip)</span>
                                 <ProBadge />
                             </div>
