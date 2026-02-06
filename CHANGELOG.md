@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.6] - 2026-02-06
+
+### 🐛 Bug Fixes
+- **Website Navigation**: The "What's New" link in the footer now opens in the same tab, keeping you within the site flow.
+
 ## [0.2.5] - 2026-02-06
 
 ### 💅 UI Improvements

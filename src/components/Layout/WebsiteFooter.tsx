@@ -30,8 +30,6 @@ const WebsiteFooter: React.FC = () => {
                         <Link to="/help" className={styles.footerLink}>Help Center</Link>
                         <Link
                             to="/changelog"
-                            target="_blank"
-                            rel="noopener noreferrer"
                             className={styles.footerLink}
                         >
                             What's New
