@@ -1,8 +1,10 @@
 import React, { ReactNode, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
 import styles from './MobileLayout.module.css';
 import { Undo2, Redo2, Share2, ChevronDown, CircleHelp, Grid, SlidersHorizontal, Menu, Save, FolderOpen, Eraser, Printer, Sparkles } from 'lucide-react';
 import Logo from '../Header/Logo';
+import pkg from '../../../package.json';
 import { useProject } from '../../hooks/useProject';
 import { useExport } from '../../hooks/useExport';
 import { usePDFExport } from '../../hooks/usePDFExport';
@@ -272,8 +274,8 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                             </div>
 
                             {!isPro && (
-                                <div 
-                                    className={styles.proSection} 
+                                <div
+                                    className={styles.proSection}
                                     title="During beta, Pro features are unlocked for free."
                                     onClick={() => { setShowMenu(false); setShowPro(true); }}
                                     style={{ cursor: 'pointer', opacity: 1 }}
@@ -323,6 +325,16 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                             <div className={`${styles.menuItem} ${styles.danger}`} onClick={handleClearCanvasClick}>
                                 <Eraser size={16} style={{ marginRight: 8 }} />
                                 Clear Canvas
+                            </div>
+
+                            <div style={{ textAlign: 'center', marginTop: '16px', marginBottom: '8px' }}>
+                                <Link
+                                    to="/changelog"
+                                    onClick={() => setShowMenu(false)}
+                                    style={{ textDecoration: 'none', color: '#8e8e93', fontSize: '11px', opacity: 0.7 }}
+                                >
+                                    Gallery Planner v{pkg.version} beta
+                                </Link>
                             </div>
 
                             <div className={styles.menuCancel} onClick={() => setShowMenu(false)}>Cancel</div>
