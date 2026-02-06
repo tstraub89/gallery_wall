@@ -22,7 +22,12 @@ const FullScreenOverlay = ({ children }: { children: React.ReactNode }) => {
 };
 
 const GlobalActions = () => {
-    const { currentProject, updateProject, addProject } = useProject();
+    const {
+        currentProject,
+        updateProject,
+        addProject,
+        setProjectLoading
+    } = useProject();
     const {
         isExporting: isBusy,
         exportError: err,
@@ -64,10 +69,8 @@ const GlobalActions = () => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // We can use isExporting state for loading UI or create a local one?
-        // Let's rely on the fact that isExporting is technically "isBusy" in the UI
-        // But for clarity let's just do it
         try {
+            setProjectLoading(true);
             const { project, images } = await importProjectBundle(file);
 
             const idMap = new Map<string, string>();
@@ -89,7 +92,7 @@ const GlobalActions = () => {
                 .map((id: any) => idMap.get(id)) : [];
 
             for (const img of remappedImages) {
-                await saveImage(img.id, img.blob);
+                await saveImage(img.id, img.blob, { skipOptimization: true });
             }
 
             const newId = addProject(project.name + ' (Imported)');
@@ -103,6 +106,7 @@ const GlobalActions = () => {
         } catch (err: any) {
             alert('Failed to import: ' + err.message);
         } finally {
+            setProjectLoading(false);
             e.target.value = '';
         }
     };
@@ -118,25 +122,25 @@ const GlobalActions = () => {
                 label="Project"
                 icon={<FolderOpen size={16} />}
                 items={[
-                    { 
+                    {
                         label: (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
                                 <span>Import Project (.gwall)</span>
                                 <ProBadge />
                             </div>
-                        ), 
-                        onClick: triggerImport, 
-                        title: 'Load a saved project including all photos' 
+                        ),
+                        onClick: triggerImport,
+                        title: 'Load a saved project including all photos'
                     },
-                    { 
+                    {
                         label: (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
                                 <span>Export Project (.gwall)</span>
                                 <ProBadge />
                             </div>
-                        ), 
-                        onClick: exportToGwall, 
-                        title: 'Save project with all photos for backup or sharing' 
+                        ),
+                        onClick: exportToGwall,
+                        title: 'Save project with all photos for backup or sharing'
                     },
                     { separator: true },
                     { label: 'Reset / Clear Canvas', onClick: handleClearCanvas, danger: true, title: 'Remove all frames from canvas' }
@@ -157,35 +161,35 @@ const GlobalActions = () => {
                 icon={<Download size={16} />}
                 items={[
                     { label: 'Snapshot (JPEG)', onClick: () => exportToPng(), title: 'Save a high-res snapshot of your wall layout' },
-                    { 
+                    {
                         label: (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
                                 <span>Hanging Guide (PDF)</span>
                                 <ProBadge />
                             </div>
-                        ), 
-                        onClick: exportToPDFGuide, 
-                        title: 'Download a printable guide with measurements and hang heights' 
+                        ),
+                        onClick: exportToPDFGuide,
+                        title: 'Download a printable guide with measurements and hang heights'
                     },
-                    { 
+                    {
                         label: (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
                                 <span>Export Project (.gwall)</span>
                                 <ProBadge />
                             </div>
-                        ), 
-                        onClick: exportToGwall, 
-                        title: 'Save project with all photos for backup or sharing' 
+                        ),
+                        onClick: exportToGwall,
+                        title: 'Save project with all photos for backup or sharing'
                     },
-                    { 
+                    {
                         label: (
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
                                 <span>Cropped Photos (.zip)</span>
                                 <ProBadge />
                             </div>
-                        ), 
-                        onClick: exportPhotosCrops, 
-                        title: 'High-res cropped photos ready for printing' 
+                        ),
+                        onClick: exportPhotosCrops,
+                        title: 'High-res cropped photos ready for printing'
                     }
                 ]}
             />

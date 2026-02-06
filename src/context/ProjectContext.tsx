@@ -59,6 +59,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     const [data, setData] = useState<ProjectData>(initialData);
 
     const [isLoaded, setIsLoaded] = useState(false);
+    const [isProjectLoading, setIsProjectLoading] = useState(false);
     const [showWelcome, setShowWelcome] = useState(false);
     const hasInitialLoaded = useRef(false);
 
@@ -140,11 +141,16 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
         return newProject.id;
     };
 
-    const switchProject = (id: string) => {
+    const switchProject = async (id: string) => {
         if (data.projects[id]) {
-            // Free memory from previous project's images
-            clearImageCache();
-            setData(prev => ({ ...prev, currentProjectId: id, selectedFrameIds: [] }));
+            setIsProjectLoading(true);
+            // Small timeout to allow the loading UI to mount and clear up any glitches
+            setTimeout(() => {
+                // Free memory from previous project's images
+                clearImageCache();
+                setData(prev => ({ ...prev, currentProjectId: id, selectedFrameIds: [] }));
+                setIsProjectLoading(false);
+            }, 300);
         }
     };
 
@@ -418,6 +424,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     // Import demo project from bundled example.gwall
     const importDemoProject = async () => {
         trackEvent(APP_EVENTS.LOAD_PROJECT);
+        setIsProjectLoading(true);
         try {
             // Use import.meta.env.BASE_URL to respect vite's base config
             const baseUrl = import.meta.env.BASE_URL || '/';
@@ -446,7 +453,8 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                 .map((id: any) => idMap.get(id)) : [];
 
             for (const img of remappedImages) {
-                await saveImage(img.id, img.blob);
+                // Import assumes images are already optimized in the bundle
+                await saveImage(img.id, img.blob, { skipOptimization: true });
             }
 
             const newProject = createNewProject(project.name || 'Demo Gallery');
@@ -470,6 +478,8 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
         } catch (err) {
             console.error('Failed to import demo project:', err);
             throw err;
+        } finally {
+            setIsProjectLoading(false);
         }
     };
 
@@ -497,8 +507,10 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             selectedFrameTemplateIds: data.selectedFrameTemplateIds || [],
             focusedArea: data.focusedArea,
             isLoaded,
+            isProjectLoading,
             addProject,
             switchProject,
+            setProjectLoading: setIsProjectLoading,
             deleteProject,
             updateProject,
             addToLibrary,

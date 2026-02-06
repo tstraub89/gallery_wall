@@ -488,7 +488,10 @@ export const exportProjectBundle = async (project: Project) => {
             if (!imageId) continue;
             const blob = await getImage(imageId);
             if (!blob) throw new Error(`Missing in database`);
-            imageFolder.file(imageId, blob);
+
+            // Append extension based on type
+            const extension = blob.type === 'image/webp' ? '.webp' : '.jpg';
+            imageFolder.file(`${imageId}${extension}`, blob);
         } catch (err: any) {
             console.warn(`Could not bundle image ${imageId}: `, err);
             errors.push(`${imageId}: ${err.message || String(err)}`);
@@ -524,13 +527,19 @@ export const importProjectBundle = async (file: File | Blob) => {
     if (imageFolder) {
         imageFolder.forEach((relativePath, file) => {
             if (!file.dir) {
-                imageFiles.push({ id: relativePath, file });
+                // Strip extension to get original ID
+                const id = relativePath.split('.')[0];
+                imageFiles.push({ id, file });
             }
         });
 
         for (const item of imageFiles) {
+            const fileName = item.file.name.toLowerCase();
+            const type = fileName.endsWith('.webp') ? 'image/webp' : 'image/jpeg';
             const blob = await item.file.async('blob');
-            images.push({ id: item.id, blob });
+            // Re-create blob with correct type
+            const typedBlob = new Blob([blob], { type });
+            images.push({ id: item.id, blob: typedBlob });
         }
     }
 

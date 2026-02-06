@@ -178,7 +178,11 @@ const CanvasWorkspace: React.FC = () => {
     const handleContextMenu = (e: React.MouseEvent) => {
         e.preventDefault();
         // If we panned, we do NOT show the context menu
-        if (hasPannedRef.current) return;
+        if (hasPannedRef.current) {
+            // But we reset it for the NEXT click so it doesn't stay stuck
+            hasPannedRef.current = false;
+            return;
+        }
 
         const tempTarget = e.target as HTMLElement;
         const frameEl = tempTarget.closest(`.${styles.frame}`);

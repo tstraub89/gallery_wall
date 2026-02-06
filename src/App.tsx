@@ -27,11 +27,17 @@ import ScrollToTop from './components/Common/ScrollToTop';
 
 // Inner component that can use context
 const AppTool: React.FC = () => {
-  const { showWelcome, importDemoProject, startFresh, undo, redo, canUndo, canRedo } = useProject();
+  const { showWelcome, importDemoProject, startFresh, undo, redo, canUndo, canRedo, isProjectLoading } = useProject();
   const isMobile = useIsMobile();
 
   return (
     <>
+      {isProjectLoading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+          <p>Optimizing Project...</p>
+        </div>
+      )}
       {showWelcome && (
         <React.Suspense fallback={null}>
           <WelcomeModal

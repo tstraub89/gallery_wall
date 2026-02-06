@@ -16,11 +16,13 @@ export interface ProjectContextType {
     selectedFrameTemplateIds: string[]; // Library templates
     focusedArea: 'canvas' | 'library' | null;
     isLoaded: boolean;
+    isProjectLoading: boolean;
     showWelcome: boolean;
 
     // Actions
     addProject: (name: string) => string; // Returns new ID
     switchProject: (id: string) => void;
+    setProjectLoading: (loading: boolean) => void;
     deleteProject: (id: string) => void;
     updateProject: (id: string, updates: Partial<Project>, skipHistory?: boolean) => void;
 

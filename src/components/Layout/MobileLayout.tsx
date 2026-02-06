@@ -31,7 +31,7 @@ interface MobileLayoutProps {
 }
 
 export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, onRedo, canUndo, canRedo }) => {
-    const { currentProject, updateProject, addProject, projects, switchProject, currentProjectId } = useProject();
+    const { currentProject, updateProject, addProject, projects, switchProject, currentProjectId, setProjectLoading } = useProject();
     const { shareProjectImage, exportToGwall, isExporting: isBusy } = useExport();
     const { exportToPDFGuide, isExporting: isPDFBusy, pdfReadyUrl, triggerPdfShare, clearPdfReady } = usePDFExport();
     const { isPro, isBeta } = useProModal();
@@ -79,6 +79,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
         if (!file) return;
 
         try {
+            setProjectLoading(true);
             const { project, images } = await importProjectBundle(file);
             const idMap = new Map<string, string>();
             const remappedImages: { id: string; blob: Blob }[] = [];
@@ -99,7 +100,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                 .map((id: any) => idMap.get(id)) : [];
 
             for (const img of remappedImages) {
-                await saveImage(img.id, img.blob);
+                await saveImage(img.id, img.blob, { skipOptimization: true });
             }
 
             const newId = addProject(project.name + ' (Imported)');
@@ -112,6 +113,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
         } catch (err: any) {
             alert('Failed to import: ' + err.message);
         } finally {
+            setProjectLoading(false);
             e.target.value = '';
         }
     };

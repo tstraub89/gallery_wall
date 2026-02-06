@@ -2,7 +2,8 @@ const DB_NAME = 'GalleryPlannerDB';
 const STORE_NAME = 'images';
 const PROJECTS_STORE = 'projects';
 const THUMB_STORE = 'thumbnails';
-const DB_VERSION = 3;
+const PREVIEW_STORE = 'previews';
+const DB_VERSION = 4;
 
 export interface ImageMetadata {
     width: number;
@@ -32,6 +33,9 @@ export const initDB = (): Promise<IDBDatabase> => {
             }
             if (!db.objectStoreNames.contains(THUMB_STORE)) {
                 db.createObjectStore(THUMB_STORE, { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains(PREVIEW_STORE)) {
+                db.createObjectStore(PREVIEW_STORE, { keyPath: 'id' });
             }
         };
 
@@ -89,87 +93,125 @@ const generateThumbnail = (blob: Blob, maxWidth = 800, maxHeight = 800): Promise
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(img, 0, 0, width, height);
-            canvas.toBlob((thumbBlob) => resolve(thumbBlob || blob), 'image/jpeg', 0.8);
+            canvas.toBlob((thumbBlob) => resolve(thumbBlob || blob), 'image/webp', 0.75);
         };
         img.src = url;
     });
 };
-// Helper: Optimize Image (Smart Compression)
-// JPEGs/WebPs -> Pass through (Zero generation loss)
-// PNGs/TIFFs -> Convert to JPEG 0.95 (Significant size saving, maintains dims)
-const optimizeImage = (blob: Blob): Promise<Blob> => {
+
+
+// Helper: Resize and Optimize Image
+// target: 'master' (WebP 0.92, 5000px max) | 'preview' (WebP 0.82, 1600px max)
+const processImage = async (blob: Blob, target: 'master' | 'preview' = 'master'): Promise<Blob> => {
+    const MAX_DIM = target === 'master' ? 5000 : 1600;
+    const QUALITY = target === 'master' ? 0.92 : 0.82;
+
     return new Promise((resolve) => {
-        // 1. Pass through efficient formats
-        if (blob.type === 'image/jpeg' || blob.type === 'image/webp') {
-            resolve(blob);
-            return;
-        }
-
-        console.log(`Optimizing image: Converting ${blob.type} to JPEG...`);
-
-        // 2. Convert inefficient formats (PNG, TIFF, BMP, etc.) to JPEG
         const img = new Image();
         const url = URL.createObjectURL(blob);
         img.onload = () => {
             URL.revokeObjectURL(url);
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d');
-            if (!ctx) { resolve(blob); return; } // Fallback
 
-            // White background for transparent PNGs converted to JPEG
+            // Calculate new dimensions
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_DIM) {
+                    height *= MAX_DIM / width;
+                    width = MAX_DIM;
+                }
+            } else {
+                if (height > MAX_DIM) {
+                    width *= MAX_DIM / height;
+                    height = MAX_DIM;
+                }
+            }
+
+            // Skip optimization if it's already a small enough WebP and we're targeting master
+            if (target === 'master' && blob.type === 'image/webp' && img.width <= MAX_DIM && img.height <= MAX_DIM) {
+                resolve(blob);
+                return;
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) { resolve(blob); return; }
+
+            // Ensure smooth scaling
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+
+            // White background for transparency
             ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.drawImage(img, 0, 0);
+            ctx.fillRect(0, 0, width, height);
+            ctx.drawImage(img, 0, 0, width, height);
 
             canvas.toBlob((newBlob) => {
                 if (newBlob) {
-                    console.log(`Optimization complete. Original: ${Math.round(blob.size / 1024)}KB, New: ${Math.round(newBlob.size / 1024)}KB`);
+                    console.log(`[${target.toUpperCase()}] Processed: ${Math.round(blob.size / 1024)}KB -> ${Math.round(newBlob.size / 1024)}KB (${width}x${height})`);
                     resolve(newBlob);
+                } else {
+                    resolve(blob);
                 }
-                else resolve(blob); // Fallback
-            }, 'image/jpeg', 0.95);
+            }, 'image/webp', QUALITY);
         };
         img.onerror = () => {
             URL.revokeObjectURL(url);
-            resolve(blob); // Fallback on error
+            resolve(blob);
         };
         img.src = url;
     });
 };
-export const saveImage = async (id: string, blob: Blob): Promise<ImageMetadata & { id: string }> => {
+
+export const saveImage = async (
+    id: string,
+    blob: Blob,
+    options: { skipOptimization?: boolean } = {}
+): Promise<ImageMetadata & { id: string }> => {
     const db = await initDB();
 
-    // Smart Compression: Convert PNG->JPEG, Keep JPEG as-is
-    const optimizedBlob = await optimizeImage(blob);
+    // Balanced Pro Strategy:
+    // 1. Master: High-quality WebP (0.92), capped at 5000px
+    // 2. Preview: Medium-quality WebP (0.82), capped at 1600px
+    // 3. Thumb: Low-quality JPEG (0.8), capped at 800px (existing logic)
 
-    // Parallelize metadata calc and thumb generation using the OPTIMIZED blob
+    console.log(`Processing image save for ${id}...`);
+
+    const [masterBlob, previewBlob] = await Promise.all([
+        options.skipOptimization ? blob : processImage(blob, 'master'),
+        processImage(blob, 'preview')
+    ]);
+
     const [metadata, thumbBlob] = await Promise.all([
-        getImageDimensions(optimizedBlob).catch(() => ({ width: 0, height: 0, aspectRatio: 1 })),
-        generateThumbnail(optimizedBlob)
+        getImageDimensions(masterBlob).catch(() => ({ width: 0, height: 0, aspectRatio: 1 })),
+        generateThumbnail(masterBlob)
     ]);
 
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME, THUMB_STORE], 'readwrite');
+        const transaction = db.transaction([STORE_NAME, THUMB_STORE, PREVIEW_STORE], 'readwrite');
         const imageStore = transaction.objectStore(STORE_NAME);
         const thumbStore = transaction.objectStore(THUMB_STORE);
+        const previewStore = transaction.objectStore(PREVIEW_STORE);
 
         const name = (blob as File).name || 'Untitled';
 
-        // Save the OPTIMIZED blob
-        imageStore.put({ id, blob: optimizedBlob, name, ...metadata });
-        // Store thumbnail
+        imageStore.put({ id, blob: masterBlob, name, ...metadata });
+        previewStore.put({ id, blob: previewBlob });
         thumbStore.put({ id, blob: thumbBlob });
 
         transaction.oncomplete = () => resolve({ id, name, ...metadata });
-        transaction.onerror = () => reject('Error saving image');
+        transaction.onerror = () => reject('Error saving image with dual-blob strategy');
     });
 };
 
-export const getImage = async (id: string, type: 'full' | 'thumb' = 'full'): Promise<Blob | null> => {
+export const getImage = async (id: string, type: 'full' | 'preview' | 'thumb' = 'full'): Promise<Blob | null> => {
     const db = await initDB();
-    const storeName = type === 'thumb' ? THUMB_STORE : STORE_NAME;
+    let storeName = STORE_NAME;
+    if (type === 'thumb') storeName = THUMB_STORE;
+    if (type === 'preview') storeName = PREVIEW_STORE;
 
     return new Promise((resolve, reject) => {
         const transaction = db.transaction([storeName], 'readonly');
@@ -196,7 +238,7 @@ export const clearImageCache = () => {
     console.log("Image cache cleared.");
 };
 
-export const preloadImages = async (ids: string[], type: 'full' | 'thumb' = 'full'): Promise<void> => {
+export const preloadImages = async (ids: string[], type: 'full' | 'preview' | 'thumb' = 'full'): Promise<void> => {
     const uniqueIds = [...new Set(ids.filter(Boolean))];
     if (uniqueIds.length === 0) return;
 
@@ -355,9 +397,10 @@ const processMigrationQueue = async (db: IDBDatabase, queue: StoredImage[]): Pro
 export const deleteImage = async (id: string): Promise<void> => {
     const db = await initDB();
     return new Promise((resolve, reject) => {
-        const transaction = db.transaction([STORE_NAME, THUMB_STORE], 'readwrite');
+        const transaction = db.transaction([STORE_NAME, THUMB_STORE, PREVIEW_STORE], 'readwrite');
         transaction.objectStore(STORE_NAME).delete(id);
         transaction.objectStore(THUMB_STORE).delete(id);
+        transaction.objectStore(PREVIEW_STORE).delete(id);
 
         transaction.oncomplete = () => resolve();
         transaction.onerror = () => reject('Error deleting image');

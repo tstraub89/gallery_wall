@@ -34,11 +34,13 @@ export const useCanvasDrag = ({
     const dragStart = useRef({ x: 0, y: 0 });
 
     const handleFrameMouseDown = (e: React.MouseEvent, frame: Frame) => {
-        // Stop propagation to prevent canvas panning/selection
-        e.stopPropagation();
-
-        // Only Left Click
+        // Only handle Left Click (0) for selection/drag. 
+        // Right/Middle clicks bubble to container for panning/context-menu.
         if (e.button !== 0) return;
+
+        // Stop propagation only for left click to prevent background selection/marquee
+        e.stopPropagation();
+        e.preventDefault(); // Prevent standard browser drag behaviors
 
         // Selection Logic (Shift/Normal)
         const isSelected = selectedFrameIds.includes(frame.id);

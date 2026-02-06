@@ -116,12 +116,12 @@ export const useCanvasSelection = ({
             }
 
             setSelection(nextSelection);
-
-            // Reset
-            setIsMarquee(false);
-            setMarqueeRect(null);
-            setCandidateFrameIds([]);
         }
+
+        // Always reset marquee/candidates on mouse up if we were in that mode
+        setIsMarquee(false);
+        setMarqueeRect(null);
+        setCandidateFrameIds([]);
     };
 
     return {

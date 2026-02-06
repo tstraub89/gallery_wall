@@ -10,8 +10,7 @@ interface FrameContentProps {
 }
 
 const FrameContent: React.FC<FrameContentProps> = ({ frame, ppi }) => {
-    const { url } = useImage(frame.imageId ?? null);
-    const [metrics, setMetrics] = React.useState<{ w: number, h: number } | null>(null);
+    const { url, metadata } = useImage(frame.imageId ?? null, 'preview');
 
     // Default PPI if not provided (fallback)
     const PPI = ppi || 10;
@@ -22,15 +21,10 @@ const FrameContent: React.FC<FrameContentProps> = ({ frame, ppi }) => {
     let ppiColor = null;
     let ppiValue = 0;
 
-    if (url && metrics && frame.width && frame.height) {
-        // Determine which dimension is "binding" is complex due to object-fit: cover.
-        // But a safe approximation for "quality" is the minimum ratio.
-        // If I have a huge 5000px wide image in a 1 inch frame, PPI is huge.
-        // If I have a 10px wide image in a 10 inch frame, PPI is 1.
-        // We check both W and H ratios.
+    if (url && metadata && frame.width && frame.height) {
         const scale = frame.imageState?.scale || 1;
-        const ppiW = metrics.w / frame.width;
-        const ppiH = metrics.h / frame.height;
+        const ppiW = metadata.width / frame.width;
+        const ppiH = metadata.height / frame.height;
 
         // Since it covers, the displayed PPI is roughly the *smaller* ratio determined by the crop?
         // No, 'Cover' uses the LARGER scale factor to fill.
@@ -46,10 +40,7 @@ const FrameContent: React.FC<FrameContentProps> = ({ frame, ppi }) => {
         else if (ppiValue < 300) ppiColor = '#fbbf24'; // Yellow
     }
 
-    // Reset metrics if url changes (basic check, though key changes usually handle this)
-    React.useEffect(() => {
-        if (!url) setMetrics(null);
-    }, [url]);
+
 
     return (
         <div
@@ -140,7 +131,6 @@ const FrameContent: React.FC<FrameContentProps> = ({ frame, ppi }) => {
                     src={url}
                     alt=""
                     draggable="false"
-                    onLoad={(e) => setMetrics({ w: e.currentTarget.naturalWidth, h: e.currentTarget.naturalHeight })}
                     style={{
                         width: '100%',
                         height: '100%',
