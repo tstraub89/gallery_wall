@@ -4,7 +4,7 @@
 
 **🎨 Live App:** [gallery-planner.com](https://gallery-planner.com)
 
-![GalleryPlanner Workspace](./public/gallery-planner.png)
+![GalleryPlanner Workspace](./public/gallery-planner.jpeg)
 
 > [!IMPORTANT]
 > **GalleryPlanner is currently in Early Beta.** During this period, all **PRO features** (AI Auto-Layout, PDF Guides, Project Exports, etc.) are **completely free** to use while I refine the experience.
