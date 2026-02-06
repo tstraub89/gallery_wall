@@ -26,8 +26,22 @@ It features a "Pro" tier (currently free in beta) that includes AI-assisted auto
 *   `npm run type-check`: Run TypeScript type checking.
 
 ## Versioning & Release Policy
-*   **Patch versions (x.x.Y)**: Bump ONLY for functionality changes to the main application (`/app`) or significant architectural updates to the website.
-*   **Minor Website Changes**: Tweaks to the landing page, footer, or copy should **NOT** trigger a version bump. Bundle these changes with the next app release or commit them without a tag.
+
+### Semantic Versioning Rules
+*   **Patch (x.x.Y)**:
+    *   **Definition**: Bug fixes, minor app functionality changes, or significant website architectural updates.
+    *   **Agent Permission**: ✅ **Allowed**. You may bump this as needed if changes meet the threshold and are not purely content/cosmetic.
+*   **Minor (x.Y.x)**:
+    *   **Definition**: New features, significant non-breaking changes.
+    *   **Agent Permission**: ⚠️ **Suggest Only**. You must **PROPOSE** this to the user. Do **NOT** bump without explicit confirmation.
+*   **Major (Y.x.x)**:
+    *   **Definition**: Breaking changes, massive overhauls.
+    *   **Agent Permission**: ⛔️ **Forbidden**. Only bump this when explicitly instructed by the user.
+
+### Commit Conventions
+*   **Standalone Release**: If the commit *only* bumps the version, use `chore(release): vX.X.X`.
+*   **Mixed Release**: If the commit includes code changes *and* a version bump, the message should focus on the changes (e.g., `feat: add new sidebar (v0.3.0)`).
+*   **Website Tweaks**: Minor copy/CSS changes to the website do **NOT** warrant a version bump. Commit them directly.
 
 
 ### State Management
