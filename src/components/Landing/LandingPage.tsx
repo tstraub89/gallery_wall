@@ -8,6 +8,17 @@ import { Sparkles, LayoutGrid, CheckCircle2, Image } from 'lucide-react';
 import { trackEvent, LANDING_EVENTS } from '../../utils/analytics';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 import LandingCarousel from './LandingCarousel';
+import AutoplayVideo from '../Common/AutoplayVideo';
+
+const SMART_LAYOUT_SOURCES = [
+    { src: "/smart-layout.webm", type: "video/webm" },
+    { src: "/smart-layout.mp4", type: "video/mp4" }
+];
+
+const ADD_PHOTOS_SOURCES = [
+    { src: "/add-photos.webm", type: "video/webm" },
+    { src: "/add-photos.mp4", type: "video/mp4" }
+];
 
 const LandingPage: React.FC = () => {
     const [featuresRef, featuresVisible] = useIntersectionObserver({ threshold: 0.2 });
@@ -167,13 +178,9 @@ const LandingPage: React.FC = () => {
                             </p>
                         </div>
                         <div className={styles.featureImageWrapper}>
-                            <video
-                                src="/smart-layout.webm"
+                            <AutoplayVideo
+                                sources={SMART_LAYOUT_SOURCES}
                                 className={styles.featureImage}
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
                             />
                         </div>
                     </div>
@@ -209,13 +216,9 @@ const LandingPage: React.FC = () => {
                             </p>
                         </div>
                         <div className={styles.featureImageWrapper}>
-                            <video
-                                src="/add-photos.webm"
+                            <AutoplayVideo
+                                sources={ADD_PHOTOS_SOURCES}
                                 className={styles.featureImage}
-                                autoPlay
-                                loop
-                                muted
-                                playsInline
                             />
                         </div>
                     </div>

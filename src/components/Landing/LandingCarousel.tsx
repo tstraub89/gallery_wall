@@ -1,15 +1,29 @@
 import React from 'react';
 import styles from './LandingCarousel.module.css';
+import AutoplayVideo from '../Common/AutoplayVideo';
 
 interface Slide {
     type: 'video' | 'image';
-    src: string;
+    src?: string;
+    sources?: { src: string; type: string }[];
     alt?: string;
 }
 
 const SLIDES: Slide[] = [
-    { type: 'video', src: '/templates.webm' },
-    { type: 'video', src: '/align-frames.webm' },
+    {
+        type: 'video',
+        sources: [
+            { src: '/templates.webm', type: 'video/webm' },
+            { src: '/templates.mp4', type: 'video/mp4' }
+        ]
+    },
+    {
+        type: 'video',
+        sources: [
+            { src: '/align-frames.webm', type: 'video/webm' },
+            { src: '/align-frames.mp4', type: 'video/mp4' }
+        ]
+    },
     { type: 'image', src: '/hanging_guide.webp', alt: 'PDF Hanging Guide' }
 ];
 
@@ -28,13 +42,11 @@ const LandingCarousel: React.FC<LandingCarouselProps> = ({ currentIndex, onChang
                     onClick={() => onChange(index)}
                 >
                     {slide.type === 'video' ? (
-                        <video
+                        <AutoplayVideo
                             src={slide.src}
+                            sources={slide.sources}
                             className={styles.media}
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
+                            isActive={index === currentIndex}
                         />
                     ) : (
                         <img
