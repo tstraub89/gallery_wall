@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState, MouseEvent } from 'react';
 import { useProject } from '../../hooks/useProject';
-import { saveImage, getImageMetadata, migrateLegacyImages } from '../../utils/imageStore';
+import { saveImage, migrateLegacyImages } from '../../utils/imageStore';
 import { useImage } from '../../hooks/useImage';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 import { v4 as uuidv4 } from 'uuid';
@@ -17,12 +17,16 @@ interface PhotoItemProps {
     imageId: string;
     isUsed: boolean;
     isSelected: boolean;
+    imageType?: 'thumb' | 'preview';
     onSelect: (e: MouseEvent) => void;
 }
 
-const PhotoItem: React.FC<PhotoItemProps> = ({ imageId, isUsed, isSelected, onSelect }) => {
-    const [ref, isVisible] = useIntersectionObserver();
-    const { url, status } = useImage(imageId, 'thumb', isVisible ?? false);
+// Memoize options to prevent effect re-running
+const OBSERVER_OPTIONS = { rootMargin: '2000px' };
+
+const PhotoItem: React.FC<PhotoItemProps> = ({ imageId, isUsed, isSelected, imageType = 'thumb', onSelect }) => {
+    const [ref, isVisible] = useIntersectionObserver(OBSERVER_OPTIONS);
+    const { url, status } = useImage(imageId, imageType, isVisible ?? false);
 
     const handleDragStart = (e: React.DragEvent) => {
         // Only allow dragging if image is loaded
@@ -79,12 +83,38 @@ const PhotoItem: React.FC<PhotoItemProps> = ({ imageId, isUsed, isSelected, onSe
     );
 };
 
+const PhotoItemThumb: React.FC<{ imageId: string }> = ({ imageId }) => {
+    const [ref, isVisible] = useIntersectionObserver();
+    const { url, status } = useImage(imageId, 'thumb', isVisible ?? false);
+
+    return (
+        <div ref={ref as React.RefObject<HTMLDivElement>} style={{ width: '100%', height: '100%' }}>
+            {status === 'loaded' ? (
+                <img src={url || undefined} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+                <div style={{ width: '100%', height: '100%', background: '#eee' }} />
+            )}
+        </div>
+    );
+};
+
 interface PhotoLibraryProps {
     onPhotoSelect?: (imageId: string) => void;
     selectionMode?: 'standard' | 'toggle';
+    viewMode?: 'list' | 'grid';
+    onViewModeChange?: (mode: 'list' | 'grid') => void;
+    zoomLevel?: 'small' | 'medium' | 'large' | 'xlarge';
+    onZoomLevelChange?: (level: 'small' | 'medium' | 'large' | 'xlarge') => void;
 }
 
-const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMode = 'standard' }) => {
+const PhotoLibrary: React.FC<PhotoLibraryProps> = ({
+    onPhotoSelect,
+    selectionMode = 'standard',
+    viewMode = 'grid',
+    onViewModeChange,
+    zoomLevel = 'medium',
+    onZoomLevelChange
+}) => {
     // ... imports ...
     const {
         currentProject,
@@ -109,29 +139,17 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
     // Persistent State
     const { searchTerm, activeFilters, sortBy } = libraryState;
 
-    // Metadata Cache
-    const [metadata, setMetadata] = useState<Record<string, any>>({});
+    // Metadata from Context (Hoisted)
+    const { imagesMetadata: metadata } = useProject();
 
     // Processing State
     const [isProcessing, setIsProcessing] = useState(false);
     const [processingProgress, setProcessingProgress] = useState({ current: 0, total: 0 });
 
-    // 1. Run Migration & Fetch Metadata on Mount / Project Change
+    // Migration Check (still needed, but maybe move to Context? Leaving for now as it's safe)
     useEffect(() => {
         if (!currentProject || !isLoaded) return;
-
-        const init = async () => {
-            // Run migration silently
-            await migrateLegacyImages();
-
-            // Fetch all metadata
-            const ids = currentProject.images || [];
-            if (ids.length > 0) {
-                const meta = await getImageMetadata(ids);
-                setMetadata(prev => ({ ...prev, ...meta })); // Merge
-            }
-        };
-        init();
+        migrateLegacyImages();
     }, [currentProject, isLoaded]);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -153,17 +171,13 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
                 try {
                     const imageId = uuidv4();
                     const result = await saveImage(imageId, file);
-                    // Result contains metadata, update cache immediately
-                    setMetadata(prev => ({
-                        ...prev,
-                        [imageId]: {
-                            width: result.width,
-                            height: result.height,
-                            aspectRatio: result.aspectRatio,
-                            name: result.name
-                        }
-                    }));
-                    addImageToLibrary(currentProject.id, imageId);
+                    const newMeta = {
+                        width: result.width,
+                        height: result.height,
+                        aspectRatio: result.aspectRatio,
+                        name: result.name
+                    };
+                    addImageToLibrary(currentProject.id, imageId, newMeta);
                 } catch (err) {
                     console.error("Failed to add image to library", err);
                 }
@@ -298,6 +312,7 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
         // Don't clear if clicking on photos, action buttons, or dialog
         const target = e.target as HTMLElement;
         if (target.closest(`.${styles.photoItem}`)) return;
+        if (target.closest(`.${styles.listItem}`)) return;
         if (target.closest(`.${styles.actions}`)) return;
         if (target.closest('[class*="DeleteConfirmDialog"]')) return;
         setSelectedImages([]);
@@ -328,16 +343,13 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
                 try {
                     const imageId = uuidv4();
                     const result = await saveImage(imageId, file);
-                    setMetadata(prev => ({
-                        ...prev,
-                        [imageId]: {
-                            width: result.width,
-                            height: result.height,
-                            aspectRatio: result.aspectRatio,
-                            name: result.name
-                        }
-                    }));
-                    addImageToLibrary(currentProject.id, imageId);
+                    const newMeta = {
+                        width: result.width,
+                        height: result.height,
+                        aspectRatio: result.aspectRatio,
+                        name: result.name
+                    };
+                    addImageToLibrary(currentProject.id, imageId, newMeta);
                 } catch (err) {
                     console.error("Failed to add dropped image to library", err);
                 }
@@ -399,9 +411,27 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
         }
 
         // 3. Sort
-        if (sortBy === 'oldest') {
+        if (sortBy === 'newest') {
+            // Assuming input is Oldest -> Newest
             result.reverse();
+        } else if (sortBy === 'name_asc') {
+            result.sort((a, b) => (metadata[a]?.name || '').localeCompare(metadata[b]?.name || ''));
+        } else if (sortBy === 'name_desc') {
+            result.sort((a, b) => (metadata[b]?.name || '').localeCompare(metadata[a]?.name || ''));
+        } else if (sortBy === 'size_desc') { // Largest
+            result.sort((a, b) => {
+                const areaA = (metadata[a]?.width || 0) * (metadata[a]?.height || 0);
+                const areaB = (metadata[b]?.width || 0) * (metadata[b]?.height || 0);
+                return areaB - areaA;
+            });
+        } else if (sortBy === 'size_asc') { // Smallest
+            result.sort((a, b) => {
+                const areaA = (metadata[a]?.width || 0) * (metadata[a]?.height || 0);
+                const areaB = (metadata[b]?.width || 0) * (metadata[b]?.height || 0);
+                return areaA - areaB;
+            });
         }
+        // 'oldest' -> leave as is (assuming source is oldest first)
 
         return result;
     };
@@ -458,7 +488,11 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
                     placeholder="Search filename..."
                     sortOptions={[
                         { value: 'newest', label: 'Newest' },
-                        { value: 'oldest', label: 'Oldest' }
+                        { value: 'oldest', label: 'Oldest' },
+                        { value: 'name_asc', label: 'Name (A-Z)' },
+                        { value: 'name_desc', label: 'Name (Z-A)' },
+                        { value: 'size_desc', label: 'Size (Largest)' },
+                        { value: 'size_asc', label: 'Size (Smallest)' }
                     ]}
                     currentSort={sortBy}
                     onSortChange={(val) => updateLibraryState({ sortBy: val })}
@@ -472,10 +506,68 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
                     activeFilters={activeFilters}
                     onFilterChange={handleFilterChange}
                     onClear={() => updateLibraryState({ activeFilters: {} })}
+                    viewOptions={[
+                        {
+                            id: 'list',
+                            label: 'List View',
+                            checked: viewMode === 'list',
+                            type: 'item',
+                            onClick: () => onViewModeChange?.('list')
+                        },
+                        {
+                            id: 'grid',
+                            label: 'Grid View',
+                            checked: viewMode === 'grid',
+                            type: 'item',
+                            onClick: () => onViewModeChange?.('grid')
+                        },
+                        {
+                            id: 'sep1',
+                            label: '',
+                            type: 'divider'
+                        },
+                        {
+                            id: 'hdr_zoom',
+                            label: 'Grid Size',
+                            type: 'header'
+                        },
+                        {
+                            id: 'small',
+                            label: 'Small',
+                            checked: zoomLevel === 'small',
+                            disabled: viewMode !== 'grid',
+                            type: 'item',
+                            onClick: () => onZoomLevelChange?.('small')
+                        },
+                        {
+                            id: 'medium',
+                            label: 'Medium',
+                            checked: zoomLevel === 'medium',
+                            disabled: viewMode !== 'grid',
+                            type: 'item',
+                            onClick: () => onZoomLevelChange?.('medium')
+                        },
+                        {
+                            id: 'large',
+                            label: 'Large',
+                            checked: zoomLevel === 'large',
+                            disabled: viewMode !== 'grid',
+                            type: 'item',
+                            onClick: () => onZoomLevelChange?.('large')
+                        },
+                        {
+                            id: 'xlarge',
+                            label: 'Extra Large',
+                            checked: zoomLevel === 'xlarge',
+                            disabled: viewMode !== 'grid',
+                            type: 'item',
+                            onClick: () => onZoomLevelChange?.('xlarge')
+                        }
+                    ]}
                 />
             </div>
 
-            <div className={styles.actions}>
+            < div className={styles.actions} >
                 <div className={styles.btnRow}>
                     <button
                         className={styles.uploadBtn}
@@ -501,47 +593,111 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({ onPhotoSelect, selectionMod
                     multiple
                     onChange={handleFileChange}
                 />
-            </div>
+            </div >
 
             <div className={styles.scrollWrapper}>
-                <div className={styles.masonryGrid}>
-                    {processedImages.length > 0 ? (
-                        processedImages.map(imageId => (
-                            <PhotoItem
-                                key={imageId}
-                                imageId={imageId}
-                                isUsed={usedImageIds.has(imageId)}
-                                isSelected={selectedImageIds.includes(imageId)}
-                                onSelect={(e) => handleSelect(imageId, e)}
-                            />
-                        ))
-                    ) : (
-                        <div className={styles.emptyState}>
-                            {currentProject.images.length === 0 ? "No photos yet." : "No matching photos."}
-                        </div>
-                    )}
-                </div>
+                {viewMode === 'grid' ? (
+                    <div className={`${styles.masonryGrid} ${styles[zoomLevel]}`}>
+                        {processedImages.length > 0 ? (
+                            processedImages.map(imageId => (
+                                <PhotoItem
+                                    key={imageId}
+                                    imageId={imageId}
+                                    isUsed={usedImageIds.has(imageId)}
+                                    isSelected={selectedImageIds.includes(imageId)}
+                                    imageType={zoomLevel === 'xlarge' ? 'preview' : 'thumb'}
+                                    onSelect={(e) => handleSelect(imageId, e)}
+                                />
+                            ))
+                        ) : (
+                            <div className={styles.emptyState}>
+                                {currentProject.images.length === 0 ? "No photos yet." : "No matching photos."}
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    /* LIST VIEW */
+                    <div className={styles.listView}>
+                        {processedImages.length > 0 ? (
+                            processedImages.map(imageId => {
+                                const m = metadata[imageId];
+                                const isUsed = usedImageIds.has(imageId);
+                                const isSelected = selectedImageIds.includes(imageId);
+
+                                return (
+                                    <div
+                                        key={imageId}
+                                        className={`${styles.listItem} ${isSelected ? styles.selected : ''}`}
+                                        onClick={(e) => handleSelect(imageId, e as unknown as MouseEvent)}
+                                        draggable={true}
+                                        onDragStart={(e) => {
+                                            e.dataTransfer.setData('application/json', JSON.stringify({
+                                                type: 'PHOTO_LIBRARY_ITEM',
+                                                imageId
+                                            }));
+                                        }}
+                                    >
+                                        <div style={{ width: 40, height: 40, background: '#eee', flexShrink: 0 }}>
+                                            {/* We can reuse useImage logic here if we extract it or just assume it's loaded if visible? 
+                                                For list view, we might want a simpler thumb loader.
+                                                Let's stick to PhotoItem for now but style it different? 
+                                                No, PhotoItem is structural. Let's make a PhotoListItem or inline it.
+                                                Ideally we use the same hook. Let's create a minimal thumb here.
+                                            */}
+                                            <PhotoItemThumb imageId={imageId} />
+                                        </div>
+                                        <div className={styles.listInfo}>
+                                            <div className={styles.listName} title={m?.name}>{m?.name || 'Untitled'}</div>
+                                            <div className={styles.listMeta}>
+                                                {m ? (
+                                                    <>
+                                                        <span style={{ whiteSpace: 'nowrap' }}>{m.width} x {m.height} px</span>
+                                                        <span style={{ margin: '0 6px', opacity: 0.5 }}>|</span>
+                                                        <span style={{ whiteSpace: 'nowrap' }}>{((m.width * m.height) / 1000000).toFixed(1)} MP</span>
+                                                        <span style={{ margin: '0 6px', opacity: 0.5 }}>|</span>
+                                                        <span style={{ whiteSpace: 'nowrap' }}>Ratio: {m.aspectRatio?.toFixed(2)}</span>
+                                                    </>
+                                                ) : 'Loading...'}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            {isUsed && <span className={`${styles.listStatus} ${styles.used}`}>Placed</span>}
+                                        </div>
+                                    </div>
+                                );
+                            })
+                        ) : (
+                            <div className={styles.emptyState}>
+                                {currentProject.images.length === 0 ? "No photos yet." : "No matching photos."}
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {showDeleteDialog && (
-                <DeleteConfirmDialog
-                    selectedCount={selectedImageIds.length}
-                    inUseCount={getInUseCount()}
-                    onDeleteUnused={handleDeleteUnused}
-                    onDeleteAll={handleDeleteAll}
-                    onCancel={handleCancelDelete}
-                />
-            )}
+            {
+                showDeleteDialog && (
+                    <DeleteConfirmDialog
+                        selectedCount={selectedImageIds.length}
+                        inUseCount={getInUseCount()}
+                        onDeleteUnused={handleDeleteUnused}
+                        onDeleteAll={handleDeleteAll}
+                        onCancel={handleCancelDelete}
+                    />
+                )
+            }
 
-            {isProcessing && (
-                <div className={styles.processingOverlay}>
-                    <div className={styles.spinner} />
-                    <div className={styles.processingText}>
-                        Processing photos... ({processingProgress.current}/{processingProgress.total})
+            {
+                isProcessing && (
+                    <div className={styles.processingOverlay}>
+                        <div className={styles.spinner} />
+                        <div className={styles.processingText}>
+                            Processing photos... ({processingProgress.current}/{processingProgress.total})
+                        </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 };
 

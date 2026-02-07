@@ -27,7 +27,18 @@ interface FilterBarProps {
     showSearch?: boolean;
 }
 
-const FilterBar: React.FC<FilterBarProps> = ({
+import { Eye } from 'lucide-react';
+
+interface ViewOptionItem {
+    id: string;
+    label: string;
+    checked?: boolean;
+    disabled?: boolean;
+    onClick?: () => void;
+    type?: 'item' | 'header' | 'divider';
+}
+
+const FilterBar: React.FC<FilterBarProps & { viewOptions?: ViewOptionItem[] }> = ({
     searchTerm,
     onSearchChange,
     sortOptions = [],
@@ -38,16 +49,20 @@ const FilterBar: React.FC<FilterBarProps> = ({
     onFilterChange,
     onClear,
     placeholder = "Search...",
-    showSearch = true
+    showSearch = true,
+    viewOptions
 }) => {
     const [showFilters, setShowFilters] = React.useState(false);
     const [showSort, setShowSort] = React.useState(false);
+    const [showView, setShowView] = React.useState(false);
 
     const sortRef = useRef<HTMLDivElement>(null);
     const filterRef = useRef<HTMLDivElement>(null);
+    const viewRef = useRef<HTMLDivElement>(null);
 
     useOnClickOutside(sortRef, () => setShowSort(false));
     useOnClickOutside(filterRef, () => setShowFilters(false));
+    useOnClickOutside(viewRef, () => setShowView(false));
 
     const hasActiveFilters = Object.values(activeFilters).some(Boolean);
 
@@ -68,11 +83,61 @@ const FilterBar: React.FC<FilterBarProps> = ({
                 )}
 
                 <div className={styles.controls} style={{ marginLeft: showSearch ? 0 : 'auto' }}>
+                    {/* View Options Dropdown */}
+                    {viewOptions && viewOptions.length > 0 && (
+                        <div className={styles.dropdownWrapper} ref={viewRef}>
+                            <button
+                                className={`${styles.iconBtn} ${showView ? styles.active : ''}`}
+                                onClick={() => { setShowView(!showView); setShowSort(false); setShowFilters(false); }}
+                                title="View Options"
+                            >
+                                <Eye size={18} />
+                            </button>
+
+                            {showView && (
+                                <div className={styles.dropdown} style={{ minWidth: '160px' }}>
+                                    <div className={styles.dropdownHeader}>View Options</div>
+                                    {viewOptions.map((opt, idx) => {
+                                        if (opt.type === 'header') {
+                                            return (
+                                                <div key={idx} className={styles.dropdownHeader} style={{ borderBottom: 'none', paddingTop: '12px' }}>
+                                                    {opt.label}
+                                                </div>
+                                            );
+                                        }
+                                        if (opt.type === 'divider') {
+                                            return <div key={idx} style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }} />;
+                                        }
+                                        return (
+                                            <button
+                                                key={opt.id}
+                                                className={`${styles.dropdownItem} ${opt.checked ? styles.selected : ''}`}
+                                                onClick={() => {
+                                                    if (!opt.disabled && opt.onClick) {
+                                                        opt.onClick();
+                                                        // Keep menu open for toggles? Standard UI usually closes, but for options sometimes stays.
+                                                        // Let's close for now to be consistent with Sort/Filter.
+                                                        setShowView(false);
+                                                    }
+                                                }}
+                                                disabled={opt.disabled}
+                                                style={opt.disabled ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                                            >
+                                                {opt.label}
+                                                {opt.checked && <span>✓</span>}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {/* Sort Dropdown */}
                     <div className={styles.dropdownWrapper} ref={sortRef}>
                         <button
                             className={`${styles.iconBtn} ${showSort ? styles.active : ''}`}
-                            onClick={() => { setShowSort(!showSort); setShowFilters(false); }}
+                            onClick={() => { setShowSort(!showSort); setShowFilters(false); setShowView(false); }}
                             title="Sort Order"
                         >
                             <ArrowUpDown size={18} />
@@ -102,7 +167,7 @@ const FilterBar: React.FC<FilterBarProps> = ({
                     <div className={styles.dropdownWrapper} ref={filterRef}>
                         <button
                             className={`${styles.iconBtn} ${hasActiveFilters ? styles.active : ''}`}
-                            onClick={() => { setShowFilters(!showFilters); setShowSort(false); }}
+                            onClick={() => { setShowFilters(!showFilters); setShowSort(false); setShowView(false); }}
                             title="Filters"
                         >
                             <Filter size={18} />

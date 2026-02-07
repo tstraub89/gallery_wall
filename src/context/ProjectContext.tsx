@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { saveProjectData, loadProjectData, cleanUpOrphanedImages, saveImage, clearImageCache } from '../utils/imageStore';
+import { saveProjectData, loadProjectData, cleanUpOrphanedImages, saveImage, clearImageCache, getImageMetadata } from '../utils/imageStore';
 import { ProjectContext, LibraryState } from './ProjectContextCore';
 import { Project, Frame, WallConfig, LibraryItem } from '../types';
 import { importProjectBundle } from '../utils/exportUtils';
@@ -11,6 +11,7 @@ interface ProjectData {
     currentProjectId: string | null;
     libraryState: LibraryState;
     frameState: LibraryState;
+    imagesMetadata: Record<string, any>;
 }
 
 interface HistoryItem {
@@ -28,6 +29,7 @@ const initialData: ProjectData = {
     currentProjectId: null,
     libraryState: { searchTerm: '', activeFilters: {}, sortBy: 'newest' },
     frameState: { searchTerm: '', activeFilters: {}, sortBy: 'newest' },
+    imagesMetadata: {}
 };
 
 const createNewProject = (name?: string): Project => ({
@@ -69,8 +71,27 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                         projects: idbData.projects,
                         currentProjectId: idbData.currentProjectId,
                         libraryState: idbData.libraryState || initialData.libraryState,
-                        frameState: idbData.frameState || initialData.frameState
+                        frameState: idbData.frameState || initialData.frameState,
+                        imagesMetadata: initialData.imagesMetadata
                     };
+
+                    // Fetch metadata for ALL images in ALL projects to be safe? 
+                    // Or just the current one? Let's do all for now since they might switch.
+                    const allImageIds = new Set<string>();
+                    Object.values(idbData.projects).forEach((p: any) => {
+                        p.images?.forEach((id: string) => allImageIds.add(id));
+                        p.frames?.forEach((f: Frame) => { if (f.imageId) allImageIds.add(f.imageId); });
+                    });
+
+                    if (allImageIds.size > 0) {
+                        try {
+                            const meta = await getImageMetadata(Array.from(allImageIds));
+                            cleanData.imagesMetadata = meta;
+                        } catch (e) {
+                            console.warn("Failed to load image metadata", e);
+                        }
+                    }
+
                     setData(cleanData);
                 } else {
                     setShowWelcome(true);
@@ -238,7 +259,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
 
     // --- Image Library Operations ---
 
-    const addImageToLibrary = (projectId: string, imageId: string) => {
+    const addImageToLibrary = (projectId: string, imageId: string, metadata?: any) => {
         setData(prev => {
             const project = prev.projects[projectId];
             if (!project) return prev;
@@ -255,7 +276,8 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                         ...project,
                         images: [imageId, ...currentImages]
                     }
-                }
+                },
+                imagesMetadata: metadata ? { ...prev.imagesMetadata, [imageId]: metadata } : prev.imagesMetadata
             };
         });
     };
@@ -460,6 +482,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             addToLibrary,
             removeFromLibrary,
             addImageToLibrary,
+            imagesMetadata: data.imagesMetadata || initialData.imagesMetadata,
             libraryState: data.libraryState || initialData.libraryState,
             frameState: data.frameState || initialData.frameState,
             updateLibraryState,

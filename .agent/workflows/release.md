@@ -2,6 +2,10 @@
 description: Steps for cutting a new release
 ---
 
+> [!IMPORTANT]
+> **CRITICAL RULE**: Whenever you bump the version in `package.json`, you **MUST** also update `CHANGELOG.md`.
+> **NO EXCEPTIONS**. A version bump without a changelog entry is incomplete.
+
 1. **Verify Impact & Permission**: 
    - **Patch**: safe to bump for app bug fixes/features.
    - **Minor**: STOP. Ask user for permission first.
@@ -11,9 +15,11 @@ description: Steps for cutting a new release
 2. **Run Pre-Commit Checks**:
    - Follow the steps in `pre_commit.md`.
 
-3. **Update Version**:
-   - Bump version in `package.json`.
-   - Update `CHANGELOG.md` with a new version section.
+3. **Update Version (If Bumping Version)**:
+   - **`package.json`**: Increment the `version` field (e.g., `0.2.9` -> `0.2.10`).
+   - **`CHANGELOG.md`**: Add a new section at the top.
+     - Header format: `## [X.X.X] - YYYY-MM-DD`
+     - Group changes by type (e.g., `### 🚀 New Features`, `### 🐛 Bug Fixes`).
 
 4. **Update Documentation**:
    - Update `walkthrough.md` if applicable.

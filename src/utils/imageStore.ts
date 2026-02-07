@@ -223,11 +223,43 @@ export const getImage = async (id: string, type: 'full' | 'preview' | 'thumb' = 
     });
 };
 
-// Preload cache for warm-starting images
-const preloadCache = new Map<string, string>();
+// LRU Cache for warm-starting images
+const CACHE_CAPACITY = 100; // Keep last 50 images
+const preloadCache = new Map<string, string>(); // Order is preserved in JS Map (insertion order)
 
-export const getPreloadedUrl = (id: string): string | null => {
-    return preloadCache.get(id) || null;
+const getCacheKey = (id: string, type: string) => `${id}:${type}`;
+
+export const getPreloadedUrl = (id: string, type: 'full' | 'preview' | 'thumb' = 'full'): string | null => {
+    const key = getCacheKey(id, type);
+    const url = preloadCache.get(key);
+    if (url) {
+        // LRU: Move to end (most recently used)
+        preloadCache.delete(key);
+        preloadCache.set(key, url);
+        return url;
+    }
+    return null;
+};
+
+export const cacheUrl = (id: string, type: 'full' | 'preview' | 'thumb', url: string) => {
+    const key = getCacheKey(id, type);
+    if (preloadCache.has(key)) {
+        // Just refresh position
+        preloadCache.delete(key);
+        preloadCache.set(key, url);
+    } else {
+        // Add new
+        if (preloadCache.size >= CACHE_CAPACITY) {
+            // Evict oldest (first)
+            const firstKey = preloadCache.keys().next().value;
+            if (firstKey) {
+                const oldUrl = preloadCache.get(firstKey);
+                if (oldUrl) URL.revokeObjectURL(oldUrl);
+                preloadCache.delete(firstKey);
+            }
+        }
+        preloadCache.set(key, url);
+    }
 };
 
 export const clearImageCache = () => {
@@ -243,12 +275,14 @@ export const preloadImages = async (ids: string[], type: 'full' | 'preview' | 't
     if (uniqueIds.length === 0) return;
 
     await Promise.all(uniqueIds.map(async (id) => {
-        if (preloadCache.has(id)) return; // Already preloaded
+        const key = getCacheKey(id, type);
+        if (preloadCache.has(key)) return; // Already preloaded
+
         try {
             const blob = await getImage(id, type);
             if (blob) {
                 const url = URL.createObjectURL(blob);
-                preloadCache.set(id, url);
+                cacheUrl(id, type, url);
             }
         } catch (err) {
             console.warn('Failed to preload image:', id, err);

@@ -14,8 +14,8 @@ export const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (isResizing) {
-                // Min width 200, Max width 600
-                const newWidth = Math.min(Math.max(200, e.clientX), 600);
+                // Min width 260, Max width 1400 (for ultrawide)
+                const newWidth = Math.min(Math.max(260, e.clientX), 1400);
                 setSidebarWidth(newWidth);
             }
         };

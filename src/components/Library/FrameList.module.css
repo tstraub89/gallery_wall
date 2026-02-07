@@ -271,3 +271,48 @@
         opacity: 1;
     }
 }
+
+/* Grid View Styles */
+.gridList {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm);
+}
+
+.gridItem {
+    display: flex;
+    flex-direction: column;
+
+    padding: var(--spacing-sm);
+    gap: 8px;
+    align-items: center;
+    text-align: center;
+    aspect-ratio: 1;
+    justify-content: center;
+    position: relative;
+}
+
+.gridItem .framePreview {
+    /* Dimensions controlled by inline styles for aspect ratio preservation */
+    margin-bottom: 4px;
+}
+
+.gridItem .frameInfo {
+    width: 100%;
+    flex: 0 0 auto;
+}
+
+.gridItem .label {
+    font-size: 11px;
+    margin-bottom: 0;
+}
+
+.gridItem .dims {
+    font-size: 10px;
+}
+
+/* Hide sub-info in grid to save space unless hovered? Or just hide it */
+.gridItem .subInfo {
+    display: none;
+}

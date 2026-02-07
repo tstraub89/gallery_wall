@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getImage, getPreloadedUrl, getImageMetadata } from '../utils/imageStore';
+import { getImage, getPreloadedUrl, getImageMetadata, cacheUrl } from '../utils/imageStore';
 
 interface ImageState {
     url: string | null;
@@ -14,8 +14,9 @@ interface ImageState {
 export const useImage = (imageId: string | null, type: 'full' | 'preview' | 'thumb' = 'full', enabled = true): ImageState => {
     const [state, setState] = useState<ImageState>(() => {
         // Check preload cache immediately for sync initialization
-        if (imageId && enabled) {
-            const cached = getPreloadedUrl(imageId);
+        // We verify cache even if disabled to prevent flash if we already have it in memory
+        if (imageId) {
+            const cached = getPreloadedUrl(imageId, type);
             if (cached) return { url: cached, metadata: null, status: 'loaded' };
         }
         return { url: null, metadata: null, status: 'loading' };
@@ -33,7 +34,7 @@ export const useImage = (imageId: string | null, type: 'full' | 'preview' | 'thu
             }
 
             // Check preload cache first
-            const cached = getPreloadedUrl(imageId);
+            const cached = getPreloadedUrl(imageId, type);
             if (cached) {
                 // Even if cached, we need metadata for PPI warnings
                 try {
@@ -63,6 +64,7 @@ export const useImage = (imageId: string | null, type: 'full' | 'preview' | 'thu
 
                 if (blob) {
                     objectUrl = URL.createObjectURL(blob);
+                    cacheUrl(imageId, type, objectUrl); // Add to LRU Cache
                     setState({ url: objectUrl, metadata, status: 'loaded' });
                 } else {
                     setState({ url: null, metadata: null, status: 'not-found' });
@@ -80,7 +82,7 @@ export const useImage = (imageId: string | null, type: 'full' | 'preview' | 'thu
         return () => {
             active = false;
             // Don't revoke preloaded URLs - they're managed by the cache
-            if (objectUrl && !getPreloadedUrl(imageId || '')) {
+            if (objectUrl && !getPreloadedUrl(imageId || '', type)) {
                 URL.revokeObjectURL(objectUrl);
             }
         };

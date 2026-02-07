@@ -11,9 +11,11 @@ interface FrameListProps {
     onFrameSelect?: (frame: Frame) => void;
     selectionMode?: 'standard' | 'toggle';
     headerAction?: React.ReactNode;
+    viewMode?: 'list' | 'grid';
+    onViewModeChange?: (mode: 'list' | 'grid') => void;
 }
 
-const FrameList: React.FC<FrameListProps> = ({ onFrameSelect, selectionMode = 'standard', headerAction }) => {
+const FrameList: React.FC<FrameListProps> = ({ onFrameSelect, selectionMode = 'standard', headerAction, viewMode = 'list', onViewModeChange }) => {
     const {
         currentProject,
         setSelection,
@@ -211,33 +213,74 @@ const FrameList: React.FC<FrameListProps> = ({ onFrameSelect, selectionMode = 's
                     activeFilters={activeFilters}
                     onFilterChange={handleFilterChange}
                     onClear={() => updateFrameState({ activeFilters: {} })}
+                    viewOptions={[
+                        {
+                            id: 'list',
+                            label: 'List View',
+                            checked: viewMode === 'list',
+                            type: 'item',
+                            onClick: () => onViewModeChange?.('list')
+                        },
+                        {
+                            id: 'grid',
+                            label: 'Grid View',
+                            checked: viewMode === 'grid',
+                            type: 'item',
+                            onClick: () => onViewModeChange?.('grid')
+                        }
+                    ]}
                 />
             </div>
 
             {/* Injected Header Action (e.g. Mobile Add Button) */}
             {headerAction}
 
-            {selectedFrameTemplateIds.length > 0 && (
-                <div className={styles.batchActions}>
-                    <span className={styles.selectionCount}>{selectedFrameTemplateIds.length} selected</span>
-                    <div className={styles.batchButtons}>
-                        <button className={styles.clearParamsBtn} onClick={() => setSelectedFrameTemplates([])} title="Clear Selection">✕</button>
-                        <button className={styles.batchDeleteBtn} onClick={handleBatchDelete} title="Delete Selected">🗑️</button>
+            {
+                selectedFrameTemplateIds.length > 0 && (
+                    <div className={styles.batchActions}>
+                        <span className={styles.selectionCount}>{selectedFrameTemplateIds.length} selected</span>
+                        <div className={styles.batchButtons}>
+                            <button className={styles.clearParamsBtn} onClick={() => setSelectedFrameTemplates([])} title="Clear Selection">✕</button>
+                            <button className={styles.batchDeleteBtn} onClick={handleBatchDelete} title="Delete Selected">🗑️</button>
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
             <div className={styles.scrollWrapper}>
-                <div className={styles.list}>
+                <div className={viewMode === 'list' ? styles.list : styles.gridList}>
                     {processedTemplates.map((template, index) => {
                         const instance = instances.find(f => f.templateId === template.id);
-                        const isPlaced = !!instance;
+                        const isPlaced = !!instance; // Keep using only isPlaced for visual dimming
                         const isSelected = selectedFrameTemplateIds.includes(template.id);
+
+                        const isGrid = viewMode === 'grid';
+
+                        // Calculate dimensions for Grid View to ensure aspect ratio is preserved
+                        // while fitting within the grid item bounds (approx 80% width, 60% height of cell)
+                        let gridStyle = {};
+                        if (isGrid) {
+                            const MAX_W = 80; // percent
+                            const MAX_H = 60; // percent
+                            const ratio = template.width / template.height;
+
+                            let w = MAX_W;
+                            let h = w / ratio;
+
+                            if (h > MAX_H) {
+                                h = MAX_H;
+                                w = h * ratio;
+                            }
+                            gridStyle = {
+                                width: `${w}%`,
+                                height: `${h}%`
+                            };
+                        }
 
                         return (
                             <div
                                 key={template.id}
-                                className={`${styles.frameItem} ${isPlaced ? styles.placedItem : ''} ${isSelected ? styles.selectedItem : ''}`}
+                                className={`${viewMode === 'list' ? styles.frameItem : styles.gridItem} ${isPlaced ? styles.placedItem : ''} ${isSelected ? styles.selectedItem : ''}`}
                                 draggable={!isPlaced}
                                 onClick={(e) => handleTemplateClick(e, template.id, index)}
                                 onDragStart={(e) => {
@@ -256,9 +299,13 @@ const FrameList: React.FC<FrameListProps> = ({ onFrameSelect, selectionMode = 's
                                         borderColor: template.frameColor || '#111111',
                                         borderWidth: `${Math.max(1, (template.borderWidth ?? 0.1) * (40 / (template.width + (template.borderWidth ?? 0.1) * 2)))}px`,
                                         borderStyle: 'solid',
-                                        backgroundColor: template.matted ? '#ffffff' : undefined
+                                        backgroundColor: template.matted ? '#ffffff' : undefined,
+                                        // Apply grid sizing if in grid mode, otherwise default (which is handled by CSS for list view? Check this.)
+                                        // Actually list view uses fixed width 40px in CSS. We should only apply this in grid mode.
+                                        ...(isGrid ? gridStyle : {})
                                     }}
                                 >
+
                                     {template.matted && (
                                         <div
                                             className={styles.mattedInner}
@@ -303,26 +350,28 @@ const FrameList: React.FC<FrameListProps> = ({ onFrameSelect, selectionMode = 's
                     )}
                 </div>
             </div>
-            {frameToRemove && (
-                <ConfirmDialog
-                    title={frameToRemove === 'BATCH_DELETE' ? "Delete Selected Frames" : "Remove Frame Template"}
-                    message={frameToRemove === 'BATCH_DELETE'
-                        ? `Are you sure you want to remove ${selectedFrameTemplateIds.length} templates?`
-                        : "Are you sure you want to remove this frame template from your library?"}
-                    confirmLabel="Remove"
-                    onConfirm={() => {
-                        if (frameToRemove === 'BATCH_DELETE') {
-                            confirmBatchDelete();
-                        } else {
-                            removeFromLibrary(currentProject.id, frameToRemove);
-                            setFrameToRemove(null);
-                        }
-                    }}
-                    onCancel={() => setFrameToRemove(null)}
-                    isDanger={true}
-                />
-            )}
-        </div>
+            {
+                frameToRemove && (
+                    <ConfirmDialog
+                        title={frameToRemove === 'BATCH_DELETE' ? "Delete Selected Frames" : "Remove Frame Template"}
+                        message={frameToRemove === 'BATCH_DELETE'
+                            ? `Are you sure you want to remove ${selectedFrameTemplateIds.length} templates?`
+                            : "Are you sure you want to remove this frame template from your library?"}
+                        confirmLabel="Remove"
+                        onConfirm={() => {
+                            if (frameToRemove === 'BATCH_DELETE') {
+                                confirmBatchDelete();
+                            } else {
+                                removeFromLibrary(currentProject.id, frameToRemove);
+                                setFrameToRemove(null);
+                            }
+                        }}
+                        onCancel={() => setFrameToRemove(null)}
+                        isDanger={true}
+                    />
+                )
+            }
+        </div >
     );
 };
 

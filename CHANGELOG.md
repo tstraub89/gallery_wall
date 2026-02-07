@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.10] - 2026-02-06
+
+### ✨ Library Improvements
+- **Gallery View Options**: Added a toggle for **Grid/List** views. Grid view now supports **Small**, **Medium** (default), **Large**, and **Extra Large** sizes.
+- **Smart Loading**: Eliminated the "loading flash" when opening the sidebar by implementing a smart **LRU Cache** that keeps recent images in memory.
+- **Dense Frame Grid**: The frames library now uses a compact, aspect-ratio-aware grid layout to make browsing shapes much faster.
+
 ## [0.2.9] - 2026-02-06
 
 ### ⚡ Performance & AI Readiness

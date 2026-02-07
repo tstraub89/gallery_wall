@@ -1,6 +1,7 @@
 import { createContext } from 'react';
 import { Project, Frame } from '../types';
 import { SelectionContextType } from './SelectionContext';
+import { ImageMetadata } from '../utils/imageStore';
 
 export interface LibraryState {
     searchTerm: string;
@@ -13,6 +14,7 @@ export interface ProjectDataContextType {
     projects: Record<string, Project>;
     currentProject: Project | null;
     currentProjectId: string | null;
+    imagesMetadata: Record<string, ImageMetadata>;
 
     // Removed selection properties from Data Context
     // selectedFrameIds: string[]; ... etc
@@ -30,7 +32,7 @@ export interface ProjectDataContextType {
 
     addToLibrary: (projectId: string, frameDimensions: Partial<Frame>) => void;
     removeFromLibrary: (projectId: string, templateId: string) => void;
-    addImageToLibrary: (projectId: string, imageId: string) => void;
+    addImageToLibrary: (projectId: string, imageId: string, metadata?: any) => void;
 
     libraryState: LibraryState;
     frameState: LibraryState;

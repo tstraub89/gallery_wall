@@ -91,3 +91,33 @@
     letter-spacing: 0.05em;
     text-transform: uppercase;
 }
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: 8px;
+}
+
+.controlBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 4px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+}
+
+.controlBtn:hover {
+    background: rgba(0,0,0,0.05);
+    opacity: 1;
+}
+
+.controlBtn.active {
+    color: var(--accent-color);
+    opacity: 1;
+    background: rgba(0, 122, 255, 0.1);
+}

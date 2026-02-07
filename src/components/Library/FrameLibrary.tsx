@@ -11,11 +11,18 @@ import ProBadge from '../Common/ProBadge';
 import pkg from '../../../package.json';
 import styles from './FrameLibrary.module.css';
 
+import { useLocalStorage } from '../../hooks/useLocalStorage';
+
 const FrameLibrary: React.FC = () => {
     const [openSection, setOpenSection] = useState<string | null>('frames');
     const [isImportOpen, setImportOpen] = useState(false);
     const [isCommonOpen, setCommonOpen] = useState(false);
     const [isManualOpen, setManualOpen] = useState(false);
+
+    // View State
+    const [framesViewMode, setFramesViewMode] = useLocalStorage<'list' | 'grid'>('library_frames_view_mode', 'grid');
+    const [photosViewMode, setPhotosViewMode] = useLocalStorage<'list' | 'grid'>('library_photos_view_mode', 'grid');
+    const [photosZoomLevel, setPhotosZoomLevel] = useLocalStorage<'small' | 'medium' | 'large' | 'xlarge'>('library_photos_zoom_level', 'medium');
 
     return (
         <SmartLayoutProvider>
@@ -62,7 +69,7 @@ const FrameLibrary: React.FC = () => {
                                 <span>{isManualOpen ? '▼' : '▶'}</span>
                             </div>
                             {isManualOpen && <ManualEntryForm />}
-                            <FrameList />
+                            <FrameList viewMode={framesViewMode} onViewModeChange={setFramesViewMode} />
                         </div>
                     )}
                 </div>
@@ -95,7 +102,12 @@ const FrameLibrary: React.FC = () => {
                     </div>
                     {openSection === 'photos' && (
                         <div className={styles.sectionContent}>
-                            <PhotoLibrary />
+                            <PhotoLibrary
+                                viewMode={photosViewMode}
+                                onViewModeChange={setPhotosViewMode}
+                                zoomLevel={photosZoomLevel}
+                                onZoomLevelChange={setPhotosZoomLevel}
+                            />
                         </div>
                     )}
                 </div>

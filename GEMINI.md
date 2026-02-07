@@ -43,6 +43,10 @@ It features a "Pro" tier (currently free in beta) that includes AI-assisted auto
 *   **Mixed Release**: If the commit includes code changes *and* a version bump, the message should focus on the changes (e.g., `feat: add new sidebar (v0.3.0)`).
 *   **Website Tweaks**: Minor copy/CSS changes to the website do **NOT** warrant a version bump. Commit them directly.
 
+### Release Process
+When bumping a version (Patch or Minor):
+1.  **Update `package.json`**: Increment the `version` field.
+2.  **Update `CHANGELOG.md`**: Add a new entry with high-level, user-friendly descriptions of the changes.
 
 ### State Management
 The application uses React Context for global state management:

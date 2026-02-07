@@ -206,3 +206,89 @@
     font-size: 1.2rem;
     font-weight: 500;
 }
+
+/* Grid Size Modifiers */
+.masonryGrid.small {
+    column-count: 4;
+}
+
+.masonryGrid.medium {
+    column-count: 3;
+}
+
+.masonryGrid.large {
+    column-count: 2;
+}
+
+.masonryGrid.xlarge {
+    column-count: 1;
+}
+
+/* List View Styles */
+.listView {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 10px;
+}
+
+.listItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.listItem:hover {
+    background: #f9f9f9;
+    border-color: #ddd;
+}
+
+.listItem.selected {
+    border-color: #007aff;
+    background: #f0f7ff;
+}
+
+.listThumb {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 4px;
+    background: #eee;
+}
+
+.listInfo {
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+}
+
+.listName {
+    font-weight: 500;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.listMeta {
+    font-size: 11px;
+    color: #888;
+}
+
+.listStatus {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background: #eee;
+    color: #666;
+}
+
+.listStatus.used {
+    background: #e3f2fd;
+    color: #1976d2;
+}
