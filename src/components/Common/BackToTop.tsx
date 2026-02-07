@@ -5,17 +5,25 @@ const BackToTop: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
+        let timeoutId: number | null = null;
+
         const toggleVisibility = () => {
-            if (window.pageYOffset > 500) {
-                setIsVisible(true);
-            } else {
-                setIsVisible(false);
-            }
+            if (timeoutId) return;
+
+            timeoutId = window.setTimeout(() => {
+                // Determine visibility based on scroll position
+                // Using > 300 to show it a bit earlier/smoother
+                setIsVisible(window.pageYOffset > 500);
+                timeoutId = null;
+            }, 100);
         };
 
-        window.addEventListener('scroll', toggleVisibility);
+        window.addEventListener('scroll', toggleVisibility, { passive: true });
 
-        return () => window.removeEventListener('scroll', toggleVisibility);
+        return () => {
+            window.removeEventListener('scroll', toggleVisibility);
+            if (timeoutId) window.clearTimeout(timeoutId);
+        };
     }, []);
 
     const scrollToTop = () => {
