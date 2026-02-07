@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.1] - 2026-02-07
+
+### 📱 Mobile Refinements
+- **Low-Data Mode**: The mobile library now automatically uses lightweight thumbnails in grid view (even for "Extra Large" size) to save bandwidth and load faster.
+- **Smart Navigation**: Tapping a frame that is already placed on your wall now **zooms you to it** instead of creating a duplicate.
+- **Crash Fixes**: Resolved an issue where opening the library view settings on mobile could cause the app to crash.
+
 ## [0.3.0] - 2026-02-07
 
 ### 🧩 Template Packs

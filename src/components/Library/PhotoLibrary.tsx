@@ -105,6 +105,7 @@ interface PhotoLibraryProps {
     onViewModeChange?: (mode: 'list' | 'grid') => void;
     zoomLevel?: 'small' | 'medium' | 'large' | 'xlarge';
     onZoomLevelChange?: (level: 'small' | 'medium' | 'large' | 'xlarge') => void;
+    isMobile?: boolean;
 }
 
 const PhotoLibrary: React.FC<PhotoLibraryProps> = ({
@@ -113,7 +114,8 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({
     viewMode = 'grid',
     onViewModeChange,
     zoomLevel = 'medium',
-    onZoomLevelChange
+    onZoomLevelChange,
+    isMobile = false
 }) => {
     // ... imports ...
     const {
@@ -605,7 +607,7 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({
                                     imageId={imageId}
                                     isUsed={usedImageIds.has(imageId)}
                                     isSelected={selectedImageIds.includes(imageId)}
-                                    imageType={zoomLevel === 'xlarge' ? 'preview' : 'thumb'}
+                                    imageType={(zoomLevel === 'xlarge' && !isMobile) ? 'preview' : 'thumb'}
                                     onSelect={(e) => handleSelect(imageId, e)}
                                 />
                             ))

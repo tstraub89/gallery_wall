@@ -11,6 +11,7 @@ import MobileAddFrameDialog from './MobileAddFrameDialog';
 import MobileCommonFrameDialog from './MobileCommonFrameDialog';
 import { SmartLayoutProvider } from '../Library/SmartLayout/SmartLayoutContext';
 import SmartLayoutSection from '../Library/SmartLayout/SmartLayoutSection';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
 
 interface MobileLibrarySheetProps {
     isOpen: boolean;
@@ -29,6 +30,11 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
         selectedFrameIds,
         addToLibrary
     } = useProject();
+
+    // View State (Mobile Specific)
+    const [framesViewMode, setFramesViewMode] = useLocalStorage<'list' | 'grid'>('mobile_library_frames_view_mode', 'grid');
+    const [photosViewMode, setPhotosViewMode] = useLocalStorage<'list' | 'grid'>('mobile_library_photos_view_mode', 'grid');
+    const [photosZoomLevel, setPhotosZoomLevel] = useLocalStorage<'small' | 'medium' | 'large' | 'xlarge'>('mobile_library_photos_zoom_level', 'medium');
 
     const viewport = useViewport();
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -61,14 +67,6 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
             zIndex: 0
         };
 
-        // For Manual Custom frames on mobile, we still add to library first? 
-        // Logic says: "Add Custom" -> Dialog -> Add. 
-        // Previously it called `handleAddFrame` (add to wall).
-        // Let's keep custom frames adding to wall directly as per user habit, or consistency?
-        // User asked for common frames to add to inventory. 
-        // Custom frames are a "one-off" usually? Or should we add to library too?
-        // Let's stick to previous behavior for Custom (Add to Wall) to minimize friction for single adds.
-
         handleAddFrame(template);
         setShowAddDialog(false);
     };
@@ -90,17 +88,39 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
         };
 
         addToLibrary(currentProject.id, frame);
-        // Do not close the dialog? Or close it?
-        // User might want to add multiple. 
-        // "Verify a 4x6 frame appears in the list (inventory) behind the dialog." implies dialog stays open or list is visible.
-        // Let's keep dialog open? Or maybe a toast? 
-        // For now, let's close it so they can see the list update, or keep it open for speed?
-        // "User can then drag/tap from the list to place them."
-        // Better to close it so they can interact with the list.
         setShowCommonDialog(false);
     };
 
     const handleAddFrame = (template: Frame) => {
+        // Smart Navigation: If frame is already placed, find it and zoom to it
+        const existingFrame = currentProject.frames.find(f => f.templateId === template.id);
+
+        if (existingFrame && viewport) {
+            // Calculate center of frame on canvas
+            const CANVAS_PPI = 10;
+            const frameCX = existingFrame.x + (existingFrame.width * CANVAS_PPI) / 2;
+            const frameCY = existingFrame.y + (existingFrame.height * CANVAS_PPI) / 2;
+
+            // Goal: Center this point on screen
+            // screenX = canvasX * scale + panX
+            // panX = screenX - canvasX * scale
+
+            const winW = window.innerWidth;
+            const winH = window.innerHeight;
+
+            // Zoom in a bit if we're too far out, or keep current if already close
+            const targetScale = Math.max(viewport.scale, 0.75);
+
+            const newPanX = (winW / 2) - (frameCX * targetScale);
+            const newPanY = (winH / 2) - (frameCY * targetScale);
+
+            viewport.setScale(targetScale);
+            viewport.setPan({ x: newPanX, y: newPanY });
+
+            onClose();
+            return;
+        }
+
         const id = uuidv4();
         const frames = currentProject.frames;
 
@@ -265,6 +285,8 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
                                 <FrameList
                                     onFrameSelect={!isEditMode ? handleAddFrame : undefined}
                                     selectionMode={isEditMode ? 'toggle' : 'standard'}
+                                    viewMode={framesViewMode}
+                                    onViewModeChange={setFramesViewMode}
                                     headerAction={!isEditMode && (
                                         <div className={styles.addFrameActions}>
                                             <button
@@ -293,6 +315,11 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
                             <PhotoLibrary
                                 onPhotoSelect={!isEditMode ? handleAddPhoto : undefined}
                                 selectionMode={isEditMode ? 'toggle' : 'standard'}
+                                viewMode={photosViewMode}
+                                onViewModeChange={setPhotosViewMode}
+                                zoomLevel={photosZoomLevel}
+                                onZoomLevelChange={setPhotosZoomLevel}
+                                isMobile={true}
                             />
                         )}
                     </div>
