@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run sitemap && vite build",
+    "sitemap": "tsx scripts/generate-sitemap.ts",
     "lint": "eslint .",
     "preview": "vite preview",
     "type-check": "tsc -b"
@@ -40,6 +41,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vite": "^7.2.4"
   }
