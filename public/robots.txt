@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://gallery-planner.com/sitemap.xml
+Sitemap: https://gallery-planner.com/llms.txt

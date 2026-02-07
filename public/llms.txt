@@ -1,0 +1,22 @@
+# GalleryPlanner
+
+> Visualize your perfect gallery wall before you hang a single nail.
+
+## Description
+GalleryPlanner is an interactive web application for planning gallery wall layouts. It allows users to visualize frame arrangements on a virtual wall, supporting customized wall dimensions (including staircases), real photos, and precise measurements.
+
+## Core Features
+- **Smart Layout**: AI-assisted auto-arrangement (Masonry, Grid, Skyline).
+- **Virtual Inventory**: Import real photo sizes and frames.
+- **Privacy Focused**: Runs entirely in-browser (local-first); images are not uploaded to a cloud.
+- **Tools**: Precision canvas with snapping, pan/zoom, and exact coordinates.
+- **Output**: Export installation PDF guides and high-res print bundles.
+
+## Documentation
+- **Help Center**: https://gallery-planner.com/help
+- **Privacy**: https://gallery-planner.com/privacy
+- **Source**: built with React 19, Vite, TypeScript.
+
+## Links
+- **App**: https://gallery-planner.com/app
+- **About**: https://gallery-planner.com/about
