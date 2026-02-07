@@ -143,6 +143,7 @@
     line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     /* Force max 2 lines */
     -webkit-box-orient: vertical;
     overflow: hidden;
@@ -159,6 +160,7 @@
     flex: 1;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     /* Force max 3 lines */
     -webkit-box-orient: vertical;
     overflow: hidden;
