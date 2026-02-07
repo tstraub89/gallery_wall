@@ -5,6 +5,7 @@ import ImageProperties from './ImageProperties';
 import ValidatedNumberInput from '../Common/ValidatedNumberInput';
 import RangeSlider from '../Common/RangeSlider';
 import ProBadge from '../Common/ProBadge';
+import ColorPicker from '../Common/ColorPicker';
 import {
     AlignHorizontalJustifyStart, AlignHorizontalJustifyCenter, AlignHorizontalJustifyEnd,
     AlignVerticalJustifyStart, AlignVerticalJustifyCenter, AlignVerticalJustifyEnd,
@@ -406,7 +407,7 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                                     max={5}
                                     step={0.1}
                                     value={(getValue('borderWidth') as number) ?? 1.0}
-                                    onChange={(val) => updateAll('borderWidth', Math.round(val * 10) / 10)}
+                                    onChange={(val: number) => updateAll('borderWidth', Math.round(val * 10) / 10)}
                                 />
                                 <ValidatedNumberInput
                                     value={getValue('borderWidth') ?? 1.0}
@@ -420,12 +421,12 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                             </div>
                         </div>
 
-                        <div className={styles.propGroup}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                                <label style={{ marginBottom: 0 }}>Shape</label>
-                                <ProBadge />
-                            </div>
-                            <div className={styles.row}>
+                        <div className={styles.row}>
+                            <div className={styles.propGroup} style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                    <label style={{ marginBottom: 0 }}>Shape</label>
+                                    <ProBadge />
+                                </div>
                                 <select
                                     value={getValue('shape') || 'rect'}
                                     onChange={(e) => updateAll('shape', e.target.value)}
@@ -435,31 +436,12 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                                     <option value="round">Round / Oval</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div className={styles.propGroup}>
-                            <label>Frame Color</label>
-                            <div className={styles.colorRow}>
-                                {[
-                                    { color: '#111111', title: 'Black' },
-                                    { color: '#ffffff', title: 'White' },
-                                    { color: '#5d4037', title: 'Wood' },
-                                    { color: '#d4af37', title: 'Gold' },
-                                    { color: '#9e9e9e', title: 'Silver' },
-                                ].map((preset) => (
-                                    <button
-                                        key={preset.color}
-                                        className={`${styles.colorSwatch} ${getValue('frameColor') === preset.color ? styles.activeSwatch : ''} `}
-                                        style={{ backgroundColor: preset.color }}
-                                        onClick={() => updateAll('frameColor', preset.color)}
-                                        title={preset.title}
-                                    />
-                                ))}
-                                <input
-                                    type="color"
-                                    value={getValue('frameColor') || '#111111'}
-                                    onChange={(e) => updateAll('frameColor', e.target.value)}
-                                    className={styles.colorPicker}
+                            <div className={styles.propGroup}>
+                                <ColorPicker
+                                    label="Color"
+                                    value={(getValue('frameColor') as string) || '#111111'}
+                                    onChange={(color: string) => updateAll('frameColor', color)}
+                                    align="project-left"
                                 />
                             </div>
                         </div>

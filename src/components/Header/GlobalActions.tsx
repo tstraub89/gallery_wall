@@ -10,7 +10,7 @@ import ProBadge from '../Common/ProBadge';
 import { importProjectBundle } from '../../utils/exportUtils';
 import { saveImage } from '../../utils/imageStore';
 import { v4 as uuidv4 } from 'uuid';
-import { FolderOpen, Download } from 'lucide-react';
+import { Download, FolderOpen, Palette } from 'lucide-react';
 
 const FullScreenOverlay = ({ children }: { children: React.ReactNode }) => {
     return createPortal(
@@ -180,6 +180,29 @@ const GlobalActions = () => {
                         ),
                         onClick: exportPhotosCrops,
                         title: 'High-res cropped photos ready for printing'
+                    }
+                ]}
+            />
+
+            {/* Help Menu */}
+            <DropdownMenu
+                label="Help"
+                icon={<div style={{ width: 16, height: 16, border: '1.5px solid currentColor', borderRadius: '50%', textAlign: 'center', fontSize: '10px', lineHeight: '14px', fontWeight: 'bold' }}>?</div>}
+                items={[
+                    {
+                        label: 'User Guide',
+                        onClick: () => window.open('/learn/galleryplanner-user-guide', '_blank'),
+                    },
+                    {
+                        label: 'Design Principles',
+                        icon: <Palette size={18} />,
+                        onClick: () => window.open('/learn/complete-guide-to-gallery-walls', '_blank'),
+                        title: 'Tips for designing better layouts'
+                    },
+                    { separator: true },
+                    {
+                        label: 'About',
+                        onClick: () => window.open('/about', '_blank')
                     }
                 ]}
             />

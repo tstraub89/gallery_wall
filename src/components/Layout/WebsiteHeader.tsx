@@ -14,16 +14,18 @@ const WebsiteHeader: React.FC = () => {
             </div>
             <nav className={styles.nav}>
                 <Link to="/">Home</Link>
+                <Link to="/learn">Learn</Link>
                 <Link to="/about">About</Link>
                 <Link to="/help">Help</Link>
-                <Link
-                    to="/app"
-                    className={styles.ctaBtn}
-                    onClick={() => trackEvent(LANDING_EVENTS.NAV_LAUNCH)}
-                >
-                    Launch App
-                </Link>
             </nav>
+            <Link
+                to="/app"
+                className={styles.ctaBtn}
+                onClick={() => trackEvent(LANDING_EVENTS.NAV_LAUNCH)}
+            >
+                <span className={styles.mobileText}>App</span>
+                <span className={styles.desktopText}>Launch App</span>
+            </Link>
         </header>
     );
 };

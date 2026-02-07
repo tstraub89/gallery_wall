@@ -12,9 +12,12 @@ const WebsiteFooter: React.FC = () => {
                         <Logo hideStatus />
                     </Link>
                     <div className={styles.copyright}>
-                        © 2026 Timothy Straub.<br />Built with precision for beautiful homes.
+                        © 2026 Timothy Straub.<br />
+                        Built with precision for beautiful homes.<br />
+                        <span style={{ opacity: 0.6, fontSize: '0.9em' }}>Proudly built with AI assistance.</span>
                     </div>
                 </div>
+
 
                 <div className={styles.footerLinks}>
                     <div className={styles.footerColumn}>
@@ -26,7 +29,8 @@ const WebsiteFooter: React.FC = () => {
                     </div>
 
                     <div className={styles.footerColumn}>
-                        <strong className={styles.footerColumnTitle}>Resources</strong>
+                        <span className={styles.footerColumnTitle}>Resources</span>
+                        <Link to="/learn" className={styles.footerLink}>Design Guides</Link>
                         <Link to="/help" className={styles.footerLink}>Help Center</Link>
                         <Link
                             to="/changelog"
@@ -34,13 +38,17 @@ const WebsiteFooter: React.FC = () => {
                         >
                             What's New
                         </Link>
+                    </div>
+
+                    <div className={styles.footerColumn}>
+                        <span className={styles.footerColumnTitle}>Company</span>
                         <Link to="/about" className={styles.footerLink}>About</Link>
                         <Link to="/privacy" className={styles.footerLink}>Privacy</Link>
+                        <a href="mailto:hello@gallery-planner.com" className={styles.footerLink}>Contact</a>
                     </div>
 
                     <div className={styles.footerColumn}>
                         <strong className={styles.footerColumnTitle}>Connect</strong>
-                        <a href="mailto:hello@gallery-planner.com" className={styles.footerLink}>Email Us</a>
                         <a href="https://github.com/tstraub89/gallery_wall" target="_blank" rel="noreferrer" className={styles.footerLink}>GitHub</a>
                         <a href="https://www.linkedin.com/in/tjstraub/" target="_blank" rel="noreferrer" className={styles.footerLink}>LinkedIn</a>
                         <a href="https://bsky.app/profile/timothystraub.com" target="_blank" rel="noreferrer" className={styles.footerLink}>Bluesky</a>

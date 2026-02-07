@@ -12,7 +12,7 @@
     width: 100vw;
     background-color: var(--bg-app);
     position: relative;
-    /* For handle positioning if needed */
+    overflow: hidden;
 }
 
 .header {

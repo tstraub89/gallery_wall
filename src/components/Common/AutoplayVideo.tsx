@@ -99,6 +99,7 @@ const AutoplayVideo: React.FC<AutoplayVideoProps> = React.memo(({ src, sources, 
                 muted
                 playsInline
                 preload="auto"
+                onContextMenu={(e) => e.preventDefault()}
                 {...props}
             >
                 {sources ? (

@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-02-07
+ 
+### 📚 The "Mastery" Update: Learn Hub Launch
+- **New /learn Center**: Transformed the basic resources page into a comprehensive learning hub. Organized by **Design 101**, **Installation Guides**, and **App Guides**.
+- **10+ New Articles**: Added deep-dive guides on complex topics: Staircase Geometry, DPI/Resolution for Prints, Renter-Friendly Installations, and Samsung Frame TV integration.
+- **Video Walkthroughs**: Integrated high-quality video guides into pillar articles, demonstrating core concepts visually.
+- **SEO & Discoverability**: 
+    - **JSON-LD Schema**: Implemented structured data for better search engine indexing.
+    - **Automated Sitemaps**: Created a sitemap generation engine to keep Google updated as new content arrives.
+    - **Semantic Routing**: Migrated from `/resources` to `/learn` with proper site-wide link refactoring.
+
+### 🎨 Color & Style Refactor
+- **Portal-based Menus**: A major architectural upgrade using **React Portals**. UI menus now float at the root Level, making them immune to sidebar clipping and overflow issues forever.
+- **Custom Color Picker**: Professional-grade selector for Pro users with hex input and standard preset swatches (Wood, Gold, Silver, etc.).
+- **Compact Properties**: Refined the right sidebar with a side-by-side Shape/Color layout to maximize screen real estate.
+
+### 📱 Mobile & Polish
+- **Responsive Design**: Fixed table wrapping and redesigned article headers for mobile screens.
+- **Transparency**: Added "AI-Assisted" notes to all editorial content, detailing our hybrid human-AI creative process.
+- **Font Loading**: Switched to async font loading to eliminate the "flash of invisible text" on first visit.
+
 ## [0.3.2] - 2026-02-07
 
 ### 🎥 Visual Upgrades

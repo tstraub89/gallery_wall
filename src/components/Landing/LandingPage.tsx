@@ -9,6 +9,7 @@ import { trackEvent, LANDING_EVENTS } from '../../utils/analytics';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 import LandingCarousel from './LandingCarousel';
 import AutoplayVideo from '../Common/AutoplayVideo';
+import FeaturedResources from './FeaturedResources';
 
 const SMART_LAYOUT_SOURCES = [
     { src: "/smart-layout.webm", type: "video/webm" },
@@ -52,15 +53,17 @@ const LandingPage: React.FC = () => {
                 </div>
                 <nav className={styles.nav}>
                     <a href="#features">Features</a>
+                    <a href="#resources">Learn</a>
                     <a href="#pro">Pro</a>
-                    <Link
-                        to="/app"
-                        className={styles.ctaBtn}
-                        onClick={() => trackEvent(LANDING_EVENTS.NAV_LAUNCH)}
-                    >
-                        Launch App
-                    </Link>
                 </nav>
+                <Link
+                    to="/app"
+                    className={styles.ctaBtn}
+                    onClick={() => trackEvent(LANDING_EVENTS.NAV_LAUNCH)}
+                >
+                    <span className={styles.mobileText}>App</span>
+                    <span className={styles.desktopText}>Launch App</span>
+                </Link>
             </header>
 
             {/* Main Content */}
@@ -265,6 +268,9 @@ const LandingPage: React.FC = () => {
                         </div>
                     </div>
                 </section>
+
+                {/* Featured Resources */}
+                <FeaturedResources id="resources" />
 
                 {/* Pro Section */}
                 <section className={styles.proSection} id="pro" ref={proRef as any}>

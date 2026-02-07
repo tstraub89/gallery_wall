@@ -67,6 +67,25 @@
     margin: 0 auto;
 }
 
+/* Responsive Text Helpers */
+.mobileText {
+    display: none;
+}
+
+.desktopText {
+    display: inline;
+}
+
+@media (max-width: 768px) {
+    .mobileText {
+        display: inline;
+    }
+
+    .desktopText {
+        display: none;
+    }
+}
+
 .betaBadge {
     display: inline-block;
     background: #f2f2f7;
@@ -361,6 +380,7 @@
         width: 100%;
         display: grid;
         grid-template-columns: repeat(2, 1fr);
+        /* 2x2 Layout */
         gap: 40px 20px;
         text-align: left;
     }
@@ -368,9 +388,9 @@
 
 @media (max-width: 480px) {
     .footerLinks {
-        grid-template-columns: 1fr;
-        text-align: center;
-        gap: 40px;
+        /* Keep 2 columns on very small screens too, standard for mobile footers */
+        grid-template-columns: repeat(2, 1fr);
+        column-gap: 16px;
     }
 
     .footerContent {

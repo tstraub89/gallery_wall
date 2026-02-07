@@ -85,6 +85,22 @@ const AboutPage: React.FC = () => {
                     </p>
                 </div>
 
+                <div className={styles.card} style={{ marginBottom: '40px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+                        <span style={{ fontSize: '24px' }}>🤖</span>
+                        <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>How We Build: Transparent & Modern</h2>
+                    </div>
+                    <p style={{ lineHeight: '1.7', color: '#48484a', fontSize: '17px', marginBottom: '16px' }}>
+                        We believe in using the best tools available to build faster and better. GalleryPlanner is proudly
+                        <strong> "Vibe Coded"</strong>—meaning we use advanced AI coding assistants to write code, generate visuals,
+                        and iterate on features at lightning speed.
+                    </p>
+                    <p style={{ lineHeight: '1.7', color: '#48484a', fontSize: '17px' }}>
+                        While AI helps us build, the <strong>vision, logic, and design</strong> are 100% human. We review every line of code
+                        and every sentence of content to ensure it meets our standards for precision and quality.
+                    </p>
+                </div>
+
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginTop: '60px' }}>
                     <a href="https://github.com/tstraub89/" target="_blank" rel="noopener noreferrer"
                         style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#636366', textDecoration: 'none', fontWeight: '500' }}>

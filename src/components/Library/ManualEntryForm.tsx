@@ -3,6 +3,7 @@ import { useProject } from '../../hooks/useProject';
 import styles from './ManualEntryForm.module.css';
 import ValidatedNumberInput from '../Common/ValidatedNumberInput';
 import ProBadge from '../Common/ProBadge';
+import ColorPicker from '../Common/ColorPicker';
 import { trackEvent, APP_EVENTS } from '../../utils/analytics';
 
 const ManualEntryForm: React.FC = () => {
@@ -96,14 +97,12 @@ const ManualEntryForm: React.FC = () => {
                         <option value="round">Round / Oval</option>
                     </select>
                 </div>
-                <div className={styles.field} style={{ flex: '0 0 45px' }}>
-                    <label>Color</label>
-                    <input
-                        type="color"
+                <div className={styles.field} style={{ flexGrow: 0 }}>
+                    <ColorPicker
+                        label="Color"
                         value={frameColor}
-                        onChange={e => setFrameColor(e.target.value)}
-                        className={styles.colorPicker}
-                        style={{ width: '45px', padding: '0', height: '31px' }} // Manual override for slightly wide look
+                        onChange={setFrameColor}
+                        align="project-right"
                     />
                 </div>
             </div>

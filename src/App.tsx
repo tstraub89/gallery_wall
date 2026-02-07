@@ -14,6 +14,8 @@ const HelpPage = React.lazy(() => import('./components/Help/HelpPage'));
 const PrivacyPolicy = React.lazy(() => import('./components/Landing/PrivacyPolicy'));
 const AboutPage = React.lazy(() => import('./components/Landing/AboutPage'));
 const ChangelogPage = React.lazy(() => import('./components/Landing/ChangelogPage'));
+const ResourcesHub = React.lazy(() => import('./components/Resources/ResourcesHub'));
+const ArticleLayout = React.lazy(() => import('./components/Resources/ArticleLayout'));
 const NotFound = React.lazy(() => import('./components/Common/NotFound'));
 
 const App: React.FC = () => {
@@ -52,6 +54,16 @@ const App: React.FC = () => {
             <Route path="/changelog" element={
               <React.Suspense fallback={null}>
                 <ChangelogPage />
+              </React.Suspense>
+            } />
+            <Route path="/learn" element={
+              <React.Suspense fallback={null}>
+                <ResourcesHub />
+              </React.Suspense>
+            } />
+            <Route path="/learn/:slug" element={
+              <React.Suspense fallback={null}>
+                <ArticleLayout />
               </React.Suspense>
             } />
             <Route path="/app" element={

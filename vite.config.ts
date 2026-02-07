@@ -4,10 +4,25 @@ import fs from 'node:fs'
 
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf-8'))
 
+// Custom plugin to load .md files as raw strings
+function markdownPlugin() {
+  return {
+    name: 'vite-plugin-markdown',
+    transform(code: string, id: string) {
+      if (id.endsWith('.md')) {
+        return `export default ${JSON.stringify(code)}`;
+      }
+    }
+  };
+}
+
 // https://vite.dev/config/
 export default defineConfig(() => {
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      markdownPlugin(),
+    ],
     // Custom domain and Vercel use root base path.
     base: '/',
     define: {
