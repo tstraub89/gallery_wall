@@ -165,7 +165,7 @@
 }
 
 .featureText {
-    flex: 1;
+    flex: 0.8;
 }
 
 .featureText h3 {
@@ -184,7 +184,7 @@
 }
 
 .featureImageWrapper {
-    flex: 1.2;
+    flex: 1.5;
     position: relative;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
@@ -199,8 +199,10 @@
 .featureImage {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    /* Changed from cover to show full image */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* Zoom/Cover to focus on the center action */
     transition: transform 0.5s ease;
 }
 
@@ -209,8 +211,8 @@
 }
 
 .hangingGuide {
-    aspect-ratio: 4/5 !important;
-    /* Taller (portrait) to match PDF shape and bullet list height */
+    aspect-ratio: 16/9 !important;
+    /* Changed from 4/5 (portrait) to 16/9 (landscape) for videos */
 }
 
 /* Pro / Beta Section */

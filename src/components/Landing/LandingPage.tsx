@@ -7,10 +7,22 @@ import BackToTop from '../Common/BackToTop';
 import { Sparkles, LayoutGrid, CheckCircle2, Image } from 'lucide-react';
 import { trackEvent, LANDING_EVENTS } from '../../utils/analytics';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
+import LandingCarousel from './LandingCarousel';
 
 const LandingPage: React.FC = () => {
     const [featuresRef, featuresVisible] = useIntersectionObserver({ threshold: 0.2 });
     const [proRef, proVisible] = useIntersectionObserver({ threshold: 0.2 });
+
+    // Carousel State
+    const [carouselIndex, setCarouselIndex] = React.useState(0);
+
+    // Auto-advance carousel
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCarouselIndex((prev) => (prev + 1) % 3);
+        }, 8000); // Slower: 8 seconds per slide
+        return () => clearInterval(interval);
+    }, [carouselIndex]); // Reset timer on manual interaction if we wanted, but simple loop is fine
 
     useEffect(() => {
         if (featuresVisible) trackEvent(LANDING_EVENTS.VIEW_FEATURES);
@@ -79,14 +91,17 @@ const LandingPage: React.FC = () => {
                         <p>Go from pile-of-frames to perfect wall in minutes.</p>
                     </div>
 
-                    <div className={styles.featureRow} style={{ maxWidth: '1000px' }}>
-                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '40px' }}>
+                    <div className={styles.featureRow} style={{ maxWidth: '1200px', gap: '40px' }}>
+                        <div style={{ flex: 0.8, display: 'flex', flexDirection: 'column', gap: '40px' }}>
                             <div style={{ display: 'flex', gap: '20px' }}>
                                 <div style={{
-                                    background: '#f2f2f7', color: '#1c1c1e', width: '40px', height: '40px',
+                                    background: carouselIndex === 0 ? '#007aff' : '#f2f2f7',
+                                    color: carouselIndex === 0 ? 'white' : '#1c1c1e',
+                                    width: '40px', height: '40px',
                                     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontWeight: 'bold', fontSize: '18px', flexShrink: 0
-                                }}>1</div>
+                                    fontWeight: 'bold', fontSize: '18px', flexShrink: 0,
+                                    cursor: 'pointer', transition: 'all 0.3s ease'
+                                }} onClick={() => setCarouselIndex(0)}>1</div>
                                 <div>
                                     <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>Upload & Measure</h3>
                                     <p style={{ color: '#636366', lineHeight: '1.5' }}>
@@ -97,10 +112,13 @@ const LandingPage: React.FC = () => {
 
                             <div style={{ display: 'flex', gap: '20px' }}>
                                 <div style={{
-                                    background: '#f2f2f7', color: '#1c1c1e', width: '40px', height: '40px',
+                                    background: carouselIndex === 1 ? '#007aff' : '#f2f2f7',
+                                    color: carouselIndex === 1 ? 'white' : '#1c1c1e',
+                                    width: '40px', height: '40px',
                                     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontWeight: 'bold', fontSize: '18px', flexShrink: 0
-                                }}>2</div>
+                                    fontWeight: 'bold', fontSize: '18px', flexShrink: 0,
+                                    cursor: 'pointer', transition: 'all 0.3s ease'
+                                }} onClick={() => setCarouselIndex(1)}>2</div>
                                 <div>
                                     <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>Design & Arrange</h3>
                                     <p style={{ color: '#636366', lineHeight: '1.5' }}>
@@ -111,10 +129,13 @@ const LandingPage: React.FC = () => {
 
                             <div style={{ display: 'flex', gap: '20px' }}>
                                 <div style={{
-                                    background: '#007aff', color: 'white', width: '40px', height: '40px',
+                                    background: carouselIndex === 2 ? '#007aff' : '#f2f2f7',
+                                    color: carouselIndex === 2 ? 'white' : '#1c1c1e',
+                                    width: '40px', height: '40px',
                                     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    fontWeight: 'bold', fontSize: '18px', flexShrink: 0
-                                }}>3</div>
+                                    fontWeight: 'bold', fontSize: '18px', flexShrink: 0,
+                                    cursor: 'pointer', transition: 'all 0.3s ease'
+                                }} onClick={() => setCarouselIndex(2)}>3</div>
                                 <div>
                                     <h3 style={{ fontSize: '20px', fontWeight: 'bold', marginBottom: '8px' }}>Hang with Confidence</h3>
                                     <p style={{ color: '#636366', lineHeight: '1.5' }}>
@@ -124,17 +145,8 @@ const LandingPage: React.FC = () => {
                             </div>
                         </div>
 
-                        <div className={`${styles.featureImageWrapper} ${styles.hangingGuide}`} style={{ flex: 1, maxWidth: '400px' }}>
-                            <img
-                                src="/hanging_guide.webp"
-                                srcSet="/hanging_guide_mobile.webp 800w, /hanging_guide.webp 1200w"
-                                sizes="(max-width: 768px) 100vw, 600px"
-                                alt="Hanging Guide PDF Example"
-                                className={styles.featureImage}
-                                loading="lazy"
-                                width="1200"
-                                height="800"
-                            />
+                        <div className={`${styles.featureImageWrapper} ${styles.hangingGuide}`} style={{ flex: 2 }}>
+                            <LandingCarousel currentIndex={carouselIndex} onChange={setCarouselIndex} />
                         </div>
                     </div>
                 </section>
@@ -155,15 +167,13 @@ const LandingPage: React.FC = () => {
                             </p>
                         </div>
                         <div className={styles.featureImageWrapper}>
-                            <img
-                                src="/smart_layout.webp"
-                                srcSet="/smart_layout_mobile.webp 800w, /smart_layout.webp 1200w"
-                                sizes="(max-width: 768px) 100vw, 600px"
-                                alt="AI Layout Engine"
+                            <video
+                                src="/smart-layout.webm"
                                 className={styles.featureImage}
-                                loading="lazy"
-                                width="1200"
-                                height="800"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
                             />
                         </div>
                     </div>
@@ -199,15 +209,13 @@ const LandingPage: React.FC = () => {
                             </p>
                         </div>
                         <div className={styles.featureImageWrapper}>
-                            <img
-                                src="/photo_library.webp"
-                                srcSet="/photo_library_mobile.webp 800w, /photo_library.webp 1200w"
-                                sizes="(max-width: 768px) 100vw, 600px"
-                                alt="Photo Management"
+                            <video
+                                src="/add-photos.webm"
                                 className={styles.featureImage}
-                                loading="lazy"
-                                width="1200"
-                                height="800"
+                                autoPlay
+                                loop
+                                muted
+                                playsInline
                             />
                         </div>
                     </div>

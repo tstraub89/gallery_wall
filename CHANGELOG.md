@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.2] - 2026-02-07
+
+### 🎥 Visual Upgrades
+- **Interactive Landing Page**: Replaced static screenshots with high-quality looping videos to demonstrate the app's "magic moments" (Template switching, AI Layouts, Drag & Drop).
+- **Hero Carousel**: Added a widescreen carousel to the "How it Works" section, visually guiding users through the core workflow.
+- **Async Fonts**: Fixed a font loading issue that was causing a flash of invisible text (FOIT) on initial load, improving perceived performance.
+
 ## [0.3.1] - 2026-02-07
 
 ### 📱 Mobile Refinements
