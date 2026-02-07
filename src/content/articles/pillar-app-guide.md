@@ -244,7 +244,7 @@ GalleryPlanner offers a **Pro tier** (currently free during beta!) that unlocks 
 | ✅ **Staircase Wall Mode** | Design layouts for angled walls following staircases |
 | ✅ **Custom Frame Shapes** | Beyond rectangles—circular, oval, hexagonal frames *(coming soon)* |
 
-**Get Pro for Free:** During our beta period, all users automatically get free lifetime access to core Pro features. [Launch the app](/) to claim yours.
+**Get Pro for Free:** During our beta period, all users automatically get free lifetime access to core Pro features. [Launch the app](/app) to claim yours.
 
 ---
 

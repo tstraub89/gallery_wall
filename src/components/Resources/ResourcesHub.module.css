@@ -125,19 +125,37 @@
     text-decoration: none;
     display: flex;
     flex-direction: column;
-    transition: all 0.3s;
+    transition: background 0.3s, transform 0.3s, box-shadow 0.3s, border-color 0.3s;
     border: 1px solid rgba(0, 0, 0, 0.05);
     /* Subtle border */
     overflow: hidden;
     height: 100%;
+    cursor: pointer;
+    /* Explicit pointer for all devices */
+    -webkit-tap-highlight-color: transparent;
+    /* Clean tap appearance on iOS */
+    touch-action: manipulation;
+    /* Disables double-tap zoom, makes single tap work immediately */
 }
 
-.articleCard:hover {
-    background: #fff;
-    transform: translateY(-4px);
-    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
-    /* Softer shadow */
-    border-color: rgba(0, 122, 255, 0.3);
+/* Active state for immediate mobile tap feedback */
+.articleCard:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+}
+
+/* Card Hover Effect - Only on devices that support hover */
+@media (hover: hover) {
+    .articleCard:hover {
+        background: #fff;
+        transform: translateY(-4px);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
+        border-color: rgba(0, 122, 255, 0.3);
+    }
+
+    .articleCard:hover .cardImage {
+        transform: scale(1.05);
+    }
 }
 
 .cardImageContainer {
@@ -153,10 +171,6 @@
     height: 100%;
     object-fit: cover;
     transition: transform 0.5s ease;
-}
-
-.articleCard:hover .cardImage {
-    transform: scale(1.05);
 }
 
 .cardContent {
@@ -261,8 +275,10 @@
     transition: transform 0.2s;
 }
 
-.articleCard:hover .readMore {
-    transform: translateX(4px);
+@media (hover: hover) {
+    .articleCard:hover .readMore {
+        transform: translateX(4px);
+    }
 }
 
 /* Empty State */

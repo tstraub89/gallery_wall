@@ -63,7 +63,7 @@ Here's a quick reference before diving into the details:
 
 **Same applies vertically** for top and bottom margins.
 
-**Pro tip:** Use [GalleryPlanner](/) to auto-calculate perfect margins. It centers your layout automatically.
+**Pro tip:** Use [GalleryPlanner](/app) to auto-calculate perfect margins. It centers your layout automatically.
 
 ---
 

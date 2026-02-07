@@ -273,7 +273,7 @@ Combine thematic content with grid precision.
 
 Not sure which style will work for your space? **Try them all** using GalleryPlanner:
 
-1. [Open GalleryPlanner](/) and input your wall dimensions
+1. [Open GalleryPlanner](/app) and input your wall dimensions
 2. Add your frame inventory
 3. Use **Smart Layout** to generate examples of each style:
    - **Grid** → Use Grid algorithm

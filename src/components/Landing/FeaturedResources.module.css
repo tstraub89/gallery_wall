@@ -58,6 +58,14 @@
     overflow: hidden;
     border: 1px solid rgba(0, 0, 0, 0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.card:active {
+    opacity: 0.8;
+    transform: scale(0.98);
 }
 
 /* Card Hover Effect - Only on devices that support hover */

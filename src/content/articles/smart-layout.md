@@ -336,7 +336,7 @@ Uses a **bin-packing algorithm** to fit frames into grid cells:
 
 Now that you understand how Smart Layout works, it's time to put it into practice:
 
-1. [Launch GalleryPlanner](/) and build your frame library
+1. [Launch GalleryPlanner](/app) and build your frame library
 2. Experiment with all 5 algorithms to see their unique styles
 3. Customize the generated layout to match your vision
 4. Export your design and bring it to life!

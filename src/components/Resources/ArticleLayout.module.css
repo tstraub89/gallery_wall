@@ -608,15 +608,25 @@
     border-radius: 12px;
     padding: 24px;
     text-decoration: none;
-    transition: all 0.3s;
+    transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
     display: flex;
     flex-direction: column;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
 }
 
-.relatedCard:hover {
-    background: #e5e5ea;
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+.relatedCard:active {
+    opacity: 0.8;
+    transform: scale(0.98);
+}
+
+@media (hover: hover) {
+    .relatedCard:hover {
+        background: #e5e5ea;
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
 }
 
 .relatedCategory {
@@ -649,6 +659,18 @@
     gap: 4px;
     font-size: 13px;
     color: #8e8e93;
+}
+
+/* Transparency Note */
+.transparencyNote {
+    margin-top: 40px;
+    padding: 24px;
+    background: #f9f9fb;
+    border-radius: 12px;
+    border-left: 4px solid #e5e5ea;
+    font-size: 14px;
+    color: #636366;
+    line-height: 1.6;
 }
 
 /* Back Link */

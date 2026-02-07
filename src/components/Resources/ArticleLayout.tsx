@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { ArticleMetadata, getArticleBySlug, getRelatedArticles } from '../../content/articles/articleRegistry';
+import { slugify, stripMarkdown, getTextContent } from '../../utils/stringUtils';
 import WebsiteHeader from '../Layout/WebsiteHeader';
 import WebsiteFooter from '../Layout/WebsiteFooter';
 import BackToTop from '../Common/BackToTop';
@@ -34,25 +35,7 @@ const ArticleLayout: React.FC = () => {
                 const markdownContent = module.default;
                 setContent(markdownContent);
 
-                // Slugify function for generating IDs
-                const slugify = (text: string): string => {
-                    return text
-                        .toLowerCase()
-                        .replace(/[^\w\s-]/g, '') // Remove special chars
-                        .replace(/\s+/g, '-') // Spaces to hyphens
-                        .replace(/--+/g, '-') // Collapse multiple hyphens
-                        .trim();
-                };
-
-                // Strip markdown formatting from display text
-                const stripMarkdown = (text: string): string => {
-                    return text
-                        .replace(/\*\*(.+?)\*\*/g, '$1') // Bold **text**
-                        .replace(/\*(.+?)\*/g, '$1') // Italic *text*
-                        .replace(/`(.+?)`/g, '$1') // Code `text`
-                        .replace(/~~(.+?)~~/g, '$1') // Strikethrough
-                        .trim();
-                };
+                // Note: slugify and stripMarkdown are imported from stringUtils
 
                 let cleanedContent = markdownContent;
 
@@ -172,27 +155,6 @@ const ArticleLayout: React.FC = () => {
             alert('Link copied to clipboard!');
         }
     };
-    // Slugify function for generating IDs (must match the one in useEffect)
-    const slugify = (text: string): string => {
-        return text
-            .toLowerCase()
-            .replace(/[^\w\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/--+/g, '-')
-            .trim();
-    };
-
-    // Extract text content from React children
-    const getTextContent = (children: any): string => {
-        if (typeof children === 'string') return children;
-        if (Array.isArray(children)) {
-            return children.map(getTextContent).join('');
-        }
-        if (children?.props?.children) {
-            return getTextContent(children.props.children);
-        }
-        return '';
-    };
 
     // Custom renderer for headings to add IDs
     const components: any = {
@@ -310,16 +272,7 @@ const ArticleLayout: React.FC = () => {
                         </div>
 
                         {/* Editorial Transparency Note */}
-                        <div style={{
-                            marginTop: '40px',
-                            padding: '24px',
-                            background: '#f9f9fb',
-                            borderRadius: '12px',
-                            borderLeft: '4px solid #e5e5ea',
-                            fontSize: '14px',
-                            color: '#636366',
-                            lineHeight: '1.6'
-                        }}>
+                        <div className={styles.transparencyNote}>
                             <strong>Transparency Note:</strong> This content was drafted with the assistance of AI tools and reviewed by our human design team for accuracy. Videos were generated using NotebookLM.
                         </div>
 

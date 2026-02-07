@@ -23,9 +23,16 @@ const App: React.FC = () => {
     const preventDefault = (e: DragEvent) => e.preventDefault();
     window.addEventListener('dragover', preventDefault);
     window.addEventListener('drop', preventDefault);
+
+    // Prime iOS Safari touch event system by adding a passive touchstart listener
+    // This helps prevent the "first tap does nothing" issue on iOS Safari
+    const touchPrimer = () => { };
+    document.addEventListener('touchstart', touchPrimer, { passive: true });
+
     return () => {
       window.removeEventListener('dragover', preventDefault);
       window.removeEventListener('drop', preventDefault);
+      document.removeEventListener('touchstart', touchPrimer);
     };
   }, []);
 
