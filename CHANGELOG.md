@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.9] - 2026-02-06
+
+### ⚡ Performance & AI Readiness
+- **Instant Load Fixes**: Eliminated "forced reflows" and optimized preloading to ensure the application starts and responds faster than ever.
+- **AI-Ready Documentation**: Added `llms.txt` support, making it easier for AI tools and search engines to understand the platform's features and documentation.
+
+## [0.2.8] - 2026-02-06
+
+### 📱 Mobile & Efficiency
+- **Mobile Spotlight**: Added a new section to the landing page highlighting the mobile planning experience.
+- **Modern Image Formats**: Migrated all website images to WebP, significantly reducing download sizes without sacrificing quality.
+- **Better Caching**: Optimized how the browser stores files (cache headers) to make repeat visits nearly instantaneous.
+
 ## [0.2.7] - 2026-02-06
 
 ### ✨ Beta Experience & Pro Gating
