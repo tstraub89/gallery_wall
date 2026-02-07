@@ -4,7 +4,7 @@
 
 **🎨 Live App:** [gallery-planner.com](https://gallery-planner.com)
 
-![GalleryPlanner Workspace](./public/gallery-planner.jpeg)
+![GalleryPlanner Workspace](./public/gallery-planner.webp)
 
 > [!IMPORTANT]
 > **GalleryPlanner is currently in Early Beta.** During this period, all **PRO features** (AI Auto-Layout, PDF Guides, Project Exports, etc.) are **completely free** to use while I refine the experience.
@@ -20,7 +20,7 @@ GalleryPlanner runs entirely in your browser.
 ---
 
 ### Create designs, then export snapshots:
-![Export Example](./public/example.jpg)
+![Export Example](./public/example.webp)
 
 ---
 
@@ -46,7 +46,7 @@ GalleryPlanner runs entirely in your browser.
 **Plan, measure, and visualize anywhere.** The GalleryPlanner is now available in your pocket.
 
 <p align="center">
-  <img src="./mobile_app.png" width="280" alt="Mobile App Preview" />
+  <img src="./public/mobile_app.webp" width="280" alt="Mobile App Preview" />
 </p>
 
 *   **Touch-Optimized Toolset**: A carefully selected set of core features—including custom frame creation and smart snapping—optimized for a native mobile feel.

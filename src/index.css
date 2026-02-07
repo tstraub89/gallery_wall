@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;300;400;500;600;800&display=swap');
+/* Font loaded in index.html for performance */
 
 :root {
   /* Colors - Refined Palette */
@@ -7,7 +7,8 @@
   --bg-canvas: #e5e5e7;
 
   --text-primary: #1c1c1e;
-  --text-secondary: #8e8e93;
+  --text-secondary: #6e6e73;
+  /* Darkened from #8e8e93 for better contrast */
 
   --accent-color: #007aff;
   --accent-hover: #0056b3;

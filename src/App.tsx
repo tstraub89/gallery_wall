@@ -1,14 +1,13 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import ErrorBoundary from './components/ErrorBoundary';
-import { ProjectProvider } from './context/ProjectContext';
-import { SelectionProvider } from './context/SelectionContext';
-import { LayoutProvider } from './context/LayoutContext';
+
 import { ProProvider } from './context/ProContext';
 import LandingPage from './components/Landing/LandingPage';
 import ScrollToTop from './components/Common/ScrollToTop';
 
-// Lazy load the Main App to avoid bloating the Landing Page
+// Lazy load the Main App & Contexts to avoid bloating the Landing Page
+const EditorContextWrapper = React.lazy(() => import('./components/Layout/EditorContextWrapper'));
 const GalleryApp = React.lazy(() => import('./components/Layout/GalleryApp'));
 
 const HelpPage = React.lazy(() => import('./components/Help/HelpPage'));
@@ -30,57 +29,53 @@ const App: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <ProjectProvider>
-        <SelectionProvider>
-          <LayoutProvider>
-            <ProProvider>
-              <BrowserRouter>
-                <ScrollToTop />
-                <Routes>
-                  <Route path="/" element={<LandingPage />} />
-                  <Route path="/privacy" element={
-                    <React.Suspense fallback={null}>
-                      <PrivacyPolicy />
-                    </React.Suspense>
-                  } />
-                  <Route path="/about" element={
-                    <React.Suspense fallback={null}>
-                      <AboutPage />
-                    </React.Suspense>
-                  } />
-                  <Route path="/help" element={
-                    <React.Suspense fallback={null}>
-                      <HelpPage />
-                    </React.Suspense>
-                  } />
-                  <Route path="/changelog" element={
-                    <React.Suspense fallback={null}>
-                      <ChangelogPage />
-                    </React.Suspense>
-                  } />
-                  <Route path="/app" element={
-                    <React.Suspense fallback={<div style={{
-                      height: '100vh',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      color: '#666'
-                    }}>Loading App...</div>}>
-                      <GalleryApp />
-                    </React.Suspense>
-                  } />
-                  {/* Fallback to NotFound */}
-                  <Route path="*" element={
-                    <React.Suspense fallback={null}>
-                      <NotFound />
-                    </React.Suspense>
-                  } />
-                </Routes>
-              </BrowserRouter>
-            </ProProvider>
-          </LayoutProvider>
-        </SelectionProvider>
-      </ProjectProvider>
+      <ProProvider>
+        <BrowserRouter>
+          <ScrollToTop />
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/privacy" element={
+              <React.Suspense fallback={null}>
+                <PrivacyPolicy />
+              </React.Suspense>
+            } />
+            <Route path="/about" element={
+              <React.Suspense fallback={null}>
+                <AboutPage />
+              </React.Suspense>
+            } />
+            <Route path="/help" element={
+              <React.Suspense fallback={null}>
+                <HelpPage />
+              </React.Suspense>
+            } />
+            <Route path="/changelog" element={
+              <React.Suspense fallback={null}>
+                <ChangelogPage />
+              </React.Suspense>
+            } />
+            <Route path="/app" element={
+              <React.Suspense fallback={<div style={{
+                height: '100vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#666'
+              }}>Loading App...</div>}>
+                <EditorContextWrapper>
+                  <GalleryApp />
+                </EditorContextWrapper>
+              </React.Suspense>
+            } />
+            {/* Fallback to NotFound */}
+            <Route path="*" element={
+              <React.Suspense fallback={null}>
+                <NotFound />
+              </React.Suspense>
+            } />
+          </Routes>
+        </BrowserRouter>
+      </ProProvider>
     </ErrorBoundary>
   );
 };

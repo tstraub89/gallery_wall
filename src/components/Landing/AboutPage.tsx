@@ -32,7 +32,7 @@ const AboutPage: React.FC = () => {
 
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '32px', alignItems: 'center', flexDirection: 'row-reverse' }}>
                         <img
-                            src="/tim-straub.jpeg"
+                            src="/tim-straub.webp"
                             alt="Timothy Straub"
                             width="120"
                             height="120"
