@@ -5,6 +5,27 @@ export interface ImageState {
     rotation: number;
 }
 
+export interface TemplateFrame {
+    width: number;
+    height: number;
+    x: number;
+    y: number;
+    label?: string;
+    rotation?: number;
+    borderWidth?: number;
+    frameColor?: string;
+    matted?: MatDimensions | null;
+    shape?: string;
+}
+
+export interface Template {
+    id: string;
+    name: string;
+    category: string;
+    description: string;
+    frames: TemplateFrame[];
+}
+
 export interface MatDimensions {
     width: number;
     height: number;
@@ -55,6 +76,7 @@ export interface Project {
     createdAt?: number;
     updatedAt?: number;
     version?: number;
+    activeTemplateId?: string | null;
 }
 
 export interface UserProfile {

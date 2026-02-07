@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-02-07
+
+### 🧩 Template Packs
+- **Template Library**: A massive expansion of the template system. Organize your wall instantly with new categories: **Essentials**, **Organic**, and **Architectural**.
+- **Smart Replace**: Preview different layouts on your wall with a single click. The system smartly replaces the current template until you start customizing, at which point it "commits" your design.
+- **Inventory Sync**: Frames added via templates are now fully integrated into your library, complete with tracking badges to show which ones are currently on the wall.
+- **New Layouts**: Added over 10 new professionally designed layouts, including **The Matrix** (3x3 Grid), **The Fibonacci** (Golden Spiral), and **The Butterfly**.
+
 ## [0.2.10] - 2026-02-06
 
 ### ✨ Library Improvements

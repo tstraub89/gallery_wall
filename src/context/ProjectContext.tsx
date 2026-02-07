@@ -2,7 +2,9 @@ import { useState, useEffect, useRef, ReactNode } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { saveProjectData, loadProjectData, cleanUpOrphanedImages, saveImage, clearImageCache, getImageMetadata } from '../utils/imageStore';
 import { ProjectContext, LibraryState } from './ProjectContextCore';
-import { Project, Frame, WallConfig, LibraryItem } from '../types';
+import { Project, Frame, WallConfig, LibraryItem, Template } from '../types';
+import templates from '../data/templates.json';
+import { PPI } from '../constants';
 import { importProjectBundle } from '../utils/exportUtils';
 import { trackEvent, APP_EVENTS } from '../utils/analytics';
 
@@ -382,10 +384,113 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
         });
     };
 
+    const applyTemplate = (projectId: string, templateId: string) => {
+        // Use require/import to get templates data
+        const templatesData = templates as Template[];
+        const template = templatesData.find(t => t.id === templateId);
+
+        if (!template) {
+            console.error(`Template ${templateId} not found`);
+            return;
+        }
+
+        const project = data.projects[projectId];
+        if (!project) return;
+
+        // SMART REPLACE LOGIC
+        // If active template exists, remove its frames and library items
+        let currentFrames = [...project.frames];
+        let currentLibrary = [...project.library];
+
+        if (project.activeTemplateId) {
+            // 1. Find library items from the previous template
+            const previousLibraryItems = currentLibrary.filter(l => l.templateId === project.activeTemplateId);
+            const previousLibraryIds = new Set(previousLibraryItems.map(l => l.id));
+
+            // 2. Remove frames linked to those library items (or linked directly to templateId for legacy compatibility)
+            currentFrames = currentFrames.filter(f =>
+                f.templateId !== project.activeTemplateId &&
+                (!f.templateId || !previousLibraryIds.has(f.templateId))
+            );
+
+            // 3. Remove the library items themselves
+            currentLibrary = currentLibrary.filter(l => l.templateId !== project.activeTemplateId);
+        }
+
+        // Center of the wall in PIXELS
+        const centerX = (project.wallConfig.width * PPI) / 2;
+        const centerY = (project.wallConfig.height * PPI) / 2;
+
+        // CREATE NEW ITEMS
+        // 1. Create Library Items FIRST to generate IDs
+        const newLibraryItems: LibraryItem[] = template.frames.map((tf) => ({
+            id: uuidv4(),
+            width: tf.width,
+            height: tf.height,
+            x: 0, y: 0,
+            rotation: 0,
+            zIndex: 0,
+            shape: tf.shape || 'rect',
+            frameColor: tf.frameColor || '#111111',
+            count: 1, // Represents "1 on wall"
+            createdAt: Date.now(),
+            templateId: templateId, // Links to Template Pack
+            label: `${template.name} (${tf.label || 'Frame'})`
+        }));
+
+        // 2. Create Frames linked to Library Items
+        const newFrames: Frame[] = template.frames.map((tf, index) => {
+            // Dimensions are stored in INCHES
+            const width = tf.width;
+            const height = tf.height;
+            const libraryItemId = newLibraryItems[index].id;
+
+            // Position is stored in PIXELS
+            // We interpret tf.x/y as INCHES relative to center
+            const xOffsetPx = tf.x * PPI;
+            const yOffsetPx = tf.y * PPI;
+            const halfWidthPx = (width * PPI) / 2;
+            const halfHeightPx = (height * PPI) / 2;
+
+            return {
+                id: uuidv4(),
+                width: width,
+                height: height,
+                x: centerX + xOffsetPx - halfWidthPx,
+                y: centerY + yOffsetPx - halfHeightPx,
+                rotation: tf.rotation || 0,
+                zIndex: (currentFrames.length || 0) + 1,
+                imageId: null,
+                imageState: null,
+                borderWidth: tf.borderWidth || 0.5,
+                frameColor: tf.frameColor || '#111111',
+                matted: tf.matted || null,
+                shape: tf.shape || 'rect',
+                locked: false,
+                templateId: libraryItemId, // Links to specific Library Item (enables "Placed" check)
+                label: tf.label || `Template Frame`
+            };
+        });
+
+        updateProject(projectId, {
+            frames: [...currentFrames, ...newFrames],
+            library: [...currentLibrary, ...newLibraryItems],
+            activeTemplateId: templateId
+        });
+    };
+
     const updateProject = (id: string, updates: Partial<Project>, skipHistory = false) => {
         if (!skipHistory) {
             pushToHistory(id);
         }
+
+        // If frames are being updated manually (moved/resized), clear the active template state
+        // This "commits" the template frames so they aren't auto-replaced next time
+        if (updates.frames && updates.activeTemplateId === undefined) {
+            // We define undefined check because applyTemplate PASSES activeTemplateId
+            updates.activeTemplateId = null;
+        }
+
         setData(prev => ({
             ...prev,
             projects: {
@@ -482,6 +587,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             addToLibrary,
             removeFromLibrary,
             addImageToLibrary,
+            applyTemplate,
             imagesMetadata: data.imagesMetadata || initialData.imagesMetadata,
             libraryState: data.libraryState || initialData.libraryState,
             frameState: data.frameState || initialData.frameState,

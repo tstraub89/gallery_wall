@@ -33,6 +33,7 @@ export interface ProjectDataContextType {
     addToLibrary: (projectId: string, frameDimensions: Partial<Frame>) => void;
     removeFromLibrary: (projectId: string, templateId: string) => void;
     addImageToLibrary: (projectId: string, imageId: string, metadata?: any) => void;
+    applyTemplate: (projectId: string, templateId: string) => void;
 
     libraryState: LibraryState;
     frameState: LibraryState;

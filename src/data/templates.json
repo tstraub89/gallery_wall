@@ -1,0 +1,546 @@
+[
+    {
+        "id": "essentials-grid-2x2",
+        "name": "The Quartet",
+        "category": "Essentials",
+        "description": "Four balanced frames in perfect harmony.",
+        "frames": [
+            {
+                "width": 16,
+                "height": 16,
+                "x": -9,
+                "y": -9,
+                "label": "Slot 1"
+            },
+            {
+                "width": 16,
+                "height": 16,
+                "x": 9,
+                "y": -9,
+                "label": "Slot 2"
+            },
+            {
+                "width": 16,
+                "height": 16,
+                "x": -9,
+                "y": 9,
+                "label": "Slot 3"
+            },
+            {
+                "width": 16,
+                "height": 16,
+                "x": 9,
+                "y": 9,
+                "label": "Slot 4"
+            }
+        ]
+    },
+    {
+        "id": "essentials-grid-3x3",
+        "name": "The Matrix",
+        "category": "Essentials",
+        "description": "The classic 3x3 grid. Order, symmetry, perfection.",
+        "frames": [
+            {
+                "width": 12,
+                "height": 12,
+                "x": -14,
+                "y": -14,
+                "label": "1"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": 0,
+                "y": -14,
+                "label": "2"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": 14,
+                "y": -14,
+                "label": "3"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": -14,
+                "y": 0,
+                "label": "4"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": 0,
+                "y": 0,
+                "label": "Center"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": 14,
+                "y": 0,
+                "label": "6"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": -14,
+                "y": 14,
+                "label": "7"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": 0,
+                "y": 14,
+                "label": "8"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": 14,
+                "y": 14,
+                "label": "9"
+            }
+        ]
+    },
+    {
+        "id": "essentials-triptych",
+        "name": "The Trinity",
+        "category": "Essentials",
+        "description": "Three guardians standing tall.",
+        "frames": [
+            {
+                "width": 18,
+                "height": 24,
+                "x": -22,
+                "y": 0,
+                "label": "Left"
+            },
+            {
+                "width": 18,
+                "height": 24,
+                "x": 0,
+                "y": 0,
+                "label": "Center"
+            },
+            {
+                "width": 18,
+                "height": 24,
+                "x": 22,
+                "y": 0,
+                "label": "Right"
+            }
+        ]
+    },
+    {
+        "id": "essentials-row-4",
+        "name": "The Panorama",
+        "category": "Essentials",
+        "description": "A horizon line of memories.",
+        "frames": [
+            {
+                "width": 14,
+                "height": 11,
+                "x": -25.5,
+                "y": 0,
+                "label": "1"
+            },
+            {
+                "width": 14,
+                "height": 11,
+                "x": -8.5,
+                "y": 0,
+                "label": "2"
+            },
+            {
+                "width": 14,
+                "height": 11,
+                "x": 8.5,
+                "y": 0,
+                "label": "3"
+            },
+            {
+                "width": 14,
+                "height": 11,
+                "x": 25.5,
+                "y": 0,
+                "label": "4"
+            }
+        ]
+    },
+    {
+        "id": "organic-cloud",
+        "name": "The Nebula",
+        "category": "Organic",
+        "description": "A drifting cloud of moments, anchored by a central piece.",
+        "frames": [
+            {
+                "width": 16,
+                "height": 20,
+                "x": -10,
+                "y": 2,
+                "label": "Anchor"
+            },
+            {
+                "width": 11,
+                "height": 14,
+                "x": 9,
+                "y": -8,
+                "label": "Top Orbit"
+            },
+            {
+                "width": 11,
+                "height": 14,
+                "x": 9,
+                "y": 10,
+                "label": "Bottom Orbit"
+            },
+            {
+                "width": 8,
+                "height": 10,
+                "x": -8,
+                "y": -18,
+                "label": "Satellite Top"
+            },
+            {
+                "width": 8,
+                "height": 10,
+                "x": 22,
+                "y": 0,
+                "label": "Satellite Far"
+            }
+        ]
+    },
+    {
+        "id": "organic-spiral",
+        "name": "The Fibonacci",
+        "category": "Organic",
+        "description": "Nature's golden ratio, spiraling outward.",
+        "frames": [
+            {
+                "width": 11,
+                "height": 14,
+                "x": -4,
+                "y": 0,
+                "label": "Origin"
+            },
+            {
+                "width": 8,
+                "height": 10,
+                "x": 8,
+                "y": 0,
+                "label": "Step 1"
+            },
+            {
+                "width": 8,
+                "height": 10,
+                "x": 7,
+                "y": 15,
+                "label": "Step 2"
+            },
+            {
+                "width": 8,
+                "height": 10,
+                "x": -6,
+                "y": 16,
+                "label": "Step 3"
+            },
+            {
+                "width": 10,
+                "height": 8,
+                "x": -20,
+                "y": 0,
+                "label": "Step 4"
+            },
+            {
+                "width": 11,
+                "height": 14,
+                "x": 0,
+                "y": -16,
+                "label": "Step 5"
+            }
+        ]
+    },
+    {
+        "id": "organic-salon",
+        "name": "The Victorian",
+        "category": "Organic",
+        "description": "A grand, eclectic salon wall style.",
+        "frames": [
+            {
+                "width": 20,
+                "height": 24,
+                "x": 0,
+                "y": 0,
+                "label": "Master"
+            },
+            {
+                "width": 16,
+                "height": 20,
+                "x": -22,
+                "y": 6,
+                "label": "Left Heavy"
+            },
+            {
+                "width": 11,
+                "height": 14,
+                "x": 20,
+                "y": -9,
+                "label": "Right Upper"
+            },
+            {
+                "width": 11,
+                "height": 14,
+                "x": 20,
+                "y": 11,
+                "label": "Right Lower"
+            },
+            {
+                "width": 8,
+                "height": 10,
+                "x": -11,
+                "y": -20,
+                "label": "Top Accent"
+            },
+            {
+                "width": 14,
+                "height": 11,
+                "x": 4,
+                "y": -20,
+                "label": "Top Wide"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": -26,
+                "y": -14,
+                "label": "Far Corner"
+            },
+            {
+                "width": 14,
+                "height": 11,
+                "x": 0,
+                "y": 22,
+                "label": "Base"
+            }
+        ]
+    },
+    {
+        "id": "organic-butterfly",
+        "name": "The Butterfly",
+        "category": "Organic",
+        "description": "Symmetrical wings spreading from a central axis.",
+        "frames": [
+            {
+                "width": 16,
+                "height": 20,
+                "x": 0,
+                "y": 0,
+                "label": "Body"
+            },
+            {
+                "width": 11,
+                "height": 14,
+                "x": -16,
+                "y": -5,
+                "label": "Left Wing Top"
+            },
+            {
+                "width": 11,
+                "height": 14,
+                "x": 16,
+                "y": -5,
+                "label": "Right Wing Top"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": -16,
+                "y": 14,
+                "label": "Left Wing Low"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": 16,
+                "y": 14,
+                "label": "Right Wing Low"
+            }
+        ]
+    },
+    {
+        "id": "architectural-steps-right",
+        "name": "Ascension (Right)",
+        "category": "Architectural",
+        "description": "A steady climb.",
+        "frames": [
+            {
+                "width": 16,
+                "height": 20,
+                "x": -22,
+                "y": 12,
+                "label": "Base"
+            },
+            {
+                "width": 16,
+                "height": 20,
+                "x": 0,
+                "y": 0,
+                "label": "Mid"
+            },
+            {
+                "width": 16,
+                "height": 20,
+                "x": 22,
+                "y": -12,
+                "label": "Peak"
+            },
+            {
+                "width": 11,
+                "height": 14,
+                "x": -38,
+                "y": 24,
+                "label": "Entry"
+            },
+            {
+                "width": 11,
+                "height": 14,
+                "x": 38,
+                "y": -24,
+                "label": "Exit"
+            }
+        ]
+    },
+    {
+        "id": "architectural-steps-left",
+        "name": "Ascension (Left)",
+        "category": "Architectural",
+        "description": "Climbing the other way.",
+        "frames": [
+            {
+                "width": 16,
+                "height": 20,
+                "x": 22,
+                "y": 12,
+                "label": "Base"
+            },
+            {
+                "width": 16,
+                "height": 20,
+                "x": 0,
+                "y": 0,
+                "label": "Mid"
+            },
+            {
+                "width": 16,
+                "height": 20,
+                "x": -22,
+                "y": -12,
+                "label": "Peak"
+            },
+            {
+                "width": 11,
+                "height": 14,
+                "x": 38,
+                "y": 24,
+                "label": "Entry"
+            },
+            {
+                "width": 11,
+                "height": 14,
+                "x": -38,
+                "y": -24,
+                "label": "Exit"
+            }
+        ]
+    },
+    {
+        "id": "architectural-tv",
+        "name": "The Hearth",
+        "category": "Architectural",
+        "description": "Surrounds a central focal point (TV or Fireplace).",
+        "frames": [
+            {
+                "width": 11,
+                "height": 14,
+                "x": -30,
+                "y": 0,
+                "label": "Left Flank"
+            },
+            {
+                "width": 11,
+                "height": 14,
+                "x": 30,
+                "y": 0,
+                "label": "Right Flank"
+            },
+            {
+                "width": 14,
+                "height": 11,
+                "x": 0,
+                "y": -20,
+                "label": "Crown Jewel"
+            },
+            {
+                "width": 14,
+                "height": 11,
+                "x": -18,
+                "y": -20,
+                "label": "Crown Left"
+            },
+            {
+                "width": 14,
+                "height": 11,
+                "x": 18,
+                "y": -20,
+                "label": "Crown Right"
+            }
+        ]
+    },
+    {
+        "id": "architectural-diamond",
+        "name": "The Diamond",
+        "category": "Architectural",
+        "description": "A layout rotated on its axis.",
+        "frames": [
+            {
+                "width": 12,
+                "height": 12,
+                "x": 0,
+                "y": -16,
+                "label": "North"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": 16,
+                "y": 0,
+                "label": "East"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": 0,
+                "y": 16,
+                "label": "South"
+            },
+            {
+                "width": 12,
+                "height": 12,
+                "x": -16,
+                "y": 0,
+                "label": "West"
+            },
+            {
+                "width": 16,
+                "height": 16,
+                "x": 0,
+                "y": 0,
+                "label": "Center"
+            }
+        ]
+    }
+]

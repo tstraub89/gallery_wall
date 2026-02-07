@@ -5,8 +5,10 @@ import CommonSizePicker from './CommonSizePicker';
 import ManualEntryForm from './ManualEntryForm';
 import FrameList from './FrameList';
 import PhotoLibrary from './PhotoLibrary';
+import TemplateList from './TemplateList';
 import SmartLayoutSection from './SmartLayout/SmartLayoutSection';
 import { SmartLayoutProvider } from './SmartLayout/SmartLayoutContext';
+import { useProject } from '../../hooks/useProject';
 import ProBadge from '../Common/ProBadge';
 import pkg from '../../../package.json';
 import styles from './FrameLibrary.module.css';
@@ -18,6 +20,8 @@ const FrameLibrary: React.FC = () => {
     const [isImportOpen, setImportOpen] = useState(false);
     const [isCommonOpen, setCommonOpen] = useState(false);
     const [isManualOpen, setManualOpen] = useState(false);
+
+    const { currentProject, applyTemplate } = useProject();
 
     // View State
     const [framesViewMode, setFramesViewMode] = useLocalStorage<'list' | 'grid'>('library_frames_view_mode', 'grid');
@@ -88,6 +92,28 @@ const FrameLibrary: React.FC = () => {
                     {openSection === 'smart' && (
                         <div className={styles.sectionContent}>
                             <SmartLayoutSection maxSolutions={10} />
+                        </div>
+                    )}
+                </div>
+
+                <div className={styles.section}>
+                    <div
+                        className={`${styles.sectionHeader} ${openSection === 'templates' ? styles.active : ''}`}
+                        onClick={() => setOpenSection(openSection === 'templates' ? null : 'templates')}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <h3>🧩 Templates</h3>
+                            <ProBadge />
+                        </div>
+                        <span>{openSection === 'templates' ? '▼' : '▶'}</span>
+                    </div>
+                    {openSection === 'templates' && (
+                        <div className={styles.sectionContent}>
+                            <TemplateList onSelect={(t) => {
+                                if (currentProject) {
+                                    applyTemplate(currentProject.id, t.id);
+                                }
+                            }} />
                         </div>
                     )}
                 </div>
