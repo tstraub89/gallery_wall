@@ -89,7 +89,7 @@ const FeaturedResources: React.FC<FeaturedResourcesProps> = ({ id }) => {
 
                 <div className={styles.cta}>
                     <Link to="/learn" className={styles.viewAllBtn}>
-                        Learn More <ArrowRight size={18} />
+                        Browse All Guides <ArrowRight size={18} />
                     </Link>
                 </div>
             </div>
