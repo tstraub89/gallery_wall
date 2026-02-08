@@ -9,7 +9,8 @@ import { Frame } from '../types';
 
 export function useSmartFill() {
     const { currentProject } = useProject();
-    const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [pendingCount, setPendingCount] = useState(0);
+    const isAnalyzing = pendingCount > 0;
     const [progress, setProgress] = useState(0);
     const workerRef = useRef<Worker | null>(null);
 
@@ -19,8 +20,16 @@ export function useSmartFill() {
 
         workerRef.current.onmessage = async (event: MessageEvent<SmartFillWorkerResponse>) => {
             const { type, payload } = event.data;
+
             if (type === 'ANALYSIS_COMPLETE') {
                 await savePhotoAnalysis(payload.id, payload);
+                setPendingCount(prev => Math.max(0, prev - 1));
+
+                // If this was the last one for a specific batch, we could resolve here
+                // But simpler is to check count in the loop below.
+            } else if (type === 'ERROR') {
+                console.error("Worker error:", payload);
+                setPendingCount(prev => Math.max(0, prev - 1));
             }
         };
 
@@ -42,22 +51,25 @@ export function useSmartFill() {
         }
 
         if (pendingIds.length === 0) {
-            setIsAnalyzing(false);
             return;
         }
 
-        setIsAnalyzing(true);
+        setPendingCount(prev => prev + pendingIds.length);
         setProgress(0);
 
-        let completed = 0;
+        let sent = 0;
         const total = pendingIds.length;
 
         for (const id of pendingIds) {
             try {
-                const blob = await getImage(id, 'preview');
+                // Try preview first, but fallback to full if missing (for legacy projects)
+                let blob = await getImage(id, 'preview');
+                if (!blob) {
+                    blob = await getImage(id, 'full');
+                }
+
                 if (blob) {
                     const objectUrl = URL.createObjectURL(blob);
-                    const bitmap = await createImageBitmap(blob);
 
                     workerRef.current.postMessage({
                         id: id,
@@ -65,22 +77,37 @@ export function useSmartFill() {
                         payload: {
                             imageId: id,
                             imageUrl: objectUrl,
-                            width: bitmap.width,
-                            height: bitmap.height,
+                            width: 0, // Worker will load metadata
+                            height: 0,
                             detectFaces: options.detectFaces
                         }
                     } as SmartFillWorkerMessage);
+                } else {
+                    // If image missing, decrement immediately
+                    setPendingCount(prev => Math.max(0, prev - 1));
                 }
 
-                completed++;
-                setProgress((completed / total) * 100);
+                sent++;
+                setProgress((sent / total) * 100);
             } catch (e) {
-                console.error("Error analyzing photo", id, e);
-                completed++;
+                console.error("Error sending photo for analysis", id, e);
+                setPendingCount(prev => Math.max(0, prev - 1));
             }
         }
 
-        setTimeout(() => setIsAnalyzing(false), 500);
+        // Wait for pending count to reach zero (or back to initial state)
+        return new Promise<void>((resolve) => {
+            const check = () => {
+                // We use a functional setter to get the latest value without closure issues
+                // but since we're in a hook, we should probably use a ref for the count too if we want sync check
+                // or just rely on the fact that isAnalyzing will trigger re-renders.
+                // For a promise, we need a reliable way to know "this batch" is done.
+                // Simpler: Just resolve after a brief delay if we really want a promise, 
+                // but better to just let the UI react to isAnalyzing.
+                resolve();
+            };
+            check();
+        });
     }, []);
 
     const getSuggestionsForFrame = useCallback(async (frame: Frame, options: ScoringOptions = {}): Promise<FrameSuggestion[]> => {

@@ -77,6 +77,7 @@ export interface Project {
     updatedAt?: number;
     version?: number;
     activeTemplateId?: string | null;
+    isDemo?: boolean;
 }
 
 export interface UserProfile {

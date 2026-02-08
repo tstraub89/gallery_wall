@@ -44,13 +44,17 @@ async function handleAnalyzePhoto(messageId: string, payload: {
     const response = await fetch(imageUrl);
     const blob = await response.blob();
     const bitmap = await createImageBitmap(blob);
+    URL.revokeObjectURL(imageUrl); // Clean up immediately after loading into bitmap
+
+    const actualWidth = bitmap.width;
+    const actualHeight = bitmap.height;
 
     // 2. Create OffscreenCanvas to extract pixel data
     // Scale down for analysis speed (max 300px)
     const MAX_SIZE = 300;
-    const scale = Math.min(1, MAX_SIZE / Math.max(width, height));
-    const scaledWidth = Math.floor(width * scale);
-    const scaledHeight = Math.floor(height * scale);
+    const scale = Math.min(1, MAX_SIZE / Math.max(actualWidth, actualHeight));
+    const scaledWidth = Math.max(1, Math.floor(actualWidth * scale));
+    const scaledHeight = Math.max(1, Math.floor(actualHeight * scale));
 
     const canvas = new OffscreenCanvas(scaledWidth, scaledHeight);
     const context = canvas.getContext('2d');

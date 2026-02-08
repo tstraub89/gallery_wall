@@ -4,7 +4,7 @@ const PROJECTS_STORE = 'projects';
 const THUMB_STORE = 'thumbnails';
 const PREVIEW_STORE = 'previews';
 export const ANALYSIS_STORE = 'analysis';
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 
 export interface ImageMetadata {
     width: number;
@@ -99,6 +99,10 @@ const generateThumbnail = (blob: Blob, maxWidth = 800, maxHeight = 800): Promise
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(img, 0, 0, width, height);
             canvas.toBlob((thumbBlob) => resolve(thumbBlob || blob), 'image/webp', 0.75);
+        };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            resolve(blob);
         };
         img.src = url;
     });
@@ -387,21 +391,25 @@ const processMigrationQueue = async (db: IDBDatabase, queue: StoredImage[]): Pro
     for (const item of queue) {
         let needsDims = !item.width || !item.height;
         let needsThumb = false;
+        let needsPreview = false;
 
-        // Check if thumbnail exists
-        try {
-            const thumb = await new Promise((resolve, reject) => {
+        // Check if thumbnail and preview exist
+        await Promise.all([
+            new Promise((resolve) => {
                 const tx = db.transaction([THUMB_STORE], 'readonly');
                 const req = tx.objectStore(THUMB_STORE).get(item.id);
-                req.onsuccess = () => resolve(req.result);
-                req.onerror = () => reject();
-            });
-            if (!thumb) needsThumb = true;
-        } catch {
-            needsThumb = true;
-        }
+                req.onsuccess = () => { if (!req.result) needsThumb = true; resolve(null); };
+                req.onerror = () => { needsThumb = true; resolve(null); };
+            }),
+            new Promise((resolve) => {
+                const tx = db.transaction([PREVIEW_STORE], 'readonly');
+                const req = tx.objectStore(PREVIEW_STORE).get(item.id);
+                req.onsuccess = () => { if (!req.result) needsPreview = true; resolve(null); };
+                req.onerror = () => { needsPreview = true; resolve(null); };
+            })
+        ]);
 
-        if (needsDims || needsThumb) {
+        if (needsDims || needsThumb || needsPreview) {
             try {
                 const updates = {};
                 if (needsDims) {
@@ -409,13 +417,17 @@ const processMigrationQueue = async (db: IDBDatabase, queue: StoredImage[]): Pro
                     Object.assign(updates, dims);
                 }
 
-                const thumbBlob = await generateThumbnail(item.blob);
+                const [thumbBlob, previewBlob] = await Promise.all([
+                    generateThumbnail(item.blob),
+                    processImage(item.blob, 'preview')
+                ]);
 
-                const upTx = db.transaction([STORE_NAME, THUMB_STORE], 'readwrite');
+                const upTx = db.transaction([STORE_NAME, THUMB_STORE, PREVIEW_STORE], 'readwrite');
                 if (needsDims) {
                     upTx.objectStore(STORE_NAME).put({ ...item, ...updates });
                 }
                 upTx.objectStore(THUMB_STORE).put({ id: item.id, blob: thumbBlob });
+                upTx.objectStore(PREVIEW_STORE).put({ id: item.id, blob: previewBlob });
 
                 await new Promise((resolve) => {
                     upTx.oncomplete = resolve;

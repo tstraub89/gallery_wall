@@ -7,9 +7,6 @@ import styles from './GlobalActions.module.css';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import DropdownMenu from '../Common/DropdownMenu';
 import ProBadge from '../Common/ProBadge';
-import { importProjectBundle } from '../../utils/exportUtils';
-import { saveImage } from '../../utils/imageStore';
-import { v4 as uuidv4 } from 'uuid';
 import { Download, FolderOpen, Palette } from 'lucide-react';
 
 const FullScreenOverlay = ({ children }: { children: React.ReactNode }) => {
@@ -25,7 +22,7 @@ const GlobalActions = () => {
     const {
         currentProject,
         updateProject,
-        addProject,
+        importGwall,
         setProjectLoading
     } = useProject();
     const {
@@ -71,38 +68,7 @@ const GlobalActions = () => {
 
         try {
             setProjectLoading(true);
-            const { project, images } = await importProjectBundle(file);
-
-            const idMap = new Map<string, string>();
-            const remappedImages: { id: string; blob: Blob }[] = [];
-
-            for (const img of images) {
-                const newId = uuidv4();
-                idMap.set(img.id, newId);
-                remappedImages.push({ id: newId, blob: img.blob });
-            }
-
-            const updatedFrames = project.frames.map((f: any) => ({
-                ...f,
-                imageId: f.imageId ? (idMap.get(f.imageId) || null) : null
-            }));
-
-            const updatedImagesArray = project.images ? project.images
-                .filter((id: any) => idMap.has(id))
-                .map((id: any) => idMap.get(id)) : [];
-
-            for (const img of remappedImages) {
-                await saveImage(img.id, img.blob, { skipOptimization: true });
-            }
-
-            const newId = addProject(project.name + ' (Imported)');
-            updateProject(newId, {
-                frames: updatedFrames,
-                wallConfig: project.wallConfig,
-                library: project.library || [],
-                images: updatedImagesArray
-            });
-
+            await importGwall(file);
         } catch (err: any) {
             alert('Failed to import: ' + err.message);
         } finally {

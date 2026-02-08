@@ -463,6 +463,8 @@ export const exportCanvasToBlob = async (
     }
 };
 
+import { getBatchPhotoAnalysis } from '../smartfill/analysisCache';
+
 /**
  * Generates a .gwall file (ZIP) containing the project metadata and all images used in frames.
  */
@@ -471,19 +473,29 @@ export const exportProjectBundle = async (project: Project) => {
     const zip = new JSZipMod();
 
     const usedImageIds = [...new Set(project.frames.filter(f => f.imageId).map(f => f.imageId))];
+    const projectImageIds = project.images || [];
 
-    const exportProject = {
-        ...project,
-        images: (project.images || []).filter(id => usedImageIds.includes(id))
-    };
-    const projectData = JSON.stringify(exportProject, null, 2);
+    // We bundle ALL images in the project library, not just placed ones
+    const allImageIds = [...new Set([...usedImageIds, ...projectImageIds].filter(Boolean) as string[])];
+
+    const projectData = JSON.stringify(project, null, 2);
     zip.file('project.json', projectData);
+
+    // Fetch and bundle analysis data
+    try {
+        const analysisData = await getBatchPhotoAnalysis(allImageIds);
+        if (Object.keys(analysisData).length > 0) {
+            zip.file('analysis.json', JSON.stringify(analysisData, null, 2));
+        }
+    } catch (e) {
+        console.warn("Failed to bundle analysis data", e);
+    }
 
     const imageFolder = zip.folder('images');
     if (!imageFolder) throw new Error("Failed to create images folder");
     const errors: string[] = [];
 
-    for (const imageId of usedImageIds) {
+    for (const imageId of allImageIds) {
         try {
             if (!imageId) continue;
             const blob = await getImage(imageId);
@@ -516,6 +528,18 @@ export const importProjectBundle = async (file: File | Blob) => {
     const projectText = await projectJsonFile.async('text');
     const project = JSON.parse(projectText);
 
+    // Read analysis data if it exists
+    let analysis: Record<string, any> = {};
+    const analysisFile = zip.file('analysis.json');
+    if (analysisFile) {
+        try {
+            const analysisText = await analysisFile.async('text');
+            analysis = JSON.parse(analysisText);
+        } catch (e) {
+            console.warn("Failed to parse analysis.json", e);
+        }
+    }
+
     if (!project || typeof project !== 'object' || !Array.isArray(project.frames) || !project.wallConfig) {
         throw new Error('Invalid .gwall file structure');
     }
@@ -543,5 +567,5 @@ export const importProjectBundle = async (file: File | Blob) => {
         }
     }
 
-    return { project, images };
+    return { project, images, analysis };
 };

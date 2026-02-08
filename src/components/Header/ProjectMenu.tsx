@@ -58,7 +58,14 @@ const ProjectMenu = () => {
                 onClick={() => setIsExpanded(!isExpanded)}
             >
                 <span className={styles.label}>Current Project:</span>
-                <span className={styles.current}>{currentName}</span>
+                <span className={styles.current}>
+                    {currentName}
+                    {currentProjectData?.isDemo && (
+                        <span className={styles.playgroundBadge} title="Pro features are unlocked for this example project!">
+                            ✨ Playground
+                        </span>
+                    )}
+                </span>
                 <span className={styles.arrow}>▼</span>
             </div>
 

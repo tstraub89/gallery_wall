@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef, ReactNode, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { saveProjectData, loadProjectData, cleanUpOrphanedImages, saveImage, clearImageCache, getImageMetadata } from '../utils/imageStore';
+import { saveProjectData, loadProjectData, cleanUpOrphanedImages, saveImage, clearImageCache, getImageMetadata, migrateLegacyImages } from '../utils/imageStore';
 import { ProjectContext, LibraryState } from './ProjectContextCore';
 import { Project, Frame, WallConfig, LibraryItem, Template } from '../types';
 import templates from '../data/templates.json';
 import { PPI, DEFAULT_FRAME_BORDER_WIDTH, DEFAULT_FRAME_COLOR } from '../constants';
 import { importProjectBundle } from '../utils/exportUtils';
 import { trackEvent, APP_EVENTS } from '../utils/analytics';
+import { savePhotoAnalysis } from '../smartfill/analysisCache';
 
 interface ProjectData {
     projects: Record<string, Project>;
@@ -89,6 +90,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                         try {
                             const meta = await getImageMetadata(Array.from(allImageIds));
                             cleanData.imagesMetadata = meta;
+                            console.log(`Loaded metadata for ${Object.keys(meta).length} images across all projects.`);
                         } catch (e) {
                             console.warn("Failed to load image metadata", e);
                         }
@@ -103,6 +105,9 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                 setShowWelcome(true);
             } finally {
                 setIsLoaded(true);
+                // Global migration check
+                migrateLegacyImages();
+
                 setTimeout(async () => {
                     try {
                         const allData = await loadProjectData();
@@ -502,6 +507,77 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
         }));
     };
 
+    const importGwall = async (blob: Blob, isDemo: boolean = false): Promise<string> => {
+        const { project, images, analysis = {} } = await importProjectBundle(blob);
+
+        const idMap = new Map<string, string>();
+        const remappedImages: { id: string; blob: Blob }[] = [];
+
+        for (const img of images) {
+            const newId = uuidv4();
+            idMap.set(img.id, newId);
+            remappedImages.push({ id: newId, blob: img.blob });
+        }
+
+        // Restore analysis data with remapped IDs
+        for (const oldId in analysis) {
+            const newId = idMap.get(oldId);
+            if (newId) {
+                await savePhotoAnalysis(newId, { ...analysis[oldId], id: newId });
+            }
+        }
+
+        const updatedFrames = project.frames.map((f: any) => ({
+            ...f,
+            imageId: f.imageId ? (idMap.get(f.imageId) || null) : null
+        }));
+
+        // CRITICAL: Some older projects might have empty project.images array.
+        // We MUST populate it from frames if it's missing or empty.
+        const frameImages = new Set<string>();
+        updatedFrames.forEach((f: any) => { if (f.imageId) frameImages.add(f.imageId); });
+
+        const updatedImagesArray = project.images ? project.images
+            .filter((id: any) => idMap.has(id))
+            .map((id: any) => idMap.get(id)) : [];
+
+        // Fill missing from frames
+        frameImages.forEach(id => {
+            if (!updatedImagesArray.includes(id)) {
+                updatedImagesArray.push(id);
+            }
+        });
+
+        const newImagesMetadata = { ...data.imagesMetadata };
+        for (const img of remappedImages) {
+            const meta = await saveImage(img.id, img.blob, { skipOptimization: true });
+            newImagesMetadata[img.id] = meta;
+        }
+
+        const newProject = createNewProject(project.name || 'Imported Gallery');
+        const projectWithData: Project = {
+            ...newProject,
+            frames: updatedFrames,
+            wallConfig: project.wallConfig || newProject.wallConfig,
+            library: project.library || [],
+            images: updatedImagesArray,
+            activeTemplateId: project.activeTemplateId || null,
+            isDemo: isDemo,
+            updatedAt: Date.now()
+        };
+
+        const newData = {
+            ...data,
+            projects: { ...data.projects, [newProject.id]: projectWithData },
+            currentProjectId: newProject.id,
+            imagesMetadata: newImagesMetadata
+        };
+
+        setData(newData);
+        await saveProjectData(newData);
+        return newProject.id;
+    };
+
     const importDemoProject = async () => {
         trackEvent(APP_EVENTS.LOAD_PROJECT);
         setIsProjectLoading(true);
@@ -511,47 +587,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             if (!response.ok) throw new Error('Failed to fetch demo project');
             const blob = await response.blob();
 
-            const { project, images } = await importProjectBundle(blob);
-
-            const idMap = new Map<string, string>();
-            const remappedImages: { id: string; blob: Blob }[] = [];
-
-            for (const img of images) {
-                const newId = uuidv4();
-                idMap.set(img.id, newId);
-                remappedImages.push({ id: newId, blob: img.blob });
-            }
-
-            const updatedFrames = project.frames.map((f: any) => ({
-                ...f,
-                imageId: f.imageId ? (idMap.get(f.imageId) || null) : null
-            }));
-
-            const updatedImagesArray = project.images ? project.images
-                .filter((id: any) => idMap.has(id))
-                .map((id: any) => idMap.get(id)) : [];
-
-            for (const img of remappedImages) {
-                await saveImage(img.id, img.blob, { skipOptimization: true });
-            }
-
-            const newProject = createNewProject(project.name || 'Demo Gallery');
-            const projectWithData = {
-                ...newProject,
-                frames: updatedFrames,
-                wallConfig: project.wallConfig || newProject.wallConfig,
-                library: project.library || [],
-                images: updatedImagesArray
-            };
-
-            const newData = {
-                ...data,
-                projects: { ...data.projects, [newProject.id]: projectWithData },
-                currentProjectId: newProject.id
-            };
-
-            setData(newData);
-            await saveProjectData(newData);
+            await importGwall(blob, true);
             setShowWelcome(false);
         } catch (err) {
             console.error('Failed to import demo project:', err);
@@ -601,6 +637,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             canRedo: history.future.length > 0,
             showWelcome,
             importDemoProject,
+            importGwall,
             startFresh
         }}>
             {children}

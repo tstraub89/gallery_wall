@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState, MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { useProject } from '../../hooks/useProject';
-import { saveImage, migrateLegacyImages } from '../../utils/imageStore';
+import { saveImage } from '../../utils/imageStore';
 import { useImage } from '../../hooks/useImage';
 import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
 import { v4 as uuidv4 } from 'uuid';
@@ -149,11 +149,7 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({
     const [isProcessing, setIsProcessing] = useState(false);
     const [processingProgress, setProcessingProgress] = useState({ current: 0, total: 0 });
 
-    // Migration Check (still needed, but maybe move to Context? Leaving for now as it's safe)
-    useEffect(() => {
-        if (!currentProject || !isLoaded) return;
-        migrateLegacyImages();
-    }, [currentProject, isLoaded]);
+
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);

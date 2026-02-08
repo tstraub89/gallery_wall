@@ -49,7 +49,12 @@ export const useImage = (imageId: string | null, type: 'full' | 'preview' | 'thu
                 return;
             }
 
-            setState({ url: null, metadata: null, status: 'loading' });
+            // Reset state or keep previous if transitioning tiers for the same image
+            setState(prev => ({
+                url: prev.url,
+                metadata: prev.metadata,
+                status: 'loading'
+            }));
 
             try {
                 // Fetch both Blob and Metadata (always Master metadata for PPI accuracy)

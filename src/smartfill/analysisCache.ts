@@ -25,3 +25,28 @@ export async function getPhotoAnalysis(id: string): Promise<any | null> {
         request.onerror = () => reject(request.error);
     });
 }
+export async function getBatchPhotoAnalysis(ids: string[]): Promise<Record<string, any>> {
+    const db = await initDB();
+    const results: Record<string, any> = {};
+
+    return new Promise((resolve) => {
+        const transaction = db.transaction([ANALYSIS_STORE], 'readonly');
+        const store = transaction.objectStore(ANALYSIS_STORE);
+
+        let completed = 0;
+        if (ids.length === 0) resolve({});
+
+        ids.forEach(id => {
+            const request = store.get(id);
+            request.onsuccess = () => {
+                if (request.result) results[id] = request.result;
+                completed++;
+                if (completed === ids.length) resolve(results);
+            };
+            request.onerror = () => {
+                completed++;
+                if (completed === ids.length) resolve(results);
+            };
+        });
+    });
+}

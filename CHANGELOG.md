@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.1] - 2026-02-08
+
+### ✨ Playground Mode
+- **Free Pro Experience**: The **Example Gallery** is now a fully unlocked "Playground." Users can try all Pro features—including Smart Fill, PDF Export, and Project Backups—completely free within this demo project.
+- **Instant Analysis**: Improved the `.gwall` import format to include pre-calculated AI analysis data. Importing the example project now instantly unlocks Smart Fill suggestions without any waiting.
+
+### ⚡️ Smart Fill Improvements
+- **Robust Import**: Fixed an issue where older project files might miss photo metadata, preventing Smart Fill from working. The importer now automatically detects and indexes all images inside frames.
+- **Performance**: Optimized the analysis engine to handle large libraries more efficiently, with better progress tracking and memory management.
+
 ## [0.5.0] - 2026-02-08
 
 ### ✨ Smart Fill: AI Selection

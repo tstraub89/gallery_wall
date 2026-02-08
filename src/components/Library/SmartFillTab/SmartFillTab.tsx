@@ -10,6 +10,14 @@ import SuggestionCard from './SuggestionCard';
 import { useSelection } from '../../../context/SelectionContext';
 
 const SmartFillTab: React.FC = () => {
+    const [preferBlackAndWhite, setPreferBlackAndWhite] = useState(() => {
+        return localStorage.getItem('smartFill_preferBlackAndWhite') === 'true';
+    });
+    const [preferVibrant, setPreferVibrant] = useState(() => {
+        return localStorage.getItem('smartFill_preferVibrant') === 'true';
+    });
+    const [needsAnalysis, setNeedsAnalysis] = useState(false);
+
     const {
         analyzeLibrary,
         checkAnalysisStatus,
@@ -25,17 +33,9 @@ const SmartFillTab: React.FC = () => {
 
     const [suggestions, setSuggestions] = useState<FrameSuggestion[]>([]);
     const [selectedFrame, setSelectedFrame] = useState<Frame | null>(null);
-
     const [prioritizePeople, setPrioritizePeople] = useState(() => {
         return localStorage.getItem('smartFill_targetFaces') === 'true';
     });
-    const [preferBlackAndWhite, setPreferBlackAndWhite] = useState(() => {
-        return localStorage.getItem('smartFill_preferBlackAndWhite') === 'true';
-    });
-    const [preferVibrant, setPreferVibrant] = useState(() => {
-        return localStorage.getItem('smartFill_preferVibrant') === 'true';
-    });
-    const [needsAnalysis, setNeedsAnalysis] = useState(false);
 
     // Persist preferences
     useEffect(() => {
@@ -50,7 +50,7 @@ const SmartFillTab: React.FC = () => {
             checkAnalysisStatus(currentProject.images, { detectFaces: prioritizePeople })
                 .then(isValid => setNeedsAnalysis(!isValid));
         }
-    }, [currentProject, prioritizePeople, checkAnalysisStatus, isAnalyzing]); // Add isAnalyzing to re-check after analysis
+    }, [currentProject, prioritizePeople, checkAnalysisStatus, isAnalyzing]);
 
     // Construct options object
     const scoringOptions = {
@@ -85,8 +85,9 @@ const SmartFillTab: React.FC = () => {
         updateProject(currentProject.id, { frames: updatedFrames });
     };
 
+
     const handleAnalyze = () => {
-        if (!featuresUnlocked) {
+        if (!featuresUnlocked && !currentProject?.isDemo) {
             openProModal();
             return;
         }
@@ -97,7 +98,7 @@ const SmartFillTab: React.FC = () => {
     };
 
     const handleFillAll = async () => {
-        if (!featuresUnlocked) {
+        if (!featuresUnlocked && !currentProject?.isDemo) {
             openProModal();
             return;
         }
@@ -174,7 +175,7 @@ const SmartFillTab: React.FC = () => {
                     )}
 
                     {!needsAnalysis && !isAnalyzing && (
-                        <div className={styles.emptyState} style={{ padding: '0.5rem', marginBottom: '1rem', background: '#e8f5e9', border: '1px solid #c8e6c9', color: '#2e7d32' }}>
+                        <div className={styles.analysisSuccess}>
                             ✓ Library Analyzed
                         </div>
                     )}
@@ -220,6 +221,10 @@ const SmartFillTab: React.FC = () => {
                             Select a single frame to see smart suggestions.
                         </div>
                     )}
+                </div>
+
+                <div className={styles.privacyNote}>
+                    🔒 Analysis happens entirely on your device. Your photos are never uploaded to a server.
                 </div>
             </div>
         </div>

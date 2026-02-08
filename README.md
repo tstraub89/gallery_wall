@@ -29,15 +29,16 @@ GalleryPlanner runs entirely in your browser.
 ---
 
 ## 🚀 Key Highlights
-
+*   **AI Smart Fill [PRO]**: Automatically populate your frames with the best photos from your library. Our local AI analyzes composition, color harmony, and faces to create the perfect arrangement in seconds.
+*   **✨ Playground Mode**: Experience the full power of GalleryPlanner Pro for free! Load the **Example Gallery** to unlock all premium features (Smart Fill, PDF Export, etc.) in a sandbox environment.
 *   **AI-Assisted Auto-Layout [PRO]**: Stuck on design? Let our smart engine propose layouts (Masonry, Grid, Skyline, etc.) based on your selected frames.
 *   **Instant Visualization**: Drag and drop photos from your computer directly onto frames to see your memories in situ.
-*   **Hanging Guide (PDF) [PRO]**: Export a professional, ready-to-print installation guide featuring your layout snapshot and a detailed frame inventory.
+*   **Hanging Guide (PDF) [PRO]**: Export a professional, ready-to-print installation guide featuring your layout snapshot and precise measurements for hanging your frames in the real world.
+*   **Portable Project Bundles [PRO]**: Save your entire workspace—including photos and AI analysis data—into a single `.gwall` file for easy sharing or backup.
 *   **Staircase Wall Support [PRO]**: Design for staircase walls with configurable rise (10-100%) to match your exact slope.
 *   **Precision Layout Canvas**: An infinite workspace with pan, zoom, and smart snapping tools (`S`, `#`) for pixel-perfect alignment.
 *   **Inventory First Workflow**: Keep track of your physical frames. Even if you remove a frame from the wall, it stays in your "Unplaced" library for later use.
-*   **Print-Ready Photo Export [PRO]**: preparing your gallery for reality? Export all your cropped photos in a high-resolution ZIP (with smart DPI capping), ready for professional printing.
-*   **Portable Project Bundles [PRO]**: Save your entire workspace—including photos—into a single `.gwall` file for easy sharing or backup.
+*   **Print-Ready Photo Export [PRO]**: Preparing your gallery for reality? Export all your cropped photos in a high-resolution ZIP (with smart DPI capping), ready for professional printing.
 *   **Designer Shapes [PRO]**: Go beyond the basics with circular and oval frame support for unique gallery looks.
 *   **Intelligent Search & Filter**: Instantly find frames by label or size (e.g., "8x10") and photos by filename. Filter collections by shape or status.
 

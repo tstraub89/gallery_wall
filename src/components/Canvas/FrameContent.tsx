@@ -1,8 +1,10 @@
 import React from 'react';
 import { useImage } from '../../hooks/useImage';
+import { useViewport } from '../../context/ViewportContext';
 import { TriangleAlert } from 'lucide-react';
 import styles from './CanvasWorkspace.module.css'; // Reusing styles
 import { Frame } from '../../types';
+import { PPI as DEFAULT_PPI } from '../../constants';
 
 interface FrameContentProps {
     frame: Frame;
@@ -10,7 +12,18 @@ interface FrameContentProps {
 }
 
 const FrameContent: React.FC<FrameContentProps> = ({ frame, ppi }) => {
-    const { url, metadata } = useImage(frame.imageId ?? null, 'preview');
+    const viewport = useViewport();
+    const viewportScale = viewport?.scale ?? 1;
+
+    // Choose optimal image tier based on on-screen pixels
+    const imageInternalScale = frame.imageState?.scale || 1;
+    const effectiveResolution = (ppi || DEFAULT_PPI) * viewportScale * imageInternalScale;
+    const targetDim = Math.max(frame.width, frame.height) * effectiveResolution;
+
+    // Use thumb (800px) if enough, otherwise preview (1600px)
+    const type = targetDim <= 800 ? 'thumb' : 'preview';
+
+    const { url, metadata } = useImage(frame.imageId ?? null, type);
 
     // Default PPI if not provided (fallback)
     const PPI = ppi || 10;

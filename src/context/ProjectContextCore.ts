@@ -47,6 +47,7 @@ export interface ProjectDataContextType {
 
     // Onboarding
     importDemoProject: () => Promise<void>;
+    importGwall: (blob: Blob) => Promise<string>;
     startFresh: () => void;
 }
 

@@ -48,6 +48,21 @@
     color: var(--text-primary);
 }
 
+.playgroundBadge {
+    display: inline-flex;
+    align-items: center;
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    vertical-align: middle;
+}
+
 .arrow {
     font-size: 10px;
     color: var(--text-secondary);

@@ -13,6 +13,7 @@ GalleryPlanner Pro unlocks powerful features designed to save you time and help 
 | Snapshot export (JPEG) | ✅ | ✅ |
 | **Custom Shapes & Colors** | — | ✅ |
 | **Smart Layout (AI)** | — | ✅ |
+| **Smart Fill (AI)** | — | ✅ |
 | **Hanging Guide (PDF)** | — | ✅ |
 | **Project Backup (.gwall)** | — | ✅ |
 | **Cropped Photos Export** | — | ✅ |
@@ -22,7 +23,28 @@ GalleryPlanner Pro unlocks powerful features designed to save you time and help 
 
 ## Pro Features Explained
 
-### 🤖 Smart Layout (AI-Powered Design)
+### 🤖 Smart Fill (AI Selection)
+
+Populate your gallery wall instantly. Smart Fill uses local AI to analyze your photo library and select the best images for your frames.
+
+- **Composition Analysis** — Detects subject focus and orientation.
+- **Color Harmony** — Matches photos with complementary color palettes.
+- **Face Detection** — Prioritizes portraits and ensures faces aren't cropped out.
+- **Resolution Check** — Only selects photos that will look sharp at print size.
+
+---
+
+### ✨ Playground Mode (Try for Free!)
+
+Want to experience the power of GalleryPlanner Pro? Load the **Example Gallery** to enter Playground Mode.
+
+- **Everything Unlocked** — Smart Fill, PDF Export, and Project Backups are completely free to use within the example project.
+- **Instant Analysis** — See how the AI works without waiting for processing.
+- **Sandbox Environment** — Experiment with layouts and features without affecting your main project.
+
+---
+
+### 🧠 Smart Layout (AI-Powered Design)
 
 Let our algorithm do the heavy lifting. Smart Layout analyzes your frames and automatically generates balanced, professional arrangements. Choose from multiple layout styles:
 
