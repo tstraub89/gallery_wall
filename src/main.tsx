@@ -8,6 +8,7 @@ import { PostHogProvider } from 'posthog-js/react'
 
 const options = {
   api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+  ui_host: 'https://us.posthog.com',
   person_profiles: 'identified_only',
 } as const
 
