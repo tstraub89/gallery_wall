@@ -461,29 +461,25 @@
 }
 
 .content table {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
     border-collapse: collapse;
     margin: 24px 0;
-    display: block;
-    /* Allows scrolling */
-    overflow-x: auto;
-    /* Scroll horizontally if needed */
-    white-space: nowrap;
-    /* Prevent wrapping inside cells if desired, or remove for wrapping */
 }
 
 .content th,
 .content td {
-    padding: 12px;
+    padding: 16px;
     border: 1px solid #e5e5ea;
     text-align: left;
-    min-width: 120px;
-    /* Ensure columns don't get too squished */
+    white-space: normal;
+    word-break: keep-all;
 }
 
 .content th {
     background: #f2f2f7;
     font-weight: 600;
+    white-space: nowrap;
 }
 
 @media (max-width: 600px) {
