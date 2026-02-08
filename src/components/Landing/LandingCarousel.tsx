@@ -5,6 +5,8 @@ import AutoplayVideo from '../Common/AutoplayVideo';
 interface Slide {
     type: 'video' | 'image';
     src?: string;
+    srcSet?: string;
+    sizes?: string;
     sources?: { src: string; type: string }[];
     alt?: string;
 }
@@ -24,7 +26,13 @@ const SLIDES: Slide[] = [
             { src: '/align-frames.mp4', type: 'video/mp4' }
         ]
     },
-    { type: 'image', src: '/hanging_guide.webp', alt: 'PDF Hanging Guide' }
+    {
+        type: 'image',
+        src: '/hanging_guide.webp',
+        srcSet: '/hanging_guide_mobile.webp 400w, /hanging_guide.webp 1084w',
+        sizes: '(max-width: 768px) 400px, 500px',
+        alt: 'PDF Hanging Guide'
+    }
 ];
 
 interface LandingCarouselProps {
@@ -51,6 +59,8 @@ const LandingCarousel: React.FC<LandingCarouselProps> = ({ currentIndex, onChang
                     ) : (
                         <img
                             src={slide.src}
+                            srcSet={slide.srcSet}
+                            sizes={slide.sizes}
                             alt={slide.alt}
                             className={styles.media}
                         />

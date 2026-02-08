@@ -23,6 +23,8 @@ const FeaturedResources: React.FC<FeaturedResourcesProps> = ({ id }) => {
                         <div className={styles.imageWrapper}>
                             <img
                                 src="/learn/hero-gallery-walls.webp"
+                                srcSet="/learn/hero-gallery-walls_mobile.webp 600w, /learn/hero-gallery-walls.webp 1493w"
+                                sizes="(max-width: 768px) 100vw, 400px"
                                 alt="Gallery Wall Guide"
                                 className={styles.image}
                             />
