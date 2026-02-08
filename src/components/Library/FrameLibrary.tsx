@@ -7,6 +7,7 @@ import FrameList from './FrameList';
 import PhotoLibrary from './PhotoLibrary';
 import TemplateList from './TemplateList';
 import SmartLayoutSection from './SmartLayout/SmartLayoutSection';
+import SmartFillTab from './SmartFillTab/SmartFillTab';
 import { SmartLayoutProvider } from './SmartLayout/SmartLayoutContext';
 import { useProject } from '../../hooks/useProject';
 import ProBadge from '../Common/ProBadge';
@@ -134,6 +135,24 @@ const FrameLibrary: React.FC = () => {
                                 zoomLevel={photosZoomLevel}
                                 onZoomLevelChange={setPhotosZoomLevel}
                             />
+                        </div>
+                    )}
+                </div>
+
+                <div className={styles.section}>
+                    <div
+                        className={`${styles.sectionHeader} ${openSection === 'smartfill' ? styles.active : ''}`}
+                        onClick={() => setOpenSection(openSection === 'smartfill' ? null : 'smartfill')}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <h3>🪄 Smart Fill</h3>
+                            <ProBadge />
+                        </div>
+                        <span>{openSection === 'smartfill' ? '▼' : '▶'}</span>
+                    </div>
+                    {openSection === 'smartfill' && (
+                        <div className={styles.sectionContent}>
+                            <SmartFillTab />
                         </div>
                     )}
                 </div>

@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState, MouseEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { useProject } from '../../hooks/useProject';
 import { saveImage, migrateLegacyImages } from '../../utils/imageStore';
 import { useImage } from '../../hooks/useImage';
@@ -690,13 +691,14 @@ const PhotoLibrary: React.FC<PhotoLibraryProps> = ({
             }
 
             {
-                isProcessing && (
+                isProcessing && createPortal(
                     <div className={styles.processingOverlay}>
                         <div className={styles.spinner} />
                         <div className={styles.processingText}>
                             Processing photos... ({processingProgress.current}/{processingProgress.total})
                         </div>
-                    </div>
+                    </div>,
+                    document.body
                 )
             }
         </div >

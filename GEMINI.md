@@ -12,18 +12,20 @@ It features a "Pro" tier (currently free in beta) that includes AI-assisted auto
 *   **Styling**: CSS Modules (`*.module.css`)
 *   **Routing**: React Router DOM
 *   **Icons**: Lucide React
+*   **Analytics**: PostHog, Vercel Speed Insights
+*   **Content**: react-markdown, rehype-raw, remark-gfm
 *   **PDF/Image Generation**: `jspdf`, `html2canvas`
-*   **Zip Generation**: `jszip`
+*   **Utilities**: `jszip` (Zip generation), `file-saver`, `uuid`, `clsx`
 
 ## Build & Run
 
 ### Scripts
 *   `npm run dev`: Start the development server (available at `http://localhost:5173`).
-*   `npm run build`: Build the application for production.
+*   `npm run build`: Build the application for production (includes sitemap generation).
 *   `npm run preview`: Preview the production build locally.
 *   `npm run lint`: Run ESLint checks.
 *   `npm run type-check`: Run TypeScript type checking.
-*   `npm run type-check`: Run TypeScript type checking.
+*   `npm run sitemap`: Generate `sitemap.xml` based on static routes and articles.
 
 ## Versioning & Release Policy
 
@@ -51,7 +53,9 @@ When bumping a version (Patch or Minor):
 ### State Management
 The application uses React Context for global state management:
 *   **`ProjectContext`**: Central store for the current project state, including the wall configuration, placed frames (`frames`), and the unplaced inventory (`library`).
-*   **`LayoutContext`**: Manages UI state related to the workspace (zoom level, selected tool, viewport position).
+*   **`LayoutContext`**: Manages UI layout state (sidebar visibility and width).
+*   **`ViewportContext`**: Manages canvas viewport state (pan and zoom).
+*   **`SelectionContext`**: Manages selection state for frames, images, and templates.
 *   **`ProContext`**: Manages subscription status and feature gating (Pro vs. Free).
 
 ### Data Model (`src/types.ts`)
@@ -71,7 +75,10 @@ The "Auto-Layout" feature runs in a separate Web Worker (`src/recommender/recomm
 *   **Communication**: The main thread sends `GENERATE` messages, and the worker replies with `SOLUTION_FOUND` for valid layouts.
 
 ## Directory Structure
+*   `infra/`: Infrastructure code (e.g., PostHog reverse proxy).
+*   `scripts/`: Build and maintenance scripts (e.g., sitemap generation).
 *   `src/components/`: React components grouped by feature (e.g., `Canvas/`, `Library/`, `Properties/`).
+*   `src/content/`: Markdown content for articles and resources.
 *   `src/context/`: Context providers and hooks.
 *   `src/hooks/`: Custom React hooks (e.g., `useCanvasDrag`, `useCanvasSelection`, `useCanvasDrop`, `useProject`).
 *   `src/recommender/`: Worker code and layout algorithms.

@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, ReactNode } from 'react';
+import { useState, useEffect, useRef, ReactNode, useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { saveProjectData, loadProjectData, cleanUpOrphanedImages, saveImage, clearImageCache, getImageMetadata } from '../utils/imageStore';
 import { ProjectContext, LibraryState } from './ProjectContextCore';
 import { Project, Frame, WallConfig, LibraryItem, Template } from '../types';
 import templates from '../data/templates.json';
-import { PPI } from '../constants';
+import { PPI, DEFAULT_FRAME_BORDER_WIDTH, DEFAULT_FRAME_COLOR } from '../constants';
 import { importProjectBundle } from '../utils/exportUtils';
 import { trackEvent, APP_EVENTS } from '../utils/analytics';
 
@@ -212,7 +212,8 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             rotation: 0,
             zIndex: 0,
             shape: 'rect',
-            frameColor: '#111',
+            frameColor: DEFAULT_FRAME_COLOR,
+            borderWidth: DEFAULT_FRAME_BORDER_WIDTH,
             ...frameDimensions,
             count: 1,
             createdAt: Date.now()
@@ -431,7 +432,8 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             rotation: 0,
             zIndex: 0,
             shape: tf.shape || 'rect',
-            frameColor: tf.frameColor || '#111111',
+            frameColor: tf.frameColor || DEFAULT_FRAME_COLOR,
+            borderWidth: tf.borderWidth || DEFAULT_FRAME_BORDER_WIDTH,
             count: 1, // Represents "1 on wall"
             createdAt: Date.now(),
             templateId: templateId, // Links to Template Pack
@@ -462,8 +464,8 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
                 zIndex: (currentFrames.length || 0) + 1,
                 imageId: null,
                 imageState: null,
-                borderWidth: tf.borderWidth || 0.5,
-                frameColor: tf.frameColor || '#111111',
+                borderWidth: tf.borderWidth || DEFAULT_FRAME_BORDER_WIDTH,
+                frameColor: tf.frameColor || DEFAULT_FRAME_COLOR,
                 matted: tf.matted || null,
                 shape: tf.shape || 'rect',
                 locked: false,
@@ -604,4 +606,12 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
             {children}
         </ProjectContext.Provider>
     );
+};
+
+export const useProject = () => {
+    const context = useContext(ProjectContext);
+    if (context === undefined) {
+        throw new Error('useProject must be used within a ProjectProvider');
+    }
+    return context;
 };

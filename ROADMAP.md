@@ -20,13 +20,18 @@
 - [ ] **Server-Side Verification**: Implement robust PRO status verification tied to Stripe purchases (replacing the current client-side only check).
 
 ## 📢 Marketing & Content
-- [ ] **Blog / Content Hub**:
+- [x] **Blog / Content Hub**:
     - **Goal**: Drive SEO/AIO traffic.
     - **Strategy**: AI-generated content is acceptable. Focus on "How to hang a gallery wall", "Interior design tips", etc.
-- [ ] **Visual Demos**: Create GIFs or short web videos demonstrating app usage (Drag & Drop, Auto-Arrange, etc.) to immediately show value.
+- [x] **Visual Demos**: Create GIFs or short web videos demonstrating app usage (Drag & Drop, Auto-Arrange, etc.) to immediately show value.
 - [ ] **Social Promotion**: Reddit & Pinterest campaigns.
 
 ## ☁️ Infrastructure & Philosophy
 - [ ] **Cloud Integration?**
     - *Discussion point*: Does this go against the "Local Only" philosophy?
     - Potential for "Optional Cloud" for cross-device syncing without forcing it.
+
+## 🛡️ Infrastructure & Security
+- [x] **Reverse Proxy (PostHog)**: Bypassing content blockers for reliable analytics.
+- [x] **Security Headers**: Implementation of CSP, HSTS, and COOP/CORP.
+- [x] **Performance Optimization**: Improved LCP, async font loading, and WebP migration.

@@ -175,7 +175,7 @@ export class MasonryGenerator {
             }
         }
 
-        // Center the result
+        // Center the result if no obstacles are present, or filter if they are
         if (placed.length > 0) {
             const minX = Math.min(...placed.map(p => p.x));
             const maxX = Math.max(...placed.map(p => p.x + p.width));
@@ -194,17 +194,23 @@ export class MasonryGenerator {
             });
         }
 
+        // CRITICAL FIX: After centering, we MUST re-validate collisions
+        // The shift might have moved frames on top of obstacles!
+        const validPlaced = placed.filter(p =>
+            !hasCollision(p, obstacles, 0)
+        );
+
         // Force Use All Check
-        if (config.forceAll && placed.length < sortedFrames.length) {
+        if (config.forceAll && validPlaced.length < sortedFrames.length) {
             return { id: crypto.randomUUID(), frames: [], score: 0 };
         }
 
-        if (placed.length === 0) return { id: crypto.randomUUID(), frames: [], score: 0 };
+        if (validPlaced.length === 0) return { id: crypto.randomUUID(), frames: [], score: 0 };
 
         return {
             id: crypto.randomUUID(),
-            frames: placed,
-            score: placed.length
+            frames: validPlaced,
+            score: validPlaced.length
         };
     }
 

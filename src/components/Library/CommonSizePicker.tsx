@@ -1,5 +1,6 @@
 import React from 'react';
 import { COMMON_SIZES } from '../../constants/commonFrames';
+import { DEFAULT_FRAME_BORDER_WIDTH, DEFAULT_FRAME_COLOR } from '../../constants';
 import { useProject } from '../../hooks/useProject';
 import { v4 as uuidv4 } from 'uuid';
 import { trackEvent, APP_EVENTS } from '../../utils/analytics';
@@ -18,9 +19,9 @@ const CommonSizePicker: React.FC = () => {
             height,
             label: `Common ${label}`,
             shape: 'rect',
-            frameColor: '#111111',
+            frameColor: DEFAULT_FRAME_COLOR,
             matted: undefined,
-            borderWidth: 1.0,
+            borderWidth: DEFAULT_FRAME_BORDER_WIDTH,
             x: 0,
             y: 0,
             rotation: 0,

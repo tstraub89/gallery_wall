@@ -1,4 +1,5 @@
 import React, { useState, FormEvent } from 'react';
+import { DEFAULT_FRAME_BORDER_WIDTH, DEFAULT_FRAME_COLOR } from '../../constants';
 import { useProject } from '../../hooks/useProject';
 import styles from './ManualEntryForm.module.css';
 import ValidatedNumberInput from '../Common/ValidatedNumberInput';
@@ -15,8 +16,8 @@ const ManualEntryForm: React.FC = () => {
     const [matWidth, setMatWidth] = useState(5);
     const [matHeight, setMatHeight] = useState(7);
     const [shape, setShape] = useState<'rect' | 'round'>('rect');
-    const [frameColor, setFrameColor] = useState('#111111');
-    const [borderWidth, setBorderWidth] = useState(1.0);
+    const [frameColor, setFrameColor] = useState(DEFAULT_FRAME_COLOR);
+    const [borderWidth, setBorderWidth] = useState(DEFAULT_FRAME_BORDER_WIDTH);
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();

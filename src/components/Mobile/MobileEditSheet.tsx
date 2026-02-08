@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useProject } from '../../hooks/useProject';
+import { DEFAULT_FRAME_BORDER_WIDTH, DEFAULT_FRAME_COLOR } from '../../constants';
 import styles from './MobileLibrarySheet.module.css';
 import { RotateCw, ImageMinus, Palette, Square, Image, Frame as FrameIcon, Trash2 } from 'lucide-react';
 import { useSwipeDismiss } from '../../hooks/useSwipeDismiss';
@@ -286,7 +287,7 @@ const MobileEditSheet: React.FC<MobileEditSheetProps> = ({ isOpen, onClose }) =>
                                         <label><Palette size={16} /> Color</label>
                                         <input
                                             type="color"
-                                            value={getFrameValue('frameColor') as string || '#111111'}
+                                            value={getFrameValue('frameColor') as string || DEFAULT_FRAME_COLOR}
                                             onChange={(e) => updateFrameProperty('frameColor', e.target.value)}
                                             className={styles.colorInput}
                                         />
@@ -301,12 +302,12 @@ const MobileEditSheet: React.FC<MobileEditSheetProps> = ({ isOpen, onClose }) =>
                                                 min="0"
                                                 max="5"
                                                 step="0.1"
-                                                value={(getFrameValue('borderWidth') as number) ?? 0.5}
+                                                value={(getFrameValue('borderWidth') as number) ?? DEFAULT_FRAME_BORDER_WIDTH}
                                                 onChange={(e) => updateFrameProperty('borderWidth', parseFloat(e.target.value))}
                                                 className={styles.slider}
                                             />
                                             <span className={styles.sliderValue}>
-                                                {((getFrameValue('borderWidth') as number) ?? 0.5).toFixed(1)}"
+                                                {((getFrameValue('borderWidth') as number) ?? DEFAULT_FRAME_BORDER_WIDTH).toFixed(1)}"
                                             </span>
                                         </div>
                                     </div>

@@ -1,7 +1,7 @@
 import { RefObject } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { saveImage } from '../utils/imageStore';
-import { PPI } from '../constants';
+import { PPI, DEFAULT_FRAME_BORDER_WIDTH, DEFAULT_FRAME_COLOR } from '../constants';
 import { Project, Frame } from '../types';
 import { ProjectContextType } from '../context/ProjectContextCore';
 
@@ -84,9 +84,9 @@ export const useCanvasDrop = ({
                     height: d.frame.height,
                     label: d.frame.label,
                     shape: d.frame.shape || 'rect',
-                    frameColor: d.frame.frameColor || '#111111',
+                    frameColor: d.frame.frameColor || DEFAULT_FRAME_COLOR,
                     matted: d.frame.matted,
-                    borderWidth: d.frame.borderWidth,
+                    borderWidth: typeof d.frame.borderWidth === 'number' ? d.frame.borderWidth : DEFAULT_FRAME_BORDER_WIDTH,
                     x: worldX, y: worldY,
                     rotation: 0,
                     zIndex: currentProject.frames.length + 1,

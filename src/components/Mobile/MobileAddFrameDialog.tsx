@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import styles from './MobileAddFrameDialog.module.css';
+import { DEFAULT_FRAME_BORDER_WIDTH } from '../../constants';
 import ValidatedNumberInput from '../Common/ValidatedNumberInput';
 import ProBadge from '../Common/ProBadge';
 
@@ -13,7 +14,7 @@ const MobileAddFrameDialog: React.FC<MobileAddFrameDialogProps> = ({ onClose, on
     const [height, setHeight] = useState(16);
     const [shape, setShape] = useState<'rect' | 'round'>('rect');
     const [matted, setMatted] = useState(false);
-    const [borderWidth, setBorderWidth] = useState(1.0);
+    const [borderWidth, setBorderWidth] = useState(DEFAULT_FRAME_BORDER_WIDTH);
 
     const handleSubmit = () => {
         onAdd(width, height, shape, matted, borderWidth);

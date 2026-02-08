@@ -6,7 +6,7 @@ import { useSmartLayout } from './SmartLayoutContext';
 import { useProModal } from '../../../context/ProContext';
 import { RecommenderFrame, LayoutSolution } from '../../../recommender/types';
 import { Frame } from '../../../types';
-import { PPI } from '../../../constants';
+import { PPI, DEFAULT_FRAME_BORDER_WIDTH, DEFAULT_FRAME_COLOR } from '../../../constants';
 import ValidatedNumberInput from '../../Common/ValidatedNumberInput';
 import RangeSlider from '../../Common/RangeSlider';
 import ProBadge from '../../Common/ProBadge';
@@ -101,7 +101,7 @@ const SmartLayoutSection: React.FC<SmartLayoutSectionProps> = ({ maxSolutions = 
                 // INFLATE: Add border width to dimensions so the algorithm sees the full size
                 // We add borderWidth * 2 because it's on both sides
                 // CRITICAL FIX: Use 0.1 default to match standard app default, not 1.0
-                const bWidth = item.borderWidth ?? 0.1;
+                const bWidth = item.borderWidth ?? DEFAULT_FRAME_BORDER_WIDTH;
 
                 inventory.push({
                     id: item.id,
@@ -116,7 +116,7 @@ const SmartLayoutSection: React.FC<SmartLayoutSectionProps> = ({ maxSolutions = 
 
         // Convert existing placed frames to Obstacles (Convert Pixels -> Inches)
         const obstacles = currentProject.frames.map((f) => {
-            const bWidth = typeof f.borderWidth === 'number' ? f.borderWidth : 0.1;
+            const bWidth = typeof f.borderWidth === 'number' ? f.borderWidth : DEFAULT_FRAME_BORDER_WIDTH;
             return {
                 // INFLATE OBSTACLES: Move X/Y back by border width, increase W/H by 2*border
                 // Logic: Accessing 'Outer' box from 'Inner' box
@@ -144,7 +144,7 @@ const SmartLayoutSection: React.FC<SmartLayoutSectionProps> = ({ maxSolutions = 
             const safeX = isNaN(pf.x) ? 0 : pf.x;
             const safeY = isNaN(pf.y) ? 0 : pf.y;
 
-            const bWidth = libraryItem?.borderWidth ?? 0.1;
+            const bWidth = libraryItem?.borderWidth ?? DEFAULT_FRAME_BORDER_WIDTH;
 
             // DEFLATE: The solution gives us the 'Outer' box (including border).
             // We need to convert back to 'Inner' box for the Frame data structure.
@@ -167,7 +167,7 @@ const SmartLayoutSection: React.FC<SmartLayoutSectionProps> = ({ maxSolutions = 
                 imageId: null, // No image yet
                 templateId: pf.libraryId,
                 borderWidth: bWidth,
-                frameColor: libraryItem?.frameColor || '#000000',
+                frameColor: libraryItem?.frameColor || DEFAULT_FRAME_COLOR,
                 matted: libraryItem?.matted,
                 shape: libraryItem?.shape || 'rect'
             };

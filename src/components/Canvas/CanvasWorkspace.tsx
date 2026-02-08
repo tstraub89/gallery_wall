@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useProject } from '../../hooks/useProject';
 import styles from './CanvasWorkspace.module.css';
 import { v4 as uuidv4 } from 'uuid';
-import { PPI, GRID_SIZE } from '../../constants';
+import { PPI, GRID_SIZE, DEFAULT_FRAME_BORDER_WIDTH, DEFAULT_FRAME_COLOR } from '../../constants';
 import FrameContent from './FrameContent';
 import ContextMenu from './ContextMenu';
 import Logo from '../Header/Logo';
@@ -12,6 +12,8 @@ import { useCanvasViewport } from '../../hooks/useCanvasViewport';
 import { useCanvasSelection } from '../../hooks/useCanvasSelection';
 import { useCanvasDrag } from '../../hooks/useCanvasDrag';
 import { useCanvasDrop } from '../../hooks/useCanvasDrop';
+import { useSmartFill } from '../../hooks/useSmartFill';
+import { useProModal } from '../../context/ProContext';
 import { useCanvasShortcuts } from '../../hooks/useCanvasShortcuts';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useTouchGestures } from '../../hooks/useTouchGestures';
@@ -31,6 +33,10 @@ const CanvasWorkspace: React.FC = () => {
     // Grid State
     const [showGrid, setShowGrid] = useState(true);
     const [snapToGrid, setSnapToGrid] = useState(true);
+
+    // Smart Fill & Pro
+    const { getSuggestionsForFrame } = useSmartFill();
+    const { featuresUnlocked, openProModal } = useProModal();
 
     // Viewport Hook
     const { scale, setScale, pan, setPan } = useCanvasViewport(containerRef);
@@ -264,6 +270,8 @@ const CanvasWorkspace: React.FC = () => {
                     zIndex: 0,
                     label: f.label || '',
                     shape: f.shape || 'rect',
+                    frameColor: f.frameColor || DEFAULT_FRAME_COLOR,
+                    borderWidth: f.borderWidth || DEFAULT_FRAME_BORDER_WIDTH,
                     createdAt: Date.now()
                 };
 
@@ -366,6 +374,36 @@ const CanvasWorkspace: React.FC = () => {
             }
             return f;
         });
+        updateProject(currentProject.id, { frames: updatedFrames });
+    };
+
+    const handleSmartFill = async (frameId: string) => {
+        if (!featuresUnlocked) {
+            openProModal();
+            return;
+        }
+        if (!currentProject) return;
+
+        const frame = currentProject.frames.find(f => f.id === frameId);
+        if (!frame) return;
+
+        // Get suggestions
+        const suggestions = await getSuggestionsForFrame(frame);
+        if (suggestions.length > 0) {
+            // Apply best match
+            const best = suggestions[0];
+            const updatedFrames = currentProject.frames.map(f =>
+                f.id === frameId ? { ...f, imageId: best.photoId } : f
+            );
+            updateProject(currentProject.id, { frames: updatedFrames });
+        }
+    };
+
+    const handleToggleLock = (frameId: string) => {
+        if (!currentProject) return;
+        const updatedFrames = currentProject.frames.map(f =>
+            f.id === frameId ? { ...f, locked: !f.locked } : f
+        );
         updateProject(currentProject.id, { frames: updatedFrames });
     };
 
@@ -581,7 +619,7 @@ const CanvasWorkspace: React.FC = () => {
 
         const widthPx = Math.round(frame.width * PPI);
         const heightPx = Math.round(frame.height * PPI);
-        const bWidthInches = typeof frame.borderWidth === 'number' ? frame.borderWidth : 1.0;
+        const bWidthInches = typeof frame.borderWidth === 'number' ? frame.borderWidth : DEFAULT_FRAME_BORDER_WIDTH;
         const bWidthPx = Math.round(bWidthInches * PPI);
 
         const leftPx = Math.round(displayX - bWidthPx);
@@ -594,8 +632,8 @@ const CanvasWorkspace: React.FC = () => {
             width: `${widthPx + bWidthPx * 2}px`,
             height: `${heightPx + bWidthPx * 2}px`,
             zIndex: frame.zIndex,
-            border: `${bWidthPx}px solid ${frame.frameColor || '#111'}`,
-            backgroundColor: frame.imageId ? (frame.frameColor || '#111') : '#fff',
+            border: `${bWidthPx}px solid ${frame.frameColor || DEFAULT_FRAME_COLOR}`,
+            backgroundColor: frame.imageId ? (frame.frameColor || DEFAULT_FRAME_COLOR) : '#fff',
             cursor: isDragging ? 'grabbing' : 'grab',
             transition: (isDragging || isTouchDragging) ? 'none' : 'box-shadow 0.1s',
             borderRadius: frame.shape === 'round' ? '50%' : '0',
@@ -826,9 +864,15 @@ const CanvasWorkspace: React.FC = () => {
                         { label: 'Send to Back', onClick: () => handleSendToBack(contextMenu.frameId) },
                         { separator: true },
                         { label: 'Rotate Photo', onClick: () => handleRotatePhoto(contextMenu.frameId) },
+                        { label: '✨ Auto-Fill', onClick: () => handleSmartFill(contextMenu.frameId) },
                         { label: 'Remove Photo', onClick: () => handleRemovePhoto(contextMenu.frameId), danger: true },
                         { separator: true },
                         { label: 'Duplicate', onClick: duplicateSelected, shortcut: 'Cmd+D' },
+                        (() => {
+                            const frame = currentProject.frames.find(f => f.id === contextMenu.frameId);
+                            const isLocked = frame?.locked;
+                            return { label: isLocked ? 'Unlock Frame' : 'Lock Frame', onClick: () => handleToggleLock(contextMenu.frameId) };
+                        })(),
                         { label: 'Delete Frame', onClick: () => handleDeleteFrame(contextMenu.frameId), danger: true, shortcut: 'Del' }
                     ]}
                 />

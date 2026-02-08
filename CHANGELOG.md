@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2026-02-08
+
+### ✨ Smart Fill: AI Selection
+- **Intelligent Photo Matching**: A powerful new tool that automatically selects the best photos for your frames based on composition, color harmony, resolution, and aspect ratio.
+- **Bulk Fill**: Populate your entire gallery wall with one click, ensuring a cohesive look across the entire arrangement.
+- **Neural Face Detection**: Integrated a neural network to identify faces, helping prioritize portraits and ensure people aren't cropped out.
+
+### 🐛 Bug Fixes & Refinements
+- **Frame Removal**: Fixed a critical bug where deleting frames from the canvas via the properties panel would cause a React hook error.
+- **Context Menu Locking**: Re-enabled "Lock/Unlock" functionality in the canvas context menu for better project control.
+- **Smart Layout (Masonry)**: Fixed the Masonry generator to correctly respect existing frames on the wall as obstacles, preventing overlapping layouts.
+
 ## [0.4.0] - 2026-02-07
  
 ### 📚 The "Mastery" Update: Learn Hub Launch

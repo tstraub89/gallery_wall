@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import styles from './PropertiesPanel.module.css';
-import { PPI } from '../../constants';
+import { PPI, DEFAULT_FRAME_BORDER_WIDTH, DEFAULT_FRAME_COLOR } from '../../constants';
 import ImageProperties from './ImageProperties';
 import ValidatedNumberInput from '../Common/ValidatedNumberInput';
 import RangeSlider from '../Common/RangeSlider';
@@ -13,6 +13,21 @@ import {
 } from 'lucide-react';
 import { Project, Frame, MatDimensions } from '../../types';
 import { ProjectContextType } from '../../context/ProjectContextCore';
+
+// Visual Bounds Helper
+// We align based on the VISUAL edge (Frame + Border)
+const getVisualBounds = (f: Frame) => {
+    const bWidth = typeof f.borderWidth === 'number' ? f.borderWidth : DEFAULT_FRAME_BORDER_WIDTH;
+    return {
+        left: f.x - (bWidth * PPI),
+        top: f.y - (bWidth * PPI),
+        right: f.x + (f.width * PPI) + (bWidth * PPI),
+        bottom: f.y + (f.height * PPI) + (bWidth * PPI),
+        width: (f.width * PPI) + (bWidth * 2 * PPI),
+        height: (f.height * PPI) + (bWidth * 2 * PPI),
+        bWidthPx: bWidth * PPI
+    };
+};
 
 interface FramePropertiesProps {
     currentProject: Project;
@@ -40,6 +55,26 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
             setActiveTab('frame');
         }
     }, [selectedFrames, activeTab]);
+
+    // Calculate selection bounds based on VISUAL edges
+    const selectionBounds = useMemo(() => {
+        if (selectedFrames.length === 0) return null;
+        const first = getVisualBounds(selectedFrames[0]);
+        let minL = first.left;
+        let minT = first.top;
+        let maxR = first.right;
+        let maxB = first.bottom;
+
+        selectedFrames.forEach(f => {
+            const b = getVisualBounds(f);
+            if (b.left < minL) minL = b.left;
+            if (b.top < minT) minT = b.top;
+            if (b.right > maxR) maxR = b.right;
+            if (b.bottom > maxB) maxB = b.bottom;
+        });
+
+        return { minL, minT, maxR, maxB, width: maxR - minL, height: maxB - minT };
+    }, [selectedFrames]);
 
     // CRITICAL SAFETY: If we have IDs but no matching frames found (e.g. just deleted)
     if (selectedFrames.length === 0) {
@@ -92,41 +127,6 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
     const toggleLock = () => {
         updateAll('locked', !isLocked);
     };
-
-    // Visual Bounds Helper
-    // We align based on the VISUAL edge (Frame + Border)
-    const getVisualBounds = (f: Frame) => {
-        const bWidth = typeof f.borderWidth === 'number' ? f.borderWidth : 0.1;
-        return {
-            left: f.x - (bWidth * PPI),
-            top: f.y - (bWidth * PPI),
-            right: f.x + (f.width * PPI) + (bWidth * PPI),
-            bottom: f.y + (f.height * PPI) + (bWidth * PPI),
-            width: (f.width * PPI) + (bWidth * 2 * PPI),
-            height: (f.height * PPI) + (bWidth * 2 * PPI),
-            bWidthPx: bWidth * PPI
-        };
-    };
-
-    // Calculate selection bounds based on VISUAL edges
-    const selectionBounds = useMemo(() => {
-        if (selectedFrames.length === 0) return null;
-        const first = getVisualBounds(selectedFrames[0]);
-        let minL = first.left;
-        let minT = first.top;
-        let maxR = first.right;
-        let maxB = first.bottom;
-
-        selectedFrames.forEach(f => {
-            const b = getVisualBounds(f);
-            if (b.left < minL) minL = b.left;
-            if (b.top < minT) minT = b.top;
-            if (b.right > maxR) maxR = b.right;
-            if (b.bottom > maxB) maxB = b.bottom;
-        });
-
-        return { minL, minT, maxR, maxB, width: maxR - minL, height: maxB - minT };
-    }, [selectedFrames]);
 
 
     const minX = Math.min(...selectedFrames.map(f => f.x));
@@ -181,7 +181,7 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
 
             // Convert VISUAL back to INTERNAL (Inner Box)
             // InnerX = VisualLeft + BorderPx
-            const bWidthPx = (typeof f.borderWidth === 'number' ? f.borderWidth : 0.1) * PPI;
+            const bWidthPx = (typeof f.borderWidth === 'number' ? f.borderWidth : DEFAULT_FRAME_BORDER_WIDTH) * PPI;
 
             return {
                 ...f,
@@ -406,11 +406,11 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                                     min={0}
                                     max={5}
                                     step={0.1}
-                                    value={(getValue('borderWidth') as number) ?? 1.0}
+                                    value={(getValue('borderWidth') as number) ?? DEFAULT_FRAME_BORDER_WIDTH}
                                     onChange={(val: number) => updateAll('borderWidth', Math.round(val * 10) / 10)}
                                 />
                                 <ValidatedNumberInput
-                                    value={getValue('borderWidth') ?? 1.0}
+                                    value={getValue('borderWidth') ?? DEFAULT_FRAME_BORDER_WIDTH}
                                     onChange={(val) => updateAll('borderWidth', val)}
                                     min={0}
                                     max={5}
@@ -439,7 +439,7 @@ const FrameProperties: React.FC<FramePropertiesProps> = ({ currentProject, selec
                             <div className={styles.propGroup}>
                                 <ColorPicker
                                     label="Color"
-                                    value={(getValue('frameColor') as string) || '#111111'}
+                                    value={(getValue('frameColor') as string) || DEFAULT_FRAME_COLOR}
                                     onChange={(color: string) => updateAll('frameColor', color)}
                                     align="project-left"
                                 />

@@ -1,0 +1,78 @@
+.card {
+    cursor: pointer;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    transition: transform 0.2s, border-color 0.2s;
+    background: var(--bg-secondary);
+}
+
+.card:hover {
+    transform: scale(1.02);
+    border-color: var(--accent-color);
+}
+
+.imageContainer {
+    position: relative;
+    width: 100%;
+    /* aspect-ratio will be set dynamically via JS */
+    background: var(--bg-tertiary);
+    min-height: 50px;
+}
+
+.image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+}
+
+.scoreBadge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    padding: 2px 5px;
+    border-radius: 4px;
+    backdrop-filter: blur(2px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 5;
+}
+
+.usedBadge,
+.matchBadge {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+}
+
+.usedBadge {
+    background: rgba(244, 67, 54, 0.9);
+}
+
+.matchBadge {
+    background: rgba(76, 175, 80, 0.9);
+}

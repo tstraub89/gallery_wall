@@ -3,7 +3,8 @@ const STORE_NAME = 'images';
 const PROJECTS_STORE = 'projects';
 const THUMB_STORE = 'thumbnails';
 const PREVIEW_STORE = 'previews';
-const DB_VERSION = 4;
+export const ANALYSIS_STORE = 'analysis';
+const DB_VERSION = 5;
 
 export interface ImageMetadata {
     width: number;
@@ -17,7 +18,8 @@ interface StoredImage extends ImageMetadata {
     blob: Blob;
 }
 
-export const initDB = (): Promise<IDBDatabase> => {
+// Initialize DB
+export function initDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
 
@@ -36,6 +38,9 @@ export const initDB = (): Promise<IDBDatabase> => {
             }
             if (!db.objectStoreNames.contains(PREVIEW_STORE)) {
                 db.createObjectStore(PREVIEW_STORE, { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains(ANALYSIS_STORE)) {
+                db.createObjectStore(ANALYSIS_STORE, { keyPath: 'id' });
             }
         };
 
