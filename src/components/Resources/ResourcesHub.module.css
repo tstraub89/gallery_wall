@@ -265,7 +265,7 @@
     align-items: center;
     gap: 6px;
     font-size: 14px;
-    color: #8e8e93;
+    color: #636366;
 }
 
 .readMore {
@@ -289,7 +289,7 @@
 
 .emptyState p {
     font-size: 18px;
-    color: #8e8e93;
+    color: #636366;
     margin-bottom: 24px;
 }
 

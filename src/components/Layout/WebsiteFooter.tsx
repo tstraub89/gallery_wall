@@ -14,7 +14,7 @@ const WebsiteFooter: React.FC = () => {
                     <div className={styles.copyright}>
                         © 2026 Timothy Straub.<br />
                         Built with precision for beautiful homes.<br />
-                        <span style={{ opacity: 0.6, fontSize: '0.9em' }}>Proudly built with AI assistance.</span>
+                        <span style={{ opacity: 0.75, fontSize: '0.9em' }}>Proudly built with AI assistance.</span>
                     </div>
                 </div>
 
