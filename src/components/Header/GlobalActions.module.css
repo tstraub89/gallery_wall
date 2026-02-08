@@ -48,7 +48,7 @@
 }
 
 .btn {
-    background: #007aff;
+    background: #005bb7;
     color: white;
     border: none;
     padding: 6px 16px;
@@ -94,8 +94,8 @@
 
 .secondaryBtn:hover {
     background: #f8f9fa;
-    border-color: #007aff;
-    color: #007aff;
+    border-color: #005bb7;
+    color: #005bb7;
 }
 
 .removeAction {
@@ -137,7 +137,7 @@
     width: 32px;
     height: 32px;
     border: 3px solid rgba(0, 122, 255, 0.1);
-    border-top: 3px solid #007aff;
+    border-top: 3px solid #005bb7;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 12px;

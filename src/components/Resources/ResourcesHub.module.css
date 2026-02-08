@@ -21,7 +21,7 @@
 }
 
 .heroIcon {
-    color: #007aff;
+    color: #005bb7;
     margin-bottom: 24px;
 }
 
@@ -46,7 +46,7 @@
 .ctaButton {
     display: inline-block;
     padding: 14px 32px;
-    background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+    background: linear-gradient(135deg, #005bb7 0%, #5856d6 100%);
     color: white;
     font-size: 16px;
     font-weight: 600;
@@ -75,7 +75,7 @@
 }
 
 .sectionIcon {
-    color: #007aff;
+    color: #005bb7;
     flex-shrink: 0;
     margin-top: 4px;
 }
@@ -194,7 +194,7 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #007aff 0%, #5856d6 100%);
+    background: linear-gradient(90deg, #005bb7 0%, #5856d6 100%);
 }
 
 .featuredBadge {
@@ -202,7 +202,7 @@
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+    background: linear-gradient(135deg, #005bb7 0%, #5856d6 100%);
     color: white;
     font-size: 12px;
     font-weight: 600;
@@ -222,7 +222,7 @@
     display: inline-block;
     padding: 6px 12px;
     background: rgba(0, 122, 255, 0.1);
-    color: #007aff;
+    color: #005bb7;
     font-size: 12px;
     font-weight: 600;
     border-radius: 6px;
@@ -271,7 +271,7 @@
 .readMore {
     font-size: 14px;
     font-weight: 600;
-    color: #007aff;
+    color: #005bb7;
     transition: transform 0.2s;
 }
 
@@ -295,7 +295,7 @@
 
 .resetButton {
     padding: 12px 24px;
-    background: #007aff;
+    background: #005bb7;
     color: white;
     border: none;
     border-radius: 8px;
@@ -312,7 +312,7 @@
 
 /* Bottom CTA */
 .bottomCta {
-    background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+    background: linear-gradient(135deg, #005bb7 0%, #5856d6 100%);
     color: white;
     padding: 60px 40px;
     border-radius: 20px;
@@ -337,7 +337,7 @@
 
 .bottomCta .ctaButton {
     background: white;
-    color: #007aff;
+    color: #005bb7;
 }
 
 .bottomCta .ctaButton:hover {

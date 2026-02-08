@@ -109,7 +109,7 @@ const LandingPage: React.FC = () => {
                         <div style={{ flex: 0.8, display: 'flex', flexDirection: 'column', gap: '40px' }}>
                             <div style={{ display: 'flex', gap: '20px' }}>
                                 <div style={{
-                                    background: carouselIndex === 0 ? '#007aff' : '#f2f2f7',
+                                    background: carouselIndex === 0 ? '#005bb7' : '#f2f2f7',
                                     color: carouselIndex === 0 ? 'white' : '#1c1c1e',
                                     width: '40px', height: '40px',
                                     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -126,7 +126,7 @@ const LandingPage: React.FC = () => {
 
                             <div style={{ display: 'flex', gap: '20px' }}>
                                 <div style={{
-                                    background: carouselIndex === 1 ? '#007aff' : '#f2f2f7',
+                                    background: carouselIndex === 1 ? '#005bb7' : '#f2f2f7',
                                     color: carouselIndex === 1 ? 'white' : '#1c1c1e',
                                     width: '40px', height: '40px',
                                     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -143,7 +143,7 @@ const LandingPage: React.FC = () => {
 
                             <div style={{ display: 'flex', gap: '20px' }}>
                                 <div style={{
-                                    background: carouselIndex === 2 ? '#007aff' : '#f2f2f7',
+                                    background: carouselIndex === 2 ? '#005bb7' : '#f2f2f7',
                                     color: carouselIndex === 2 ? 'white' : '#1c1c1e',
                                     width: '40px', height: '40px',
                                     borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',

@@ -17,7 +17,8 @@
 .badge {
     display: inline-block;
     background: #e0f2fe;
-    color: #0284c7;
+    color: #0369a1;
+    /* Darkened from #0284c7 for AA contrast */
     padding: 6px 12px;
     border-radius: 99px;
     font-size: 12px;
@@ -170,7 +171,8 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: #007aff;
+    color: #005bb7;
+    /* Darkened from #005bb7 for AA contrast */
     font-weight: 600;
     font-size: 15px;
 }

@@ -40,7 +40,7 @@
 }
 
 .breadcrumbs a {
-    color: #007aff;
+    color: #005bb7;
     text-decoration: none;
     transition: color 0.2s;
 }
@@ -116,8 +116,8 @@
 }
 
 .toc a:hover {
-    color: #007aff;
-    border-left-color: #007aff;
+    color: #005bb7;
+    border-left-color: #005bb7;
 }
 
 .toc .level2 a {
@@ -131,8 +131,8 @@
 }
 
 .toc .active a {
-    color: #007aff;
-    border-left-color: #007aff;
+    color: #005bb7;
+    border-left-color: #005bb7;
     font-weight: 600;
 }
 
@@ -161,7 +161,7 @@
 }
 
 .pillarBadge {
-    background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+    background: linear-gradient(135deg, #005bb7 0%, #5856d6 100%);
     color: white;
 }
 
@@ -383,7 +383,7 @@
 }
 
 .content a {
-    color: #007aff;
+    color: #005bb7;
     text-decoration: none;
     font-weight: 500;
     transition: color 0.2s;
@@ -447,7 +447,7 @@
 }
 
 .content blockquote {
-    border-left: 4px solid #007aff;
+    border-left: 4px solid #005bb7;
     padding-left: 20px;
     margin: 24px 0;
     font-style: italic;
@@ -540,7 +540,7 @@
 
 /* CTA Section */
 .cta {
-    background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+    background: linear-gradient(135deg, #005bb7 0%, #5856d6 100%);
     color: white;
     padding: 48px;
     border-radius: 16px;
@@ -565,7 +565,7 @@
     display: inline-block;
     padding: 14px 32px;
     background: white;
-    color: #007aff;
+    color: #005bb7;
     font-size: 16px;
     font-weight: 600;
     border-radius: 10px;
@@ -682,7 +682,7 @@
     gap: 8px;
     font-size: 16px;
     font-weight: 500;
-    color: #007aff;
+    color: #005bb7;
     text-decoration: none;
     transition: gap 0.2s;
 }

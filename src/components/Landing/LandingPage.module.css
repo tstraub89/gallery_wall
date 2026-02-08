@@ -40,7 +40,7 @@
 }
 
 .nav a:hover {
-    color: #007aff;
+    color: #005bb7;
 }
 
 .ctaBtn {
@@ -330,7 +330,7 @@
 }
 
 .footerLink:hover {
-    color: #007aff;
+    color: #005bb7;
 }
 
 @media (max-width: 850px) {

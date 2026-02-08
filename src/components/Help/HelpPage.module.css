@@ -129,7 +129,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #007aff;
+    color: #005bb7;
 }
 
 .card h2 {
@@ -242,8 +242,8 @@
 .actionBtn:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    color: #007aff;
-    border-color: #007aff;
+    color: #005bb7;
+    border-color: #005bb7;
 }
 
 .footer {

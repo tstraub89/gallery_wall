@@ -10,9 +10,10 @@
   --text-secondary: #6e6e73;
   /* Darkened from #8e8e93 for better contrast */
 
-  --accent-color: #007aff;
-  --accent-hover: #0056b3;
-  --accent-soft: rgba(0, 122, 255, 0.1);
+  --accent-color: #005bb7;
+  /* Darkened from #005bb7 for AA contrast */
+  --accent-hover: #004a94;
+  --accent-soft: rgba(0, 91, 183, 0.1);
 
   --border-color: rgba(0, 0, 0, 0.1);
 

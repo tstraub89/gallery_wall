@@ -60,7 +60,7 @@
 
 .addBtn {
     width: 100%;
-    background: #007aff;
+    background: #005bb7;
     color: white;
     border: none;
     padding: 8px;
@@ -110,7 +110,7 @@
 }
 
 .activeSwatch {
-    border: 2px solid #007aff;
+    border: 2px solid #005bb7;
     box-shadow: 0 0 4px rgba(0, 122, 255, 0.3);
 }
 

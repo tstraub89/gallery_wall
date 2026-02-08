@@ -122,8 +122,8 @@ const PrivacyPolicy: React.FC = () => {
                         If you have any questions about this Privacy Policy or how we handle information, you can contact us at:
                     </p>
                     <p style={{ lineHeight: '1.6', color: '#48484a', marginTop: '16px' }}>
-                        <strong>Email:</strong> <a href="mailto:hello@gallery-planner.com" style={{ color: '#007aff' }}>hello@gallery-planner.com</a><br />
-                        <strong>GitHub:</strong> <a href="https://github.com/tstraub89/gallery_wall" style={{ color: '#007aff' }}>https://github.com/tstraub89/gallery_wall</a>
+                        <strong>Email:</strong> <a href="mailto:hello@gallery-planner.com" style={{ color: '#005bb7' }}>hello@gallery-planner.com</a><br />
+                        <strong>GitHub:</strong> <a href="https://github.com/tstraub89/gallery_wall" style={{ color: '#005bb7' }}>https://github.com/tstraub89/gallery_wall</a>
                     </p>
                 </section>
             </main>

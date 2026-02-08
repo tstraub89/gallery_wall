@@ -21,7 +21,7 @@
 .uploadBtn {
     flex: 1;
     padding: 8px;
-    background: #007aff;
+    background: #005bb7;
     color: white;
     border: none;
     border-radius: 4px;
@@ -104,7 +104,7 @@
 }
 
 .photoItem.selected {
-    box-shadow: 0 0 0 3px #007aff;
+    box-shadow: 0 0 0 3px #005bb7;
     transform: scale(0.98);
 }
 
@@ -112,7 +112,7 @@
     position: absolute;
     top: 5px;
     right: 5px;
-    background: #007aff;
+    background: #005bb7;
     color: white;
     width: 20px;
     height: 20px;
@@ -249,7 +249,7 @@
 }
 
 .listItem.selected {
-    border-color: #007aff;
+    border-color: #005bb7;
     background: #f0f7ff;
 }
 
