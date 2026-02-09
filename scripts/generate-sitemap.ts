@@ -11,7 +11,23 @@ const SITEMAP_PATH = path.join(__dirname, '../public/sitemap.xml');
 const BASE_URL = 'https://gallery-planner.com';
 const CURRENT_DATE = new Date().toISOString().split('T')[0];
 
+const ARTICLES_DIR = path.join(__dirname, '../src/content/articles');
+
 console.log('Generating sitemap...');
+
+const getEffectiveDate = (articleId: string, registeredDate: string) => {
+    const filePath = path.join(ARTICLES_DIR, `${articleId}.md`);
+    try {
+        if (fs.existsSync(filePath)) {
+            const stats = fs.statSync(filePath);
+            const fileMtime = stats.mtime.toISOString().split('T')[0];
+            return fileMtime > registeredDate ? fileMtime : registeredDate;
+        }
+    } catch (e) {
+        console.warn(`Could not check mtime for ${articleId}`);
+    }
+    return registeredDate;
+};
 
 const generateSitemap = () => {
     const staticPages = [
@@ -36,7 +52,7 @@ const generateSitemap = () => {
     ${articles.map(article => `
     <url>
         <loc>${BASE_URL}/resources/${article.slug}</loc>
-        <lastmod>${article.lastUpdated}</lastmod>
+        <lastmod>${getEffectiveDate(article.id, article.lastUpdated)}</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
     </url>

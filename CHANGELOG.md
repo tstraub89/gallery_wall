@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.2] - 2026-02-08
+
+### 🌐 Social & Discoverability
+- **Project Socials**: Updated footer links to official GalleryPlanner accounts:
+    - **Instagram**: [@gallery.planner](https://www.instagram.com/gallery.planner/)
+    - **Bluesky**: [gallery-planner.com](https://bsky.app/profile/gallery-planner.com)
+    - **Pinterest**: [galleryplanner](https://www.pinterest.com/galleryplanner/)
+- **RSS Feed**: Launched an automated RSS feed at `/rss.xml` for Pinterest and feed readers.
+- **Visual Polish**: Added brand icons (Instagram, GitHub, Pinterest, and a custom butterfly for Bluesky) to the footer for a more premium look.
+- **Privacy First**: Moved personal social links (LinkedIn) to the About page to keep the main footer focused on the project.
+
+### ⚡️ Automated Dates
+- **Smart Last-Updated**: The sitemap and RSS feed now automatically detect when a "Learn" guide was last modified on disk, ensuring search engines always see the most recent version without manual registry updates.
+
 ## [0.5.1] - 2026-02-08
 
 ### ✨ Playground Mode

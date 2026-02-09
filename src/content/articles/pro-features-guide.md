@@ -7,17 +7,15 @@ GalleryPlanner Pro unlocks powerful features designed to save you time and help 
 | Feature | Free | Pro |
 |---------|------|-----|
 | Unlimited frames | ✅ | ✅ |
-| Drag & drop layout | ✅ | ✅ |
 | Add your own photos | ✅ | ✅ |
-| Standard wall shapes | ✅ | ✅ |
+| Standard walls | ✅ | ✅ |
 | Snapshot export (JPEG) | ✅ | ✅ |
 | **Custom Shapes & Colors** | — | ✅ |
-| **Smart Layout (AI)** | — | ✅ |
-| **Smart Fill (AI)** | — | ✅ |
+| **Smart Features (AI)** | — | ✅ |
 | **Hanging Guide (PDF)** | — | ✅ |
 | **Project Backup (.gwall)** | — | ✅ |
 | **Cropped Photos Export** | — | ✅ |
-| **Staircase/Diagonal Walls** | — | ✅ |
+| **Staircases** | — | ✅ |
 
 ---
 
