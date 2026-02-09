@@ -461,10 +461,22 @@
 }
 
 .content table {
-    width: auto;
+    width: 100%;
+    /* Full width */
     max-width: 100%;
     border-collapse: collapse;
+    margin: 0;
+    /* Margin handled by wrapper */
+}
+
+.tableWrapper {
+    width: 100%;
+    overflow-x: auto;
+    /* Enable horizontal scroll */
     margin: 24px 0;
+    border-radius: 8px;
+    border: 1px solid #e5e5ea;
+    /* Optional: border around the scroll area */
 }
 
 .content th,
@@ -484,57 +496,36 @@
 
 @media (max-width: 600px) {
 
-    /* Transform tables into vertical cards */
-    .content table {
-        display: block;
-        border: none;
-        margin-top: 0;
+    /* On mobile, ensure table wrapper scrolls */
+    .tableWrapper {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        /* flushed to edges if desired, or keep rounded */
     }
 
-    .content thead {
-        display: none;
-        /* Hide headers */
-    }
-
-    .content tbody {
-        display: block;
-    }
-
-    .content tr {
-        display: block;
-        background: #f9f9fb;
-        border: 1px solid #e5e5ea;
-        border-radius: 12px;
-        padding: 16px;
-        margin-bottom: 24px;
-    }
-
+    .content th,
     .content td {
-        display: block;
-        padding: 8px 0;
-        border: none;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-        font-size: 15px;
-        color: #48484a;
-        min-width: auto;
+        white-space: nowrap;
+        /* Force scroll for dense data tables */
+        /* OR use min-width to force scroll while allowing wrap */
+        min-width: 120px;
         white-space: normal;
-        /* Critical: Allow text to wrap */
-        overflow-wrap: break-word;
-        /* Ensure long words don't overflow */
+        /* Allow wrapping within the min-width */
     }
 
-    .content td:last-child {
-        border-bottom: none;
-    }
-
-    /* Make the first cell look like a card title */
+    .content th:first-child,
     .content td:first-child {
-        font-weight: 700;
-        font-size: 17px;
-        color: #1c1c1e;
-        margin-bottom: 4px;
-        padding-top: 0;
-        border-bottom: none;
+        position: sticky;
+        left: 0;
+        background: #fff;
+        z-index: 10;
+        border-right: 2px solid #e5e5ea;
+        /* Shadow or border to separation */
+    }
+
+    .content th:first-child {
+        background: #f2f2f7;
     }
 }
 

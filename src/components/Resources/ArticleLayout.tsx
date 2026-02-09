@@ -168,6 +168,11 @@ const ArticleLayout: React.FC = () => {
             const id = slugify(text);
             return <h3 id={id} {...props}>{children}</h3>;
         },
+        table: ({ children, ...props }: any) => (
+            <div className={styles.tableWrapper}>
+                <table {...props}>{children}</table>
+            </div>
+        ),
     };
 
     return (
