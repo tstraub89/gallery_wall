@@ -6,13 +6,14 @@ You've designed the perfect gallery wall layout in GalleryPlanner—but will you
 
 If you just want to know whether your photo is big enough, here's the reference:
 
-| Print Size | Minimum Pixels Needed |
-|------------|----------------------|
-| 4×6" | 1200 × 1800 |
-| 8×10" | 2400 × 3000 |
-| 11×14" | 3300 × 4200 |
-| 16×20" | 4800 × 6000 |
-| 24×36" | 7200 × 10800 |
+| Print Size | Minimum Pixels Needed | Target PPI | Lowest Acceptable (Red Alert) |
+|------------|----------------------|------------|-------------------------------|
+| 4×6" | 1200 × 1800 | ~300 PPI | < 150 PPI |
+| 5×7" | 1500 × 2100 | ~300 PPI | < 150 PPI |
+| 8×10" | 2400 × 3000 | ~300 PPI | < 150 PPI |
+| 11×14" | 2750 × 3500 | ~250 PPI | < 125 PPI |
+| 16×20" | 3200 × 4000 | ~200 PPI | < 100 PPI |
+| 24×36" | 3600 × 5400 | ~150 PPI | < 100 PPI |
 
 For most gallery walls viewed from 3-5 feet away, these minimums will look great.
 

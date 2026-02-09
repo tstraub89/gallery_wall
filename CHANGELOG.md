@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-02-09
+
+### ✨ Smart Fill & AI Mastery
+- **Mastering Smart Fill**: Launched a comprehensive guide for the new AI-powered photo selection tool, detailing composition, face detection, and color harmony logic.
+- **Intelligent Auto-Fill**: Refined the Smart Fill selection engine to prioritize unique photos, preventing duplication across the wall while still allowing manual overrides.
+- **Dynamic Print Quality**: Rebuilt the PPI (relative resolution) alerting system to be size-aware. Larger prints now have more reasonable thresholds (150 PPI) while smaller frames remain strict (300 PPI), reducing unnecessary "low quality" warnings.
+
+### 🎨 UI & Help Overhaul
+- **Sidebar Strips**: Implemented persistent, low-profile toggle handles at the screen edges. Users can now collapse sidebars to maximize workspace while maintaining an intuitive way to bring them back.
+- **Expanded Help Menu**:
+    - **Interactive Quick Start**: Added a modal-based guide for first-time users and keyboard shortcuts.
+    - **Direct Bug Reporting**: New built-in tool to report issues directly from the app.
+- **Refined Header**: Reorganized the top bar for better hierarchy. The logo is now prioritized on the left, with project and export actions clustered for easier navigation.
+- **Dropdown Polish**: Added descriptive icons to all dropdown menu items (Project, Export, and Help) for improved scannability and a more premium feel.
+- **Styling Refinements**: Added global hover states and optimized menu spacing for a tighter, more modern aesthetic.
+
 ## [0.5.2] - 2026-02-08
 
 ### 🌐 Social & Discoverability

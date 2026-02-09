@@ -2,6 +2,8 @@
 
 GalleryPlanner Pro unlocks powerful features designed to save you time and help you create professional-quality gallery wall layouts. During our public beta, **all Pro features are completely free**—no credit card required.
 
+> 🗒️ **Note:** GalleryPlanner is in active development. We are constantly improving our AI tools, adding new frame styles, and refining the user experience based on your feedback.
+
 ## Free vs Pro: Quick Comparison
 
 | Feature | Free | Pro |
@@ -29,6 +31,8 @@ Populate your gallery wall instantly. Smart Fill uses local AI to analyze your p
 - **Color Harmony** — Matches photos with complementary color palettes.
 - **Face Detection** — Prioritizes portraits and ensures faces aren't cropped out.
 - **Resolution Check** — Only selects photos that will look sharp at print size.
+
+[Learn more about Smart Fill →](/learn/mastering-smart-fill)
 
 ---
 

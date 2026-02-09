@@ -389,9 +389,19 @@ const CanvasWorkspace: React.FC = () => {
 
         // Get suggestions
         const suggestions = await getSuggestionsForFrame(frame);
-        if (suggestions.length > 0) {
-            // Apply best match
-            const best = suggestions[0];
+
+        // Find best unused photo
+        // Create a Set of all imageIds currently used in OTHER frames
+        const usedImageIds = new Set(
+            currentProject.frames
+                .filter(f => f.id !== frameId && f.imageId)
+                .map(f => f.imageId!)
+        );
+
+        // Find the first suggestion whose photoId is NOT in the used set
+        const best = suggestions.find(s => !usedImageIds.has(s.photoId));
+
+        if (best) {
             const updatedFrames = currentProject.frames.map(f =>
                 f.id === frameId ? { ...f, imageId: best.photoId } : f
             );

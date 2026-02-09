@@ -5,7 +5,7 @@
     <link>https://gallery-planner.com/learn</link>
     <description>Learn how to design, plan, and install beautiful gallery walls with our comprehensive guides.</description>
     <language>en-us</language>
-    <lastBuildDate>Mon, 09 Feb 2026 03:29:31 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 09 Feb 2026 05:46:55 GMT</lastBuildDate>
     <atom:link href="https://gallery-planner.com/rss.xml" rel="self" type="application/rss+xml" />
     
         <item>
@@ -53,9 +53,19 @@
             <link>https://gallery-planner.com/resources/what-is-galleryplanner-pro</link>
             <guid isPermaLink="true">https://gallery-planner.com/resources/what-is-galleryplanner-pro</guid>
             <description><![CDATA[Discover Pro features like Smart Layout, PDF hanging guides, and project backup—all free during beta.]]></description>
-            <pubDate>Sun, 08 Feb 2026 21:37:08 GMT</pubDate>
+            <pubDate>Mon, 09 Feb 2026 03:50:47 GMT</pubDate>
             <author>Timothy Straub</author>
             <enclosure url="https://gallery-planner.com/learn/hero-pro-features.webp" length="0" type="image/webp" />
+            <category>App Guides</category>
+        </item>
+        <item>
+            <title><![CDATA[Mastering Smart Fill: AI-Powered Photo Selection]]></title>
+            <link>https://gallery-planner.com/resources/mastering-smart-fill</link>
+            <guid isPermaLink="true">https://gallery-planner.com/resources/mastering-smart-fill</guid>
+            <description><![CDATA[Learn how GalleryPlanner's AI can automatically select and place the perfect photos in your frames based on color, composition, and resolution.]]></description>
+            <pubDate>Mon, 09 Feb 2026 04:13:01 GMT</pubDate>
+            <author>Timothy Straub</author>
+            <enclosure url="https://gallery-planner.com/learn/hero-smart-fill.webp" length="0" type="image/webp" />
             <category>App Guides</category>
         </item>
         <item>
@@ -133,7 +143,7 @@
             <link>https://gallery-planner.com/resources/print-resolution-guide</link>
             <guid isPermaLink="true">https://gallery-planner.com/resources/print-resolution-guide</guid>
             <description><![CDATA[Avoid blurry prints by understanding DPI, PPI, and resolution requirements for gallery wall art.]]></description>
-            <pubDate>Sat, 07 Feb 2026 19:44:49 GMT</pubDate>
+            <pubDate>Mon, 09 Feb 2026 04:15:17 GMT</pubDate>
             <author>Timothy Straub</author>
             <enclosure url="https://gallery-planner.com/learn/hero-print-resolution.webp" length="0" type="image/webp" />
             <category>Design 101</category>

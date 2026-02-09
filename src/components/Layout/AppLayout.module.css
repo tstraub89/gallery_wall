@@ -23,7 +23,7 @@
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
-    padding: 0 var(--spacing-lg);
+    padding: 0 var(--spacing-sm);
     z-index: 1000;
 }
 
@@ -74,4 +74,46 @@
     border-left: 1px solid var(--border-color);
     overflow: hidden;
     z-index: 5;
+}
+
+.toggleHandle {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 60px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 0 8px 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 100;
+    transition: background 0.2s, color 0.2s, width 0.2s, box-shadow 0.2s;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+    color: var(--text-secondary);
+}
+
+.toggleHandle:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    width: 24px;
+}
+
+.leftHandle {
+    left: var(--sidebar-width);
+    border-left: none;
+}
+
+.rightHandle {
+    right: var(--properties-width);
+    border-radius: 8px 0 0 8px;
+    border-right: none;
+    border-left: 1px solid var(--border-color);
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.handleIcon {
+    transition: transform 0.3s ease;
 }

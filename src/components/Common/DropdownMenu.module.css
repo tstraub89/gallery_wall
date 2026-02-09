@@ -59,6 +59,15 @@
     background: var(--bg-app);
 }
 
+.itemIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    opacity: 0.8;
+}
+
 .item.danger {
     color: #ff3b30;
 }

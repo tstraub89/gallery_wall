@@ -64,6 +64,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ label, icon, items = [], ch
                                     setIsOpen(false);
                                 }}
                             >
+                                {item.icon && <span className={styles.itemIcon}>{item.icon}</span>}
                                 {item.label}
                             </div>
                         );

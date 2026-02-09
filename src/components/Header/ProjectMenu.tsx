@@ -4,9 +4,6 @@ import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import styles from './ProjectMenu.module.css';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import ProBadge from '../Common/ProBadge';
-import { PanelLeftOpen, PanelLeftClose } from 'lucide-react';
-import { useLayout } from '../../hooks/useLayout';
-
 const ProjectMenu = () => {
     const {
         projects,
@@ -15,8 +12,6 @@ const ProjectMenu = () => {
         addProject,
         deleteProject
     } = useProject();
-
-    const { isLeftSidebarOpen, toggleLeftSidebar } = useLayout();
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
@@ -45,14 +40,6 @@ const ProjectMenu = () => {
 
     return (
         <div className={styles.container} ref={containerRef}>
-            <button
-                onClick={toggleLeftSidebar}
-                className={styles.iconBtn}
-                title={isLeftSidebarOpen ? "Collapse Frame Library" : "Expand Frame Library"}
-                style={{ marginRight: 16 }}
-            >
-                {isLeftSidebarOpen ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}
-            </button>
             <div
                 className={styles.trigger}
                 onClick={() => setIsExpanded(!isExpanded)}

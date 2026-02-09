@@ -12,9 +12,9 @@ import ProjectMenu from '../Header/ProjectMenu';
 import WindowControls from '../Header/WindowControls';
 import LoadingOverlay from '../Common/LoadingOverlay';
 
-// Moved Lazy Load imports here if they are only used in App?
-// But actually WelcomeModal is used here.
 const WelcomeModal = React.lazy(() => import('../Common/WelcomeModal'));
+
+const VDivider = () => <div style={{ width: 1, height: 20, background: 'rgba(0,0,0,0.1)', margin: '0 8px' }} />;
 
 const GalleryApp: React.FC = () => {
     const { showWelcome, importDemoProject, startFresh, undo, redo, canUndo, canRedo, isProjectLoading } = useProject();
@@ -47,12 +47,17 @@ const GalleryApp: React.FC = () => {
                 <AppLayout>
                     <Header>
                         <Logo />
-                        {/* Project Selector - LEFT */}
-                        <ProjectMenu />
-                        {/* Project/Export Actions - LEFT */}
-                        <GlobalActions />
+                        <VDivider />
+
+                        {/* Main Actions Cluster */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <ProjectMenu />
+                            <GlobalActions />
+                        </div>
+
                         <div style={{ flex: 1 }} />
-                        {/* Github/Help/Collapse - RIGHT */}
+
+                        {/* PRO BUTTON */}
                         <WindowControls />
                     </Header>
                     <LeftSidebar>

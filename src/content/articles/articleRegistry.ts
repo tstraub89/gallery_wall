@@ -46,7 +46,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 10,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['getting-started', 'smart-layout', 'spacing-alignment'],
+        relatedArticles: ['getting-started', 'smart-layout', 'smart-fill', 'spacing-alignment'],
         video: '/learn/video-galleryplanner-guide.mp4',
         videoDuration: '2 min video',
         heroImage: '/learn/hero-user-guide.webp',
@@ -78,7 +78,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 7,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['pillar-app-guide', 'getting-started'],
+        relatedArticles: ['pillar-app-guide', 'getting-started', 'smart-fill'],
         video: '/learn/video-smart-layout.mp4',
         videoDuration: '1 min video',
         heroImage: '/learn/hero-smart-layout.webp',
@@ -97,6 +97,20 @@ export const articles: ArticleMetadata[] = [
         relatedArticles: ['pillar-app-guide', 'smart-layout', 'getting-started'],
         heroImage: '/learn/hero-pro-features.webp',
         keywords: ['GalleryPlanner Pro', 'Pro features', 'GalleryPlanner pricing', 'Smart Layout', 'PDF hanging guide'],
+        author: 'Timothy Straub'
+    },
+    {
+        id: 'smart-fill',
+        slug: 'mastering-smart-fill',
+        title: 'Mastering Smart Fill: AI-Powered Photo Selection',
+        description: 'Learn how GalleryPlanner\'s AI can automatically select and place the perfect photos in your frames based on color, composition, and resolution.',
+        category: 'App Guides',
+        readingTime: 6,
+        publishedDate: '2026-02-08',
+        lastUpdated: '2026-02-08',
+        relatedArticles: ['pillar-app-guide', 'smart-layout', 'pro-features-guide'],
+        heroImage: '/learn/hero-smart-fill.webp',
+        keywords: ['GalleryPlanner smart fill', 'AI photo selection', 'automatic photo framing', 'gallery wall photo picker'],
         author: 'Timothy Straub'
     },
 

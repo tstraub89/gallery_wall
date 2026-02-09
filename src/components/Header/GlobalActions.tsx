@@ -7,7 +7,9 @@ import styles from './GlobalActions.module.css';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import DropdownMenu from '../Common/DropdownMenu';
 import ProBadge from '../Common/ProBadge';
-import { Download, FolderOpen, Palette } from 'lucide-react';
+import { Download, FolderOpen, HelpCircle, Bug, Sparkles, BookOpen, Palette, Info } from 'lucide-react';
+import { useBugReporter } from '../../hooks/useBugReporter';
+const HelpModal = React.lazy(() => import('../Common/HelpModal'));
 
 const FullScreenOverlay = ({ children }: { children: React.ReactNode }) => {
     return createPortal(
@@ -40,6 +42,9 @@ const GlobalActions = () => {
         setExportError: setPdfErr,
         exportToPDFGuide
     } = usePDFExport();
+
+    const { reportBug } = useBugReporter();
+    const [showHelp, setShowHelp] = React.useState(false);
 
     // Combined states
     const isExporting = isBusy || isPDFBusy;
@@ -153,25 +158,49 @@ const GlobalActions = () => {
             {/* Help Menu */}
             <DropdownMenu
                 label="Help"
-                icon={<div style={{ width: 16, height: 16, border: '1.5px solid currentColor', borderRadius: '50%', textAlign: 'center', fontSize: '10px', lineHeight: '14px', fontWeight: 'bold' }}>?</div>}
+                icon={<HelpCircle size={16} />}
                 items={[
                     {
+                        label: 'Report an Issue',
+                        icon: <Bug size={14} />,
+                        onClick: reportBug,
+                        title: 'Found a bug? Let me know!',
+                        danger: true
+                    },
+                    { separator: true },
+                    {
+                        label: 'Quick Start Guide',
+                        icon: <Sparkles size={14} />,
+                        onClick: () => setShowHelp(true),
+                        title: 'Interactive guide and keyboard shortcuts'
+                    },
+                    { separator: true },
+                    {
                         label: 'User Guide',
+                        icon: <BookOpen size={14} />,
                         onClick: () => window.open('/learn/galleryplanner-user-guide', '_blank'),
                     },
                     {
                         label: 'Design Principles',
-                        icon: <Palette size={18} />,
+                        icon: <Palette size={14} />,
                         onClick: () => window.open('/learn/complete-guide-to-gallery-walls', '_blank'),
                         title: 'Tips for designing better layouts'
                     },
                     { separator: true },
                     {
                         label: 'About',
+                        icon: <Info size={14} />,
                         onClick: () => window.open('/about', '_blank')
                     }
                 ]}
             />
+
+            {showHelp && (
+                <React.Suspense fallback={null}>
+                    <HelpModal onClose={() => setShowHelp(false)} />
+                </React.Suspense>
+            )}
+
 
             {isExporting && (
                 <FullScreenOverlay>

@@ -1,6 +1,5 @@
 .container {
     position: relative;
-    margin-left: var(--spacing-lg);
     display: flex;
     align-items: center;
 }

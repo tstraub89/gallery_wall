@@ -33,24 +33,40 @@ const FrameContent: React.FC<FrameContentProps> = ({ frame, ppi }) => {
     // We use the limiting dimension logic (usually width for landscape)
     let ppiColor = null;
     let ppiValue = 0;
+    let targetPPI = 300;
 
     if (url && metadata && frame.width && frame.height) {
         const scale = frame.imageState?.scale || 1;
         const ppiW = metadata.width / frame.width;
         const ppiH = metadata.height / frame.height;
 
-        // Since it covers, the displayed PPI is roughly the *smaller* ratio determined by the crop?
-        // No, 'Cover' uses the LARGER scale factor to fill.
-        // So effective source pixels used is determined by the dimension that fits exactly.
-        // Which means the *smaller* PPI of the two dimensions is the effective one across the print?
-        // Actually, if 5000px W fits 10in W (500 PPI). And 10px H fits 10in H (1 PPI).
-        // Cover will scale to make H fit. W will be cropped.
-        // The visible area has 1 PPI vertical resolution. 500 PPI horizontal.
-        // So quality is limited by the WORST dimension.
+        // Since it covers, the displayed PPI is roughly the *smaller* ratio determined by the crop
+        // The visible area is limited by the WORST dimension scaling
         ppiValue = Math.min(ppiW, ppiH) / scale;
 
-        if (ppiValue < 150) ppiColor = '#ef4444'; // Red
-        else if (ppiValue < 300) ppiColor = '#fbbf24'; // Yellow
+        // Dynamic Threshold Logic
+        // Small frames need higher PPI (viewed closer). large frames can have lower PPI.
+        // Logic: <= 5" -> 300 PPI. >= 30" -> 150 PPI. Linear interpolate in between.
+        const maxDim = Math.max(frame.width, frame.height);
+        const MIN_DIM = 5;
+        const MAX_DIM = 30;
+        const MAX_PPI = 300;
+        const MIN_PPI = 150;
+
+        if (maxDim <= MIN_DIM) targetPPI = MAX_PPI;
+        else if (maxDim >= MAX_DIM) targetPPI = MIN_PPI;
+        else {
+            const ratio = (maxDim - MIN_DIM) / (MAX_DIM - MIN_DIM);
+            targetPPI = Math.round(MAX_PPI - (ratio * (MAX_PPI - MIN_PPI)));
+        }
+
+        // Critical Threshold Logic
+        // We set a hard floor of 100 PPI for large prints (below that is visible pixelation even at distance).
+        // For small prints, we stick to 50% of target (150 PPI).
+        const critThreshold = Math.max(100, targetPPI * 0.5);
+
+        if (ppiValue < critThreshold) ppiColor = '#ef4444'; // Red
+        else if (ppiValue < targetPPI) ppiColor = '#fbbf24'; // Yellow
     }
 
 
@@ -81,7 +97,7 @@ const FrameContent: React.FC<FrameContentProps> = ({ frame, ppi }) => {
                         pointerEvents: 'auto', // Allow hover
                         cursor: 'help'
                     }}
-                    title={`Low Resolution: ~${Math.round(ppiValue)} PPI (Target 300)`}
+                    title={`Low Resolution: ~${Math.round(ppiValue)} PPI (Target ${targetPPI})`}
                 >
                     <TriangleAlert size={16} fill="currentColor" stroke="#fff" strokeWidth={1.5} />
                 </div>
