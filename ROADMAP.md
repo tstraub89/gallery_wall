@@ -18,6 +18,11 @@
     - **Flexible Photo Grid**: Toggle between small, medium, and large previews (e.g., 1, 2, or 3 columns).
     - **Detailed List View**: Alternative row-based view for photos/frames showing metadata like name, resolution (MP), and aspect ratio.
 
+## 📱 Mobile Experience
+- [ ] **Mobile Parity**: Bring core Desktop features to the mobile experience.
+    - **Frame Templates**: Enable the "Template Pack" browser on mobile devices for quick layout generation.
+    - **Smart Fill**: Adapt the Smart Fill sidebar and suggestions for smaller screens.
+
 ## 💰 Monetization & Pro (Low Priority - Beta Phase)
 - [ ] **Stripe Integration**:
     - *Status*: On hold for extended beta.
