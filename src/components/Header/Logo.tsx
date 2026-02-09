@@ -34,7 +34,7 @@ const Logo: React.FC<LogoProps> = ({ hideStatus = false, scale = 1 }) => {
     return (
         <div
             className={styles.logo}
-            title="Early beta - core features are free while I build this out"
+            title="Beta - Pro features are free!"
             style={{
                 transform: `scale(${scale})`,
                 transformOrigin: 'left center'
