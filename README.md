@@ -73,6 +73,13 @@ For a deep dive into feature guides, "how-to" videos, and advanced shortcuts, ch
 2.  **Dev Server**: `npm run dev`
 3.  **Browse**: Open `http://localhost:5173`.
 
+### 🏗️ Build & Prerender (SEO)
+For production, the site uses a custom Static Site Generation (SSG) pipeline to ensure all content (Landing, Help, Design Guides) is fully readable by bots and scrapers:
+```bash
+npm run build
+```
+This command generates the sitemap, RSS feed, builds the SPA, and then prerenders all static routes into HTML files in the `dist/` directory using Vite's SSR API.
+
 > [!TIP]
 > First-time users can load a demo gallery wall from the welcome screen or anytime via the Help menu (**?**). You can also check [example_frame_template.txt](./example_frame_template.txt) to see how to format your own frame collection for **batch importing [PRO]**.
 

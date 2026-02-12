@@ -55,7 +55,7 @@ If you have a specific frame you want to fill manually but need inspiration:
     - **Current Selection (Green ✓)**: Marks the photo currently inside the selected frame.
 
 > **Note on Print Quality:** If you see a **Red or Yellow Triangle** on your canvas frames, that is a resolution warning.
-> *   🔺 **Yellow**: Quality is okay (< 300 PPI) but could be sharper.
+> *   ⚠️ **Yellow**: Quality is okay (< 300 PPI) but could be sharper.
 > *   🔺 **Red**: Quality is low (< 150 PPI) and may look pixelated.
 
 ### 3. **The Right-Click Shortcut**

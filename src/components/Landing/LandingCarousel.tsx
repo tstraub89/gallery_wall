@@ -45,7 +45,7 @@ const LandingCarousel: React.FC<LandingCarouselProps> = ({ currentIndex, onChang
         <div className={styles.carouselContainer}>
             {SLIDES.map((slide, index) => (
                 <div
-                    key={slide.src}
+                    key={index}
                     className={`${styles.slide} ${index === currentIndex ? styles.active : ''}`}
                     onClick={() => onChange(index)}
                 >

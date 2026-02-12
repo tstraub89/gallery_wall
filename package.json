@@ -1,11 +1,12 @@
 {
   "name": "gallery_wall",
   "private": true,
-  "version": "0.6.0",
+  "version": "0.6.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run sitemap && npm run rss && vite build",
+    "build": "npm run sitemap && npm run rss && vite build && npm run prerender",
+    "prerender": "tsx scripts/prerender.ts",
     "sitemap": "tsx scripts/generate-sitemap.ts",
     "rss": "tsx scripts/generate-rss.ts",
     "lint": "eslint .",

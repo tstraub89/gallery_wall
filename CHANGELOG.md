@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.1] - 2026-02-12
+
+### 🌐 The "Lighthouse" Update: Custom SSG
+- **Custom Prerendering Engine**: Implemented a robust Static Site Generation (SSG) pipeline using Vite's SSR API. All content pages (Landing, Help, Design Guides) are now delivered as static HTML, ensuring 100% crawlability for SEO and AI scrapers with zero client-side hydration required for core content.
+- **Static Data Injection**: Developed a `StaticDataContext` to pre-populate markdown content during the build phase. This ensures Design Guides are fully rendered in the static output, even without client-side JavaScript execution.
+- **Performance Optimization**: Removed heavy dependencies from the initial payload by strictly segregating content routes from the main editor application.
+
+### 🐛 Bug Fixes & Refinements
+- **Carousel Stability**: Fixed a React key warning in the landing page carousel by implementing stable, index-based keys for static media slides.
+- **Build Robustness**: Resolved entry point resolution issues in the server-side rendering bundle.
+- **Content Polish**: Updated technical guides to reflect improved resolution warning iconography.
+
 ## [0.6.0] - 2026-02-09
 
 ### ✨ Smart Fill & AI Mastery

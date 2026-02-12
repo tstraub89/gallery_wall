@@ -10,14 +10,27 @@ import WebsiteFooter from '../Layout/WebsiteFooter';
 import BackToTop from '../Common/BackToTop';
 import styles from './ArticleLayout.module.css';
 import { Share2, Clock, Calendar, ArrowLeft } from 'lucide-react';
+import { useStaticData } from '../../context/StaticDataContext.tsx';
 
 const ArticleLayout: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
+    const staticData = useStaticData();
     const [article, setArticle] = useState<ArticleMetadata | null>(() =>
         slug ? getArticleBySlug(slug) || null : null
     );
-    const [content, setContent] = useState<string>('');
-    const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>([]);
+    const [content, setContent] = useState<string>(staticData.content || '');
+    const [headings, setHeadings] = useState<{ id: string; text: string; level: number }[]>(() => {
+        if (staticData.content) {
+            const headingRegex = /^(#{2,3})\s+(.+)$/gm;
+            const matches = [...staticData.content.replace(/^#\s+.+(\r?\n|$)/, '').matchAll(headingRegex)];
+            return matches.map((match) => ({
+                id: slugify(stripMarkdown(match[2])),
+                text: stripMarkdown(match[2]),
+                level: match[1].length,
+            }));
+        }
+        return [];
+    });
     const [activeSection, setActiveSection] = useState<string>('');
 
     useEffect(() => {
