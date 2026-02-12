@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 ## [0.6.2] - 2026-02-12
 
 ### ⚡️ SEO & Performance Precision
-- **Payload Reduction**: Optimized mobile video loading by defaulting to `preload="metadata"` and implementing proactive scroll-to-play with 100px margins. This significantly reduces initial data usage on the landing page for cellular users.
+- **Extreme Payload Optimization**: Rebuilt the video interaction engine to use **Lazy Mounting**. Video tags are no longer rendered on the server and only mount on the client when needed, eliminating hydration mismatches and resolving duplicate download issues.
+- **Source Stability**: Simplified all video sources to a single high-compatibility MP4 format, further reducing browser overhead and redundant network requests.
+- **Payload Reduction**: Defaulted to `preload="metadata"` with a refined 50px scroll margin, balancing instant feedback with maximum data efficiency.
 - **Search Optimization**: Refined landing page meta tags (Title, Description) for optimal SERP lengths and added `BreadcrumbList` structured data for improved site architecture signals.
 - **Canonicalization**: Implemented canonical URL tags to prevent duplicate content indexing.
 

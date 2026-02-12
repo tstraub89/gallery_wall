@@ -20,25 +20,41 @@ const AutoplayVideo: React.FC<AutoplayVideoProps> = React.memo(({ src, sources, 
     const containerRef = useRef<HTMLDivElement>(null);
     const [isPlaying, setIsPlaying] = React.useState(false);
     const [isInView, setIsInView] = React.useState(false);
+    const [hasMounted, setHasMounted] = React.useState(false);
+    const [shouldRenderVideo, setShouldRenderVideo] = React.useState(false);
 
-    // 1. Handle Visibility (Intersection Observer)
+    // 1. Handle Hydration & Initial Mounting
     useEffect(() => {
+        setHasMounted(true);
+    }, []);
+
+    // 2. Handle Visibility (Intersection Observer)
+    useEffect(() => {
+        if (!hasMounted) return;
         const container = containerRef.current;
         if (!container) return;
 
         const observer = new IntersectionObserver(([entry]) => {
             setIsInView(entry.isIntersecting);
+            // If it ever enters view, we should at least mount the tag to get metadata
+            if (entry.isIntersecting) setShouldRenderVideo(true);
         }, {
-            threshold: 0.1, // Slightly more lenient for mobile
-            rootMargin: '100px' // Start loading/playing before it hit the viewport
+            threshold: 0.1,
+            rootMargin: '50px' // Slightly less aggressive than before
         });
 
         observer.observe(container);
         return () => observer.disconnect();
-    }, []);
+    }, [hasMounted]);
 
-    // 2. Handle Playback Logic
+    // 3. Mount video if active (e.g. for carousel slides even if off-screen/clipped)
     useEffect(() => {
+        if (isActive) setShouldRenderVideo(true);
+    }, [isActive]);
+
+    // 4. Handle Playback Logic
+    useEffect(() => {
+        if (!shouldRenderVideo) return;
         const video = videoRef.current;
         if (!video) return;
 
@@ -52,23 +68,16 @@ const AutoplayVideo: React.FC<AutoplayVideoProps> = React.memo(({ src, sources, 
         video.addEventListener('play', handlePlay);
         video.addEventListener('pause', handlePause);
 
-        // Only play if:
-        // 1. Component is "Active" (e.g. current slide)
-        // 2. Component is "In View" (scrolled near viewport)
         const shouldPlay = isActive && isInView;
 
         if (shouldPlay) {
-            // Attempt to play when active
-            // video.currentTime = 0; // Removing reset on view to avoid jarring restarts when scrolling
             const playPromise = video.play();
             if (playPromise !== undefined) {
                 playPromise.catch(() => {
-                    // Suppress autoplay errors
                     setIsPlaying(false);
                 });
             }
         } else {
-            // Pause if not active to save resources
             video.pause();
         }
 
@@ -76,7 +85,7 @@ const AutoplayVideo: React.FC<AutoplayVideoProps> = React.memo(({ src, sources, 
             video.removeEventListener('play', handlePlay);
             video.removeEventListener('pause', handlePause);
         };
-    }, [src, sources, isActive, isInView]);
+    }, [shouldRenderVideo, isActive, isInView]);
 
     const togglePlayback = () => {
         if (!videoRef.current) return;
@@ -90,32 +99,40 @@ const AutoplayVideo: React.FC<AutoplayVideoProps> = React.memo(({ src, sources, 
     return (
         <div
             ref={containerRef}
-            style={{ position: 'relative', width: '100%', height: '100%', ...style }}
+            style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                background: '#f2f2f7', // Consistent placeholder color
+                ...style
+            }}
             className={className}
         >
-            <video
-                ref={videoRef}
-                onClick={togglePlayback}
-                style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
-                loop
-                muted
-                playsInline
-                preload="metadata"
-                poster={poster}
-                onContextMenu={(e) => e.preventDefault()}
-                {...props}
-            >
-                {sources ? (
-                    sources.map((source, index) => (
-                        <source key={index} src={source.src} type={source.type} />
-                    ))
-                ) : (
-                    <source src={src} />
-                )}
-            </video>
+            {hasMounted && shouldRenderVideo && (
+                <video
+                    ref={videoRef}
+                    onClick={togglePlayback}
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
+                    loop
+                    muted
+                    playsInline
+                    preload="metadata"
+                    poster={poster}
+                    onContextMenu={(e) => e.preventDefault()}
+                    {...props}
+                >
+                    {sources ? (
+                        sources.map((source, index) => (
+                            <source key={index} src={source.src} type={source.type} />
+                        ))
+                    ) : (
+                        <source src={src} />
+                    )}
+                </video>
+            )}
 
             {/* Play Overlay */}
-            {!isPlaying && isActive && isInView && (
+            {!isPlaying && (isActive || isInView) && hasMounted && (
                 <div
                     onClick={togglePlayback}
                     style={{
@@ -127,7 +144,7 @@ const AutoplayVideo: React.FC<AutoplayVideoProps> = React.memo(({ src, sources, 
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        background: 'rgba(0,0,0,0.1)',
+                        background: 'rgba(0,0,0,0.05)',
                         cursor: 'pointer',
                         zIndex: 10
                     }}
@@ -136,7 +153,7 @@ const AutoplayVideo: React.FC<AutoplayVideoProps> = React.memo(({ src, sources, 
                         width: '64px',
                         height: '64px',
                         borderRadius: '50%',
-                        background: 'rgba(255, 255, 255, 0.25)',
+                        background: 'rgba(255, 255, 255, 0.3)',
                         backdropFilter: 'blur(8px)',
                         display: 'flex',
                         alignItems: 'center',

@@ -14,17 +14,11 @@ interface Slide {
 const SLIDES: Slide[] = [
     {
         type: 'video',
-        sources: [
-            { src: '/templates.webm', type: 'video/webm' },
-            { src: '/templates.mp4', type: 'video/mp4' }
-        ]
+        src: '/templates.mp4'
     },
     {
         type: 'video',
-        sources: [
-            { src: '/align-frames.webm', type: 'video/webm' },
-            { src: '/align-frames.mp4', type: 'video/mp4' }
-        ]
+        src: '/align-frames.mp4'
     },
     {
         type: 'image',

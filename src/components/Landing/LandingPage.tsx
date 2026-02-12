@@ -11,15 +11,8 @@ import LandingCarousel from './LandingCarousel';
 import AutoplayVideo from '../Common/AutoplayVideo';
 import FeaturedResources from './FeaturedResources';
 
-const SMART_LAYOUT_SOURCES = [
-    { src: "/smart-layout.webm", type: "video/webm" },
-    { src: "/smart-layout.mp4", type: "video/mp4" }
-];
-
-const ADD_PHOTOS_SOURCES = [
-    { src: "/add-photos.webm", type: "video/webm" },
-    { src: "/add-photos.mp4", type: "video/mp4" }
-];
+const SMART_LAYOUT_VIDEO = "/smart-layout.mp4";
+const ADD_PHOTOS_VIDEO = "/add-photos.mp4";
 
 const LandingPage: React.FC = () => {
     const [featuresRef, featuresVisible] = useIntersectionObserver({ threshold: 0.2 });
@@ -182,7 +175,7 @@ const LandingPage: React.FC = () => {
                         </div>
                         <div className={styles.featureImageWrapper}>
                             <AutoplayVideo
-                                sources={SMART_LAYOUT_SOURCES}
+                                src={SMART_LAYOUT_VIDEO}
                                 className={styles.featureImage}
                                 preload="metadata"
                             />
@@ -221,7 +214,7 @@ const LandingPage: React.FC = () => {
                         </div>
                         <div className={styles.featureImageWrapper}>
                             <AutoplayVideo
-                                sources={ADD_PHOTOS_SOURCES}
+                                src={ADD_PHOTOS_VIDEO}
                                 className={styles.featureImage}
                                 preload="metadata"
                             />
