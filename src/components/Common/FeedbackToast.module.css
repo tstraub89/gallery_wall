@@ -1,0 +1,159 @@
+.toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 320px;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    padding: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(100%) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+.closeButton {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.closeButton:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #333;
+}
+
+.stage {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #111;
+    margin: 0;
+    line-height: 1.4;
+    padding-right: 24px;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 12px;
+}
+
+.primaryButton {
+    flex: 1;
+    background: #007AFF;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.primaryButton:hover {
+    background: #0062CC;
+}
+
+.primaryButton:active {
+    transform: scale(0.98);
+}
+
+.secondaryButton {
+    flex: 1;
+    background: #F2F2F7;
+    color: #333;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.secondaryButton:hover {
+    background: #E5E5EA;
+}
+
+.textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: white;
+    font-family: inherit;
+    font-size: 14px;
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.textarea:focus {
+    border-color: #007AFF;
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.thanks {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    color: #111;
+}
+
+.emailLink {
+    color: #007AFF;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+.emailLink:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+    .toast {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+        width: auto;
+    }
+}

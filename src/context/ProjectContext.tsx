@@ -59,6 +59,7 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     const [isProjectLoading, setIsProjectLoading] = useState(false);
     const [showWelcome, setShowWelcome] = useState(false);
     const hasInitialLoaded = useRef(false);
+    const isImportingRef = useRef(false);
 
     // Initial load from IndexedDB
     useEffect(() => {
@@ -110,24 +111,41 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
 
                 setTimeout(async () => {
                     try {
-                        const allData = await loadProjectData();
-                        if (!allData || !allData.projects) return;
+                        // 1. Get projects from IndexedDB
+                        const idbData = await loadProjectData();
+                        const idbProjects = idbData?.projects || {};
+
+                        // 2. Get projects currently in state (might not be in IDB yet if just imported)
+                        // We use the 'data' state here, which might be stale in this closure, 
+                        // but it's better than nothing. Actually, let's use a ref or check isImporting.
+                        if (isImportingRef.current) {
+                            console.log("GC Postponed: Import in progress.");
+                            return;
+                        }
 
                         const activeImageIds = new Set<string>();
 
-                        Object.values(allData.projects).forEach((proj: any) => {
+                        // Helper to collect IDs from a project
+                        const collectIds = (proj: any) => {
                             proj.frames?.forEach((f: Frame) => {
                                 if (f.imageId) activeImageIds.add(f.imageId);
                             });
                             proj.images?.forEach((imgId: string) => activeImageIds.add(imgId));
-                        });
+                        };
+
+                        // Collect from IDB
+                        Object.values(idbProjects).forEach(collectIds);
+
+                        // Collect from current state to be extra safe
+                        // Note: setData is async, so we rely on the fact that if we just imported,
+                        // isImportingRef was true, or it's already in IDB.
 
                         const count = await cleanUpOrphanedImages(Array.from(activeImageIds));
                         if (count > 0) console.log(`GC Cleaned ${count} orphaned images.`);
                     } catch (e) {
                         console.warn("GC Failed", e);
                     }
-                }, 2000);
+                }, 5000); // Wait 5s for demo imports to settle
             }
         };
         init();
@@ -508,74 +526,79 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
     };
 
     const importGwall = async (blob: Blob, isDemo: boolean = false): Promise<string> => {
-        const { project, images, analysis = {} } = await importProjectBundle(blob);
+        isImportingRef.current = true;
+        try {
+            const { project, images, analysis = {} } = await importProjectBundle(blob);
 
-        const idMap = new Map<string, string>();
-        const remappedImages: { id: string; blob: Blob }[] = [];
+            const idMap = new Map<string, string>();
+            const remappedImages: { id: string; blob: Blob }[] = [];
 
-        for (const img of images) {
-            const newId = uuidv4();
-            idMap.set(img.id, newId);
-            remappedImages.push({ id: newId, blob: img.blob });
-        }
-
-        // Restore analysis data with remapped IDs
-        for (const oldId in analysis) {
-            const newId = idMap.get(oldId);
-            if (newId) {
-                await savePhotoAnalysis(newId, { ...analysis[oldId], id: newId });
+            for (const img of images) {
+                const newId = uuidv4();
+                idMap.set(img.id, newId);
+                remappedImages.push({ id: newId, blob: img.blob });
             }
-        }
 
-        const updatedFrames = project.frames.map((f: any) => ({
-            ...f,
-            imageId: f.imageId ? (idMap.get(f.imageId) || null) : null
-        }));
-
-        // CRITICAL: Some older projects might have empty project.images array.
-        // We MUST populate it from frames if it's missing or empty.
-        const frameImages = new Set<string>();
-        updatedFrames.forEach((f: any) => { if (f.imageId) frameImages.add(f.imageId); });
-
-        const updatedImagesArray = project.images ? project.images
-            .filter((id: any) => idMap.has(id))
-            .map((id: any) => idMap.get(id)) : [];
-
-        // Fill missing from frames
-        frameImages.forEach(id => {
-            if (!updatedImagesArray.includes(id)) {
-                updatedImagesArray.push(id);
+            // Restore analysis data with remapped IDs
+            for (const oldId in analysis) {
+                const newId = idMap.get(oldId);
+                if (newId) {
+                    await savePhotoAnalysis(newId, { ...analysis[oldId], id: newId });
+                }
             }
-        });
 
-        const newImagesMetadata = { ...data.imagesMetadata };
-        for (const img of remappedImages) {
-            const meta = await saveImage(img.id, img.blob, { skipOptimization: true });
-            newImagesMetadata[img.id] = meta;
+            const updatedFrames = project.frames.map((f: any) => ({
+                ...f,
+                imageId: f.imageId ? (idMap.get(f.imageId) || null) : null
+            }));
+
+            // CRITICAL: Some older projects might have empty project.images array.
+            // We MUST populate it from frames if it's missing or empty.
+            const frameImages = new Set<string>();
+            updatedFrames.forEach((f: any) => { if (f.imageId) frameImages.add(f.imageId); });
+
+            const updatedImagesArray = project.images ? project.images
+                .filter((id: any) => idMap.has(id))
+                .map((id: any) => idMap.get(id)) : [];
+
+            // Fill missing from frames
+            frameImages.forEach(id => {
+                if (!updatedImagesArray.includes(id)) {
+                    updatedImagesArray.push(id);
+                }
+            });
+
+            const newImagesMetadata = { ...data.imagesMetadata };
+            for (const img of remappedImages) {
+                const meta = await saveImage(img.id, img.blob, { skipOptimization: true });
+                newImagesMetadata[img.id] = meta;
+            }
+
+            const newProject = createNewProject(project.name || 'Imported Gallery');
+            const projectWithData: Project = {
+                ...newProject,
+                frames: updatedFrames,
+                wallConfig: project.wallConfig || newProject.wallConfig,
+                library: project.library || [],
+                images: updatedImagesArray,
+                activeTemplateId: project.activeTemplateId || null,
+                isDemo: isDemo,
+                updatedAt: Date.now()
+            };
+
+            const newData = {
+                ...data,
+                projects: { ...data.projects, [newProject.id]: projectWithData },
+                currentProjectId: newProject.id,
+                imagesMetadata: newImagesMetadata
+            };
+
+            setData(newData);
+            await saveProjectData(newData);
+            return newProject.id;
+        } finally {
+            isImportingRef.current = false;
         }
-
-        const newProject = createNewProject(project.name || 'Imported Gallery');
-        const projectWithData: Project = {
-            ...newProject,
-            frames: updatedFrames,
-            wallConfig: project.wallConfig || newProject.wallConfig,
-            library: project.library || [],
-            images: updatedImagesArray,
-            activeTemplateId: project.activeTemplateId || null,
-            isDemo: isDemo,
-            updatedAt: Date.now()
-        };
-
-        const newData = {
-            ...data,
-            projects: { ...data.projects, [newProject.id]: projectWithData },
-            currentProjectId: newProject.id,
-            imagesMetadata: newImagesMetadata
-        };
-
-        setData(newData);
-        await saveProjectData(newData);
-        return newProject.id;
     };
 
     const importDemoProject = async () => {

@@ -36,3 +36,10 @@ export const LANDING_EVENTS = {
     VIEW_FEATURES: 'landing_view_features',
     VIEW_PRO: 'landing_view_pro_section',
 };
+
+export const FEEDBACK_EVENTS = {
+    FEEDBACK_SHOWN: 'feedback_shown',
+    FEEDBACK_CHOICE: 'feedback_choice',
+    FEEDBACK_SUBMITTED: 'feedback_submitted',
+    FEEDBACK_DISMISSED: 'feedback_dismissed',
+};

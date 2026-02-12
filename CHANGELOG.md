@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.3] - 2026-02-12
+
+### 🐛 Bug Fixes
+- **Demo Reliability**: Fixed a race condition between the automatic garbage collection and the example project import. Photos in the "Playground" project now load reliably without being prematurely deleted as "orphaned" during the initial application setup.
+
 ## [0.6.2] - 2026-02-12
 
 ### ⚡️ SEO & Performance Precision
