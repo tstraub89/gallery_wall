@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.2] - 2026-02-12
+
+### ⚡️ SEO & Performance Precision
+- **Payload Reduction**: Optimized mobile video loading by defaulting to `preload="metadata"` and implementing proactive scroll-to-play with 100px margins. This significantly reduces initial data usage on the landing page for cellular users.
+- **Search Optimization**: Refined landing page meta tags (Title, Description) for optimal SERP lengths and added `BreadcrumbList` structured data for improved site architecture signals.
+- **Canonicalization**: Implemented canonical URL tags to prevent duplicate content indexing.
+
+### 🛡 Security & Interaction
+- **External Links**: Added `rel="noopener noreferrer"` to all outbound footer links to improve security and performance.
+- **H1 Hierarchy**: Unified the page heading structure for better crawlability.
+
 ## [0.6.1] - 2026-02-12
 
 ### 🌐 The "Lighthouse" Update: Custom SSG

@@ -50,19 +50,19 @@ const WebsiteFooter: React.FC = () => {
 
                     <div className={styles.footerColumn}>
                         <strong className={styles.footerColumnTitle}>Connect</strong>
-                        <a href="https://github.com/tstraub89/gallery_wall" target="_blank" rel="noreferrer" className={styles.footerLink}>
+                        <a href="https://github.com/tstraub89/gallery_wall" target="_blank" rel="noopener noreferrer" className={styles.footerLink}>
                             <Github size={16} /> GitHub
                         </a>
-                        <a href="https://www.instagram.com/gallery.planner/" target="_blank" rel="noreferrer" className={styles.footerLink}>
+                        <a href="https://www.instagram.com/gallery.planner/" target="_blank" rel="noopener noreferrer" className={styles.footerLink}>
                             <Instagram size={16} /> Instagram
                         </a>
-                        <a href="https://bsky.app/profile/gallery-planner.com" target="_blank" rel="noreferrer" className={styles.footerLink}>
+                        <a href="https://bsky.app/profile/gallery-planner.com" target="_blank" rel="noopener noreferrer" className={styles.footerLink}>
                             <span style={{ fontSize: '14px', lineHeight: 1 }}>🦋</span> Bluesky
                         </a>
-                        <a href="https://www.pinterest.com/galleryplanner/" target="_blank" rel="noreferrer" className={styles.footerLink}>
+                        <a href="https://www.pinterest.com/galleryplanner/" target="_blank" rel="noopener noreferrer" className={styles.footerLink}>
                             <Pin size={16} /> Pinterest
                         </a>
-                        <a href="/rss.xml" target="_blank" rel="noreferrer" className={styles.footerLink}>
+                        <a href="/rss.xml" target="_blank" rel="noopener noreferrer" className={styles.footerLink}>
                             <Rss size={16} /> RSS Feed
                         </a>
                     </div>

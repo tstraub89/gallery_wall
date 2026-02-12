@@ -184,6 +184,7 @@ const LandingPage: React.FC = () => {
                             <AutoplayVideo
                                 sources={SMART_LAYOUT_SOURCES}
                                 className={styles.featureImage}
+                                preload="metadata"
                             />
                         </div>
                     </div>
@@ -222,6 +223,7 @@ const LandingPage: React.FC = () => {
                             <AutoplayVideo
                                 sources={ADD_PHOTOS_SOURCES}
                                 className={styles.featureImage}
+                                preload="metadata"
                             />
                         </div>
                     </div>

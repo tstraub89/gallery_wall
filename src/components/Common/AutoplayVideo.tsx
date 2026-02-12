@@ -6,6 +6,7 @@ interface AutoplayVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement>
     sources?: { src: string; type: string }[];
     className?: string;
     isActive?: boolean; // Control playback externally (e.g., carousel slide active)
+    poster?: string;
 }
 
 
@@ -14,7 +15,7 @@ interface AutoplayVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement>
 
 // ... imports
 
-const AutoplayVideo: React.FC<AutoplayVideoProps> = React.memo(({ src, sources, className, style, isActive = true, ...props }) => {
+const AutoplayVideo: React.FC<AutoplayVideoProps> = React.memo(({ src, sources, className, style, isActive = true, poster, ...props }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isPlaying, setIsPlaying] = React.useState(false);
@@ -28,7 +29,8 @@ const AutoplayVideo: React.FC<AutoplayVideoProps> = React.memo(({ src, sources, 
         const observer = new IntersectionObserver(([entry]) => {
             setIsInView(entry.isIntersecting);
         }, {
-            threshold: 0.2 // 20% visible to start playing
+            threshold: 0.1, // Slightly more lenient for mobile
+            rootMargin: '100px' // Start loading/playing before it hit the viewport
         });
 
         observer.observe(container);
@@ -98,7 +100,8 @@ const AutoplayVideo: React.FC<AutoplayVideoProps> = React.memo(({ src, sources, 
                 loop
                 muted
                 playsInline
-                preload="auto"
+                preload="metadata"
+                poster={poster}
                 onContextMenu={(e) => e.preventDefault()}
                 {...props}
             >

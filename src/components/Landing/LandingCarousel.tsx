@@ -55,6 +55,7 @@ const LandingCarousel: React.FC<LandingCarouselProps> = ({ currentIndex, onChang
                             sources={slide.sources}
                             className={styles.media}
                             isActive={index === currentIndex}
+                            preload="metadata"
                         />
                     ) : (
                         <img
