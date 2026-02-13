@@ -210,7 +210,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                     {/* Left Group: Logo + Project Title */}
                     <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0, gap: '4px' }}>
                         <div style={{ flexShrink: 0 }}>
-                            <Logo />
+                            <Logo stacked />
                         </div>
 
                         {/* Project Title / Switcher */}
@@ -218,6 +218,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                             className={styles.projectTitle}
                             onClick={() => setShowSwitcher(true)}
                         >
+                            <FolderOpen size={18} className={styles.titleIcon} />
                             <span className={styles.titleText}>{currentProject?.name || 'Untitled'}</span>
                             <ChevronDown size={14} className={styles.titleArrow} />
                         </div>

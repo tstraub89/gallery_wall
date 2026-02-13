@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.4] - 2026-02-13
+
+### ✨ Mobile Experience & Project Flow
+- **Project Naming Dialog**: Implemented a dedicated naming dialog for new projects on mobile and the welcome screen. Users can now name their gallery upfront or cancel the action to avoid clutter.
+- **Flexible Header**: Redesigned the mobile header to be fully flexible. The project switcher now expands to show more of the project name on larger devices, with the dropdown arrow pinned to the far right for a balanced look.
+- **Stacked Logo**: Refined the brand identity with a vertical-stacked logo layout and a larger 40px icon for better visibility and a more premium feel on mobile.
+- **Seamless Transitions**: The Project Switcher now automatically dismisses itself when the last project is deleted, ensuring a direct and clean path through the onboarding flow.
+
+### 🌐 Discoverability
+- **Header Parity**: Relocated the "Try Example Gallery" trigger to the Project dropdown (Desktop) and Switcher sheet (Mobile) for better discoverability.
+- **Visual Parity**: Added the `FolderOpen` icon to the mobile project switcher to match the desktop interface.
+
 ## [0.6.3] - 2026-02-12
 
 ### 🐛 Bug Fixes

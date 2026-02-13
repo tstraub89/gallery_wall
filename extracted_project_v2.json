@@ -1,0 +1,305 @@
+{
+  "id": "289fb9fd-6296-49f9-b40c-2526f8d9d0be",
+  "name": "example",
+  "createdAt": 1770567092835,
+  "updatedAt": 1770567092835,
+  "wallConfig": {
+    "type": "flat",
+    "width": 55,
+    "height": 35,
+    "backgroundColor": "#feffff",
+    "backgroundImage": null
+  },
+  "frames": [
+    {
+      "id": "084be832-eac9-4aa8-9ca7-0e89095fb4bf",
+      "templateId": "dfe6412c-57e8-467b-9afa-5c51ab957b4e",
+      "width": 12,
+      "height": 8,
+      "matted": null,
+      "x": 280,
+      "y": 190,
+      "rotation": 0,
+      "zIndex": 2,
+      "imageId": "b8a76f26-d677-4a64-b4d5-d2e7c0c5fe17",
+      "imageState": null,
+      "borderWidth": 1,
+      "shape": "rect",
+      "label": "",
+      "frameColor": "#5d4037"
+    },
+    {
+      "id": "bdcd5e1c-e751-4dd1-9188-86ef148aee4d",
+      "templateId": "683515ba-cd89-43c3-92be-a1c918efdff4",
+      "width": 10,
+      "height": 8,
+      "matted": null,
+      "x": 400,
+      "y": 70,
+      "rotation": 0,
+      "zIndex": 4,
+      "imageId": "e30a7846-8d47-4614-9e19-2913006dfa2f",
+      "borderWidth": 0.5,
+      "imageState": null
+    },
+    {
+      "id": "683bd7ac-e9dc-4be2-9818-b06fa9509d4d",
+      "templateId": "e5df6b1b-3ee1-4a3c-8881-7f0ab56222e2",
+      "width": 9,
+      "height": 7,
+      "matted": null,
+      "x": 430,
+      "y": 195,
+      "rotation": 0,
+      "zIndex": 6,
+      "imageId": "2eef6ab1-7ae5-4272-9b32-792e7bfd615c",
+      "borderWidth": 0.2,
+      "imageState": {
+        "scale": 1,
+        "x": 0,
+        "y": 0,
+        "rotation": 0
+      }
+    },
+    {
+      "id": "c7d9e316-078d-42ea-b3bc-ead10c01e6d8",
+      "templateId": "9ce7223d-0f28-4c8f-8ce4-7e7df5dbd469",
+      "width": 8,
+      "height": 5.5,
+      "matted": null,
+      "x": 170,
+      "y": 202.5,
+      "rotation": 0,
+      "zIndex": 7,
+      "imageId": "fa7a4891-bc7e-4c57-8028-a2a4da6dee9b",
+      "imageState": null,
+      "borderWidth": 0.5,
+      "shape": "rect",
+      "label": ""
+    },
+    {
+      "id": "1cc95ca9-aec1-4b2b-bdd4-6264f814d7d3",
+      "templateId": "420c61e3-2fca-4139-8d4c-6295546ccafa",
+      "width": 10,
+      "height": 8,
+      "matted": null,
+      "x": 150,
+      "y": 70,
+      "rotation": 0,
+      "zIndex": 8,
+      "imageId": "aa5b2317-f419-45ff-b5da-238c9564af68",
+      "borderWidth": 0.5,
+      "imageState": null
+    },
+    {
+      "id": "b9e8cd00-1d47-4b2d-9218-691a9a1216d2",
+      "templateId": "d2839729-7ba9-46a7-b9c2-aa52c835d1ee",
+      "width": 8,
+      "height": 5.5,
+      "matted": null,
+      "x": 280,
+      "y": 82.5,
+      "rotation": 0,
+      "zIndex": 10,
+      "imageId": "c2a3781b-9e68-478f-b453-9660a8aae8e7",
+      "borderWidth": 0.5,
+      "frameColor": "#9e9e9e",
+      "imageState": null
+    },
+    {
+      "id": "4b6ae1a1-ccb4-4771-8231-52d2d3682666",
+      "templateId": "e1d4b82e-d30f-46e5-9d5e-d4406cf3c0d3",
+      "width": 10,
+      "height": 8,
+      "matted": null,
+      "x": 40,
+      "y": 190,
+      "rotation": 0,
+      "zIndex": 14,
+      "imageId": "32522927-03b8-4602-a6d9-8bdc8f8c8824",
+      "borderWidth": 0.5,
+      "shape": "rect",
+      "imageState": null
+    },
+    {
+      "id": "cb090d9a-c1cc-4fc1-81a1-4d7222e22fec",
+      "templateId": "bf1a44c0-0368-48c3-9f6c-c7f425019c21",
+      "width": 8,
+      "height": 10,
+      "label": "",
+      "shape": "rect",
+      "frameColor": "#d4af37",
+      "matted": null,
+      "x": 40,
+      "y": 60,
+      "rotation": 0,
+      "zIndex": 9,
+      "imageId": "f8986587-309a-45e3-89f2-68c6dbcb36ec",
+      "imageState": null,
+      "borderWidth": 0.5
+    }
+  ],
+  "library": [
+    {
+      "id": "75d23f1e-304b-4d0a-b948-5bbc11780119",
+      "width": 7,
+      "height": 5,
+      "displayString": "5 x 7",
+      "matted": null,
+      "count": 1,
+      "frameColor": "#ffffff"
+    },
+    {
+      "id": "dfe6412c-57e8-467b-9afa-5c51ab957b4e",
+      "width": 12,
+      "height": 8,
+      "displayString": "12 x 9",
+      "matted": null,
+      "count": 1,
+      "borderWidth": 1,
+      "label": "",
+      "frameColor": "#5d4037"
+    },
+    {
+      "id": "ab92e110-20c8-4c25-8e10-6ec3aa4448e1",
+      "width": 16,
+      "height": 12,
+      "displayString": "12 x 16",
+      "matted": null,
+      "count": 1,
+      "label": ""
+    },
+    {
+      "id": "683515ba-cd89-43c3-92be-a1c918efdff4",
+      "width": 10,
+      "height": 8,
+      "displayString": "8 x 10",
+      "matted": null,
+      "count": 1
+    },
+    {
+      "id": "10c1365f-a0c9-42cd-98d4-a5ed34ad18fb",
+      "width": 14,
+      "height": 9,
+      "displayString": "9 x 14",
+      "matted": null,
+      "count": 1
+    },
+    {
+      "id": "e5df6b1b-3ee1-4a3c-8881-7f0ab56222e2",
+      "width": 9,
+      "height": 7,
+      "displayString": "9 1/2 x 7",
+      "matted": null,
+      "count": 1,
+      "borderWidth": 0.2
+    },
+    {
+      "id": "9ce7223d-0f28-4c8f-8ce4-7e7df5dbd469",
+      "width": 8,
+      "height": 5.5,
+      "displayString": "5 1/2 x 8",
+      "matted": null,
+      "count": 1,
+      "label": ""
+    },
+    {
+      "id": "420c61e3-2fca-4139-8d4c-6295546ccafa",
+      "width": 10,
+      "height": 8,
+      "displayString": "8 x 10",
+      "matted": null,
+      "count": 1
+    },
+    {
+      "id": "bf1a44c0-0368-48c3-9f6c-c7f425019c21",
+      "width": 8,
+      "height": 10,
+      "displayString": "16 1/4 x 20 matted to 12 1/4 x 16 and 1/4",
+      "matted": null,
+      "count": 1,
+      "label": "",
+      "frameColor": "#d4af37",
+      "borderWidth": 0.5
+    },
+    {
+      "id": "d2839729-7ba9-46a7-b9c2-aa52c835d1ee",
+      "width": 8,
+      "height": 5.5,
+      "displayString": "5 1/2 x 8",
+      "matted": null,
+      "count": 1,
+      "frameColor": "#9e9e9e"
+    },
+    {
+      "id": "13eb072e-e013-4c8b-8493-4ac01da4bf69",
+      "width": 10,
+      "height": 13,
+      "displayString": "13 x 10",
+      "matted": null,
+      "count": 1
+    },
+    {
+      "id": "1db809b5-bfdf-4814-8baf-e0c5a0e136a0",
+      "width": 8,
+      "height": 6,
+      "displayString": "6 x 8",
+      "matted": null,
+      "count": 1
+    },
+    {
+      "id": "ad7606ab-751c-4425-a2dd-7a107913533e",
+      "width": 14,
+      "height": 11,
+      "displayString": "11 x 14",
+      "matted": null,
+      "count": 1
+    },
+    {
+      "id": "e1d4b82e-d30f-46e5-9d5e-d4406cf3c0d3",
+      "width": 10,
+      "height": 8,
+      "displayString": "8 x 10",
+      "matted": null,
+      "count": 1
+    },
+    {
+      "id": "8fab808b-8dd0-431b-8e6c-1fb7aa16e6ae",
+      "width": 4,
+      "height": 6,
+      "displayString": "6 x 4",
+      "matted": null,
+      "count": 1
+    },
+    {
+      "id": "f69934f7-b2c3-4a35-9186-9c88d96b7505",
+      "width": 11.5,
+      "height": 14,
+      "displayString": "14 x 11 1/2",
+      "matted": null,
+      "count": 1
+    },
+    {
+      "id": "8c088fa3-3f18-4bf0-8840-5f528811838b",
+      "width": 12.25,
+      "height": 16.25,
+      "displayString": "16 1/4 x 12 1/4 matted to 10 x 8",
+      "matted": {
+        "width": 8,
+        "height": 10
+      },
+      "count": 1
+    }
+  ],
+  "images": [
+    "b8a76f26-d677-4a64-b4d5-d2e7c0c5fe17",
+    "aa5b2317-f419-45ff-b5da-238c9564af68",
+    "2eef6ab1-7ae5-4272-9b32-792e7bfd615c",
+    "c2a3781b-9e68-478f-b453-9660a8aae8e7",
+    "fa7a4891-bc7e-4c57-8028-a2a4da6dee9b",
+    "f8986587-309a-45e3-89f2-68c6dbcb36ec",
+    "e30a7846-8d47-4614-9e19-2913006dfa2f",
+    "32522927-03b8-4602-a6d9-8bdc8f8c8824"
+  ],
+  "activeTemplateId": null
+}

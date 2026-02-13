@@ -63,27 +63,42 @@
 .projectTitle {
     display: flex;
     align-items: center;
-    gap: 4px;
-    background-color: #f5f5f5;
-    padding: 6px 10px;
-    border-radius: 16px;
+    gap: 8px;
+    /* Increased from 6px */
+    background-color: #f2f2f7;
+    padding: 8px 16px;
+    border-radius: 20px;
     cursor: pointer;
-    max-width: 140px;
-    /* Limit width */
-    margin-left: 8px;
+    flex: 1;
+    /* Allow it to flex and fill space */
+    min-width: 0;
+    /* Important for flex-basis: 0 and ellipsis */
+    max-width: none;
+    /* Removed fixed max-width */
+    margin-left: 12px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .titleText {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #333;
+    flex: 1;
+    /* Take up available space to push arrow to the right */
+    font-size: 1.1rem;
+    /* Increased from 1rem */
+    font-weight: 700;
+    /* Increased from 600 */
+    color: #1a1a1a;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+.titleIcon {
+    color: var(--accent-color);
+    flex-shrink: 0;
+}
+
 .titleArrow {
-    color: #666;
+    color: #8e8e93;
     flex-shrink: 0;
 }
 

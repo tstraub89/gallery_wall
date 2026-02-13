@@ -10,14 +10,16 @@
 }
 
 .icon {
-    width: 32px;
-    height: 32px;
+    width: 40px;
+    /* Increased from 32px */
+    height: 40px;
+    /* Increased from 32px */
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--accent-color);
     background: var(--accent-soft);
-    border-radius: 8px;
+    border-radius: 10px;
     flex-shrink: 0;
 }
 
@@ -33,9 +35,21 @@
     letter-spacing: -0.02em;
 }
 
+.text.stacked {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 14px;
+    line-height: 1.1;
+    gap: 0;
+}
+
 .bold {
     font-weight: 800;
     color: var(--text-primary);
+}
+
+.stacked .bold {
+    font-size: 16px;
 }
 
 .light {
@@ -44,7 +58,14 @@
     margin-left: 2px;
 }
 
-.beta, .pro, .free {
+.stacked .light {
+    margin-left: 0;
+    font-size: 12px;
+}
+
+.beta,
+.pro,
+.free {
     font-size: 10px;
     font-weight: 800;
     padding: 2px 6px;
@@ -72,7 +93,9 @@
     border: 1px solid var(--accent-soft);
 }
 
-.beta:hover, .pro:hover, .free:hover {
+.beta:hover,
+.pro:hover,
+.free:hover {
     transform: translateY(-1px);
     filter: brightness(1.1);
 }

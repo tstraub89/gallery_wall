@@ -620,9 +620,9 @@ export const ProjectProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    const startFresh = () => {
+    const startFresh = (name?: string) => {
         trackEvent(APP_EVENTS.SAVE_PROJECT);
-        const fresh = createNewProject('Untitled Project');
+        const fresh = createNewProject(name || 'Untitled Project');
         const freshData = {
             ...initialData,
             projects: { [fresh.id]: fresh },

@@ -1,8 +1,9 @@
 import React from 'react';
 import styles from './ProjectSwitcher.module.css';
 import { useProject } from '../../hooks/useProject';
-import { Plus, Trash2, Check, X } from 'lucide-react';
+import { Plus, Trash2, Check, X, Sparkles } from 'lucide-react';
 import ConfirmDialog from '../Common/ConfirmDialog';
+import ProjectNameDialog from '../Common/ProjectNameDialog';
 import ProBadge from '../Common/ProBadge';
 
 interface ProjectSwitcherProps {
@@ -10,8 +11,10 @@ interface ProjectSwitcherProps {
 }
 
 const ProjectSwitcher: React.FC<ProjectSwitcherProps> = ({ onClose }) => {
-    const { projects, currentProjectId, switchProject, addProject, deleteProject } = useProject();
+    const { projects, currentProjectId, switchProject, addProject, deleteProject, importDemoProject } = useProject();
     const [projectToDelete, setProjectToDelete] = React.useState<string | null>(null);
+    const [isLoadingDemo, setIsLoadingDemo] = React.useState(false);
+    const [showNameDialog, setShowNameDialog] = React.useState(false);
 
     const sortedProjects = Object.values(projects).sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
 
@@ -23,8 +26,13 @@ const ProjectSwitcher: React.FC<ProjectSwitcherProps> = ({ onClose }) => {
     };
 
     const handleNew = () => {
-        const id = addProject("New Project");
+        setShowNameDialog(true);
+    };
+
+    const handleConfirmName = (name: string) => {
+        const id = addProject(name);
         switchProject(id);
+        setShowNameDialog(false);
         onClose();
     };
 
@@ -35,8 +43,12 @@ const ProjectSwitcher: React.FC<ProjectSwitcherProps> = ({ onClose }) => {
 
     const confirmDelete = () => {
         if (projectToDelete) {
+            const isLast = Object.keys(projects).length === 1;
             deleteProject(projectToDelete);
             setProjectToDelete(null);
+            if (isLast) {
+                onClose();
+            }
         }
     };
 
@@ -82,6 +94,23 @@ const ProjectSwitcher: React.FC<ProjectSwitcherProps> = ({ onClose }) => {
                         </div>
                         <ProBadge />
                     </button>
+
+                    <button
+                        className={styles.demoBtn}
+                        onClick={async () => {
+                            setIsLoadingDemo(true);
+                            try {
+                                await importDemoProject();
+                                onClose();
+                            } finally {
+                                setIsLoadingDemo(false);
+                            }
+                        }}
+                        disabled={isLoadingDemo}
+                    >
+                        <Sparkles size={18} />
+                        <span>{isLoadingDemo ? 'Loading Example...' : 'Try Example Gallery'}</span>
+                    </button>
                 </div>
             </div>
 
@@ -93,6 +122,13 @@ const ProjectSwitcher: React.FC<ProjectSwitcherProps> = ({ onClose }) => {
                     isDanger
                     onConfirm={confirmDelete}
                     onCancel={() => setProjectToDelete(null)}
+                />
+            )}
+
+            {showNameDialog && (
+                <ProjectNameDialog
+                    onConfirm={handleConfirmName}
+                    onCancel={() => setShowNameDialog(false)}
                 />
             )}
         </div>

@@ -48,7 +48,7 @@ export interface ProjectDataContextType {
     // Onboarding
     importDemoProject: () => Promise<void>;
     importGwall: (blob: Blob) => Promise<string>;
-    startFresh: () => void;
+    startFresh: (name?: string) => void;
 }
 
 // Combined type for legacy compatibility in useProject

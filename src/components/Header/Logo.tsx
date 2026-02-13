@@ -7,9 +7,10 @@ import styles from './Logo.module.css';
 interface LogoProps {
     hideStatus?: boolean;
     scale?: number;
+    stacked?: boolean;
 }
 
-const Logo: React.FC<LogoProps> = ({ hideStatus = false, scale = 1 }) => {
+const Logo: React.FC<LogoProps> = ({ hideStatus = false, scale = 1, stacked = false }) => {
     const isMobile = useIsMobile();
     const navigate = useNavigate();
     const location = useLocation();
@@ -47,7 +48,7 @@ const Logo: React.FC<LogoProps> = ({ hideStatus = false, scale = 1 }) => {
                     <polyline points="21 15 16 10 5 21" />
                 </svg>
             </div>
-            <div className={styles.text} onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
+            <div className={`${styles.text} ${stacked ? styles.stacked : ''}`} onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
                 <span className={styles.bold}>Gallery</span>
                 <span className={styles.light}>Planner</span>
             </div>

@@ -112,6 +112,9 @@
     background-color: #fafafa;
     /* safe area for iPhone home bar */
     padding-bottom: max(16px, env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
 .newBtn {
@@ -127,6 +130,36 @@
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
+}
+
+.demoBtn {
+    width: 100%;
+    padding: 12px;
+    background-color: white;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.demoBtn:active {
+    background-color: #f0f0f0;
+}
+
+.demoBtn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.demoBtn svg {
+    color: #f59e0b;
 }
 
 .proBadge {

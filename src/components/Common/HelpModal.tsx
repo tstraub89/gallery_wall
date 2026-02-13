@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import styles from './HelpModal.module.css';
-import { useProject } from '../../hooks/useProject';
 import { useIsMobile } from '../../hooks/useIsMobile';
-import { Sparkles, ExternalLink } from 'lucide-react';
+import { ExternalLink, Palette, Info, BookOpen } from 'lucide-react';
 
 interface HelpModalProps {
     onClose: () => void;
 }
 
 const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
-    const { importDemoProject } = useProject();
-    const [isLoadingDemo, setIsLoadingDemo] = useState(false);
     const isMobile = useIsMobile();
 
     useEffect(() => {
@@ -23,18 +20,6 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
         return () => window.removeEventListener('keydown', handleEsc);
     }, [onClose]);
 
-    const handleLoadDemo = async () => {
-        setIsLoadingDemo(true);
-        try {
-            await importDemoProject();
-            onClose();
-        } catch (err) {
-            console.error('Failed to load demo:', err);
-            alert('Failed to load demo project. Please try again.');
-        } finally {
-            setIsLoadingDemo(false);
-        }
-    };
 
     const modalContent = (
         <div className={styles.overlay} onClick={onClose}>
@@ -45,16 +30,6 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                         {!isMobile ? (
                             /* DESKTOP HEADER ACTIONS */
                             <>
-                                <button
-                                    className={styles.secondaryBtn}
-                                    onClick={handleLoadDemo}
-                                    disabled={isLoadingDemo}
-                                    style={{ padding: '6px 12px', fontSize: '13px' }}
-                                >
-                                    <Sparkles size={14} />
-                                    {isLoadingDemo ? 'Loading...' : 'Load Demo Wall'}
-                                </button>
-                                <div style={{ width: '1px', height: '20px', background: 'var(--border-color)' }}></div>
                                 <Link
                                     to="/help"
                                     target="_blank"
@@ -87,23 +62,27 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                                     target="_blank"
                                     className={styles.textLinkBtn}
                                     style={{ fontSize: '12px', padding: '4px 8px' }}
+                                    title="Manual"
                                 >
-                                    <span>Manual</span>
-                                    <ExternalLink size={12} />
+                                    <BookOpen size={14} />
                                 </Link>
-                                <a
-                                    href="https://github.com/tstraub89/gallery_wall"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={styles.githubLink}
-                                    title="GitHub"
-                                    style={{ display: 'flex', alignItems: 'center', color: 'var(--text-secondary)' }}
+                                <div style={{ width: '1px', height: '20px', background: 'var(--border-color)' }}></div>
+                                <button
+                                    onClick={() => window.open('/learn/complete-guide-to-gallery-walls', '_blank')}
+                                    className={styles.textLinkBtn}
+                                    style={{ fontSize: '12px', padding: '4px 8px' }}
+                                    title="Design Principles"
                                 >
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
-                                        <path d="M9 18c-4.51 2-5-2-7-2" />
-                                    </svg>
-                                </a>
+                                    <Palette size={14} />
+                                </button>
+                                <button
+                                    onClick={() => window.open('/about', '_blank')}
+                                    className={styles.textLinkBtn}
+                                    style={{ fontSize: '12px', padding: '4px 8px' }}
+                                    title="About"
+                                >
+                                    <Info size={14} />
+                                </button>
                             </>
                         )}
                         <button className={styles.closeBtn} onClick={onClose}>&times;</button>
@@ -222,22 +201,7 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                 </div>
 
                 <footer className={styles.footer}>
-                    {isMobile && (
-                        <div className={styles.footerActions} style={{ justifyContent: 'center' }}>
-                            <button
-                                className={styles.secondaryBtn}
-                                onClick={handleLoadDemo}
-                                disabled={isLoadingDemo}
-                                style={{ minWidth: '200px', justifyContent: 'center' }}
-                            >
-                                <Sparkles size={16} />
-                                {isLoadingDemo ? 'Loading...' : 'Load Demo Wall'}
-                            </button>
-                        </div>
-                    )}
-
                     <div style={{
-                        marginTop: isMobile ? '12px' : '0',
                         paddingTop: isMobile ? '12px' : '0',
                         borderTop: isMobile ? '1px solid rgba(0,0,0,0.05)' : 'none',
                         fontSize: '11px',

@@ -4,19 +4,22 @@ import { useOnClickOutside } from '../../hooks/useOnClickOutside';
 import styles from './ProjectMenu.module.css';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import ProBadge from '../Common/ProBadge';
+import { Sparkles } from 'lucide-react';
 const ProjectMenu = () => {
     const {
         projects,
         currentProjectId,
         switchProject,
         addProject,
-        deleteProject
+        deleteProject,
+        importDemoProject
     } = useProject();
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const [newName, setNewName] = useState('');
     const [projectToDelete, setProjectToDelete] = useState<{ id: string; name: string } | null>(null);
+    const [isLoadingDemo, setIsLoadingDemo] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -94,14 +97,33 @@ const ProjectMenu = () => {
                                 <button type="submit">Create</button>
                             </form>
                         ) : (
-                            <button
-                                className={styles.createBtn}
-                                onClick={() => setIsCreating(true)}
-                                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                            >
-                                <span>+ New Project</span>
-                                <ProBadge />
-                            </button>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                <button
+                                    className={styles.createBtn}
+                                    onClick={() => setIsCreating(true)}
+                                    style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                                >
+                                    <span>+ New Project</span>
+                                    <ProBadge />
+                                </button>
+
+                                <button
+                                    className={styles.demoBtn}
+                                    onClick={async () => {
+                                        setIsLoadingDemo(true);
+                                        try {
+                                            await importDemoProject();
+                                            setIsExpanded(false);
+                                        } finally {
+                                            setIsLoadingDemo(false);
+                                        }
+                                    }}
+                                    disabled={isLoadingDemo}
+                                >
+                                    <Sparkles size={14} />
+                                    <span>{isLoadingDemo ? 'Loading...' : 'Try Example Gallery'}</span>
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>
