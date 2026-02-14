@@ -39,11 +39,7 @@ export function useSmartFill() {
     }, []);
 
     const analyzeLibrary = useCallback(async (imageIds: string[], options: { detectFaces?: boolean } = {}) => {
-        console.log("analyzeLibrary called with:", imageIds.length, "images", options);
-        if (!workerRef.current) {
-            console.error("Worker not initialized!");
-            return;
-        }
+        if (!workerRef.current) return;
 
         // Check which items actually need analysis
         const pendingIds: string[] = [];
@@ -54,10 +50,9 @@ export function useSmartFill() {
             }
         }
 
-        console.log("Pending analysis items:", pendingIds.length);
+
 
         if (pendingIds.length === 0) {
-            console.log("No pending items, returning early.");
             return;
         }
 

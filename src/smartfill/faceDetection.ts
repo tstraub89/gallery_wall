@@ -10,22 +10,18 @@ export async function loadFaceDetectionModel(): Promise<void> {
     if (model) return;
 
     try {
-        console.log("[SmartFill] Loading face detection model...");
         // Dynamic imports to avoid initial bundle bloat
         tf = await import('@tensorflow/tfjs');
         blazeface = await import('@tensorflow-models/blazeface');
-
-        console.log("[SmartFill] TFJS imported, initializing backend...");
 
         // Initialize backend (try WebGL, fall back to CPU)
         await tf.setBackend('webgl');
         await tf.ready();
 
-        console.log("[SmartFill] Backend ready, loading blazeface...");
         model = await blazeface.load();
-        console.log('[SmartFill] Face detection model loaded successfully');
+        console.log('Face detection model loaded');
     } catch (e) {
-        console.error('[SmartFill] Failed to load face detection model', e);
+        console.error('Failed to load face detection model', e);
         // Fallback or disable feature
     }
 }
