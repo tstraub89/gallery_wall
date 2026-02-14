@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2026-02-14
+
+### ✨ Mobile Experience Overhaul
+- **Mobile Templates**: Launched a dedicated "Templates" tab in the mobile library. Users can now browse and apply professional layouts on their phone.
+    - **Dynamic Zoom**: Template cards now automatically scale to fit the preview area, ensuring large layouts (like staircases) are fully visible.
+    - **Smart Placement**: Templates intelligently replace your wall content if you're starting fresh, or append below if you already have custom frames.
+- **Context-Aware Smart Sheet**: A new unified sheet for **Auto-Layout** and **Smart Fill**.
+    - **Smart Context**: Tapping "Smart" with a frame selected instantly opens Smart Fill. Tapping it with an empty wall opens Auto-Layout.
+    - **Mobile Smart Fill**: Full feature parity with desktop, including AI analysis and "Lucky" fill.
+    - **Score Details**: Tapping a score badge now opens a detailed breakdown modal, explaining match quality (Resolution, Composition, Faces).
+
+### 💅 UX Polish
+- **Sheet Interactions**:
+    - **Auto-Dismiss**: The Smart Sheet now automatically closes when you apply a photo or use "Fill All", so you can see your results instantly.
+    - **Scroll Reliability**: Fixed a conflict between scrolling and swiping. You can now scroll up vigorously in lists without accidentally closing the sheet.
+- **Navigation**: Improved bottom bar organization with mutually exclusive tabs for Library, Smart, and Edit tools.
+
+### 🐛 Bug Fixes
+- **Auto-Analysis**: Fixed a bug where toggling "Target Faces" would trigger an unnecessary (and slow) full library analysis.
+- **Template Spacing**: Fixed an issue where some templates appeared with overlapping frames by refining the coordinate scaling.
+
 ## [0.6.6] - 2026-02-14
 
 ### ✨ Help Center & SEO Overhaul

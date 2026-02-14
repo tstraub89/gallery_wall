@@ -114,8 +114,9 @@ export function useSmartFill() {
         if (!currentProject) return [];
 
         const imageIds = currentProject.images;
-        // If we want faces, trigger analysis for those specifically if missing
-        analyzeLibrary(imageIds, { detectFaces: options.targetFaces });
+
+        // Removed auto-analysis trigger to prevent race conditions
+        // User must manually click "Analyze" if faces are missing
 
         const metadataMap = await getImageMetadata(imageIds);
         const suggestions: FrameSuggestion[] = [];
@@ -136,7 +137,7 @@ export function useSmartFill() {
         }
 
         return suggestions.sort((a, b) => b.matchScore.totalScore - a.matchScore.totalScore).slice(0, 10);
-    }, [currentProject, analyzeLibrary]);
+    }, [currentProject]);
 
     const generateGallerySolutions = useCallback(async (count = 10, options: ScoringOptions = {}): Promise<any[]> => {
         if (!currentProject) return [];

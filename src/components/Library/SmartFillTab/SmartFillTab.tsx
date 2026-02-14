@@ -9,7 +9,11 @@ import { Frame } from '../../../types';
 import SuggestionCard from './SuggestionCard';
 import { useSelection } from '../../../context/SelectionContext';
 
-const SmartFillTab: React.FC = () => {
+interface SmartFillTabProps {
+    onClose?: () => void;
+}
+
+const SmartFillTab: React.FC<SmartFillTabProps> = ({ onClose }) => {
     const [preferBlackAndWhite, setPreferBlackAndWhite] = useState(() => {
         return localStorage.getItem('smartFill_preferBlackAndWhite') === 'true';
     });
@@ -36,6 +40,9 @@ const SmartFillTab: React.FC = () => {
     const [prioritizePeople, setPrioritizePeople] = useState(() => {
         return localStorage.getItem('smartFill_targetFaces') === 'true';
     });
+
+    // New state for modal
+    const [activeScoreSuggestion, setActiveScoreSuggestion] = useState<FrameSuggestion | null>(null);
 
     // Persist preferences
     useEffect(() => {
@@ -72,7 +79,7 @@ const SmartFillTab: React.FC = () => {
             setSelectedFrame(null);
             setSuggestions([]);
         }
-    }, [selectedFrameIds, currentProject?.frames, getSuggestionsForFrame, prioritizePeople, preferBlackAndWhite, preferVibrant]);
+    }, [selectedFrameIds, currentProject?.frames, getSuggestionsForFrame, prioritizePeople, preferBlackAndWhite, preferVibrant, isAnalyzing]);
 
     const handleApplySuggestion = (suggestion: FrameSuggestion) => {
         if (!currentProject || !selectedFrame) return;
@@ -83,6 +90,9 @@ const SmartFillTab: React.FC = () => {
         );
 
         updateProject(currentProject.id, { frames: updatedFrames });
+
+        // Dismiss sheet on successful apply if callback provided
+        if (onClose) onClose();
     };
 
 
@@ -115,6 +125,9 @@ const SmartFillTab: React.FC = () => {
             });
 
             updateProject(currentProject.id, { frames: updatedFrames });
+
+            // Dismiss sheet on successful fill if callback provided
+            if (onClose) onClose();
         }
     };
 
@@ -206,6 +219,7 @@ const SmartFillTab: React.FC = () => {
                                                 key={s.photoId}
                                                 suggestion={s}
                                                 onClick={handleApplySuggestion}
+                                                onScoreClick={setActiveScoreSuggestion}
                                                 showFaceScore={prioritizePeople}
                                                 aspectRatio={selectedFrame ? selectedFrame.width / selectedFrame.height : 1}
                                                 isCurrentMatch={isCurrent}
@@ -227,6 +241,58 @@ const SmartFillTab: React.FC = () => {
                     🔒 Analysis happens entirely on your device. Your photos are never uploaded to a server.
                 </div>
             </div>
+
+            {/* Score Details Modal */}
+            {activeScoreSuggestion && (
+                <div className={styles.scoreModalOverlay} onClick={() => setActiveScoreSuggestion(null)}>
+                    <div className={styles.scoreModal} onClick={e => e.stopPropagation()}>
+                        <div className={styles.scoreHeader}>
+                            <div className={styles.scoreTitle}>Score Breakdown</div>
+                            <div
+                                className={styles.totalScore}
+                                style={{
+                                    backgroundColor: activeScoreSuggestion.matchScore.totalScore > 80 ? '#4caf50' :
+                                        activeScoreSuggestion.matchScore.totalScore > 50 ? '#ff9800' : '#f44336'
+                                }}
+                            >
+                                {Math.round(activeScoreSuggestion.matchScore.totalScore)}
+                            </div>
+                        </div>
+
+                        <div className={styles.scoreList}>
+                            <div className={styles.scoreItem}>
+                                <span className={styles.scoreLabel}>📐 Aspect Ratio</span>
+                                <span className={styles.scoreValue}>{Math.round(activeScoreSuggestion.matchScore.breakdown.aspectRatio)} / 25</span>
+                            </div>
+                            <div className={styles.scoreItem}>
+                                <span className={styles.scoreLabel}>🔍 Resolution</span>
+                                <span className={styles.scoreValue}>{Math.round(activeScoreSuggestion.matchScore.breakdown.resolution)} / 25</span>
+                            </div>
+                            <div className={styles.scoreItem}>
+                                <span className={styles.scoreLabel}>⚖️ Composition</span>
+                                <span className={styles.scoreValue}>{Math.round(activeScoreSuggestion.matchScore.breakdown.composition)} / 20</span>
+                            </div>
+                            <div className={styles.scoreItem}>
+                                <span className={styles.scoreLabel}>🎨 Color Harmony</span>
+                                <span className={styles.scoreValue}>{Math.round(activeScoreSuggestion.matchScore.breakdown.colorHarmony)} / 15</span>
+                            </div>
+                            <div className={styles.scoreItem}>
+                                <span className={styles.scoreLabel}>👤 Face Handling</span>
+                                <span className={styles.scoreValue}>
+                                    {prioritizePeople
+                                        ? `${Math.round(activeScoreSuggestion.matchScore.breakdown.faceHandling)} / 15`
+                                        : 'N/A'
+                                    }
+                                </span>
+                            </div>
+                        </div>
+
+                        <button className={styles.closeButton} onClick={() => setActiveScoreSuggestion(null)}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

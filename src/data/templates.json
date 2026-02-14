@@ -8,29 +8,29 @@
             {
                 "width": 16,
                 "height": 16,
-                "x": -9,
-                "y": -9,
+                "x": -10.35,
+                "y": -10.35,
                 "label": "Slot 1"
             },
             {
                 "width": 16,
                 "height": 16,
-                "x": 9,
-                "y": -9,
+                "x": 10.35,
+                "y": -10.35,
                 "label": "Slot 2"
             },
             {
                 "width": 16,
                 "height": 16,
-                "x": -9,
-                "y": 9,
+                "x": -10.35,
+                "y": 10.35,
                 "label": "Slot 3"
             },
             {
                 "width": 16,
                 "height": 16,
-                "x": 9,
-                "y": 9,
+                "x": 10.35,
+                "y": 10.35,
                 "label": "Slot 4"
             }
         ]
@@ -44,28 +44,28 @@
             {
                 "width": 12,
                 "height": 12,
-                "x": -14,
-                "y": -14,
+                "x": -16.1,
+                "y": -16.1,
                 "label": "1"
             },
             {
                 "width": 12,
                 "height": 12,
                 "x": 0,
-                "y": -14,
+                "y": -16.1,
                 "label": "2"
             },
             {
                 "width": 12,
                 "height": 12,
-                "x": 14,
-                "y": -14,
+                "x": 16.1,
+                "y": -16.1,
                 "label": "3"
             },
             {
                 "width": 12,
                 "height": 12,
-                "x": -14,
+                "x": -16.1,
                 "y": 0,
                 "label": "4"
             },
@@ -79,29 +79,29 @@
             {
                 "width": 12,
                 "height": 12,
-                "x": 14,
+                "x": 16.1,
                 "y": 0,
                 "label": "6"
             },
             {
                 "width": 12,
                 "height": 12,
-                "x": -14,
-                "y": 14,
+                "x": -16.1,
+                "y": 16.1,
                 "label": "7"
             },
             {
                 "width": 12,
                 "height": 12,
                 "x": 0,
-                "y": 14,
+                "y": 16.1,
                 "label": "8"
             },
             {
                 "width": 12,
                 "height": 12,
-                "x": 14,
-                "y": 14,
+                "x": 16.1,
+                "y": 16.1,
                 "label": "9"
             }
         ]
@@ -115,7 +115,7 @@
             {
                 "width": 18,
                 "height": 24,
-                "x": -22,
+                "x": -25.3,
                 "y": 0,
                 "label": "Left"
             },
@@ -129,7 +129,7 @@
             {
                 "width": 18,
                 "height": 24,
-                "x": 22,
+                "x": 25.3,
                 "y": 0,
                 "label": "Right"
             }
@@ -144,28 +144,28 @@
             {
                 "width": 14,
                 "height": 11,
-                "x": -25.5,
+                "x": -29.32,
                 "y": 0,
                 "label": "1"
             },
             {
                 "width": 14,
                 "height": 11,
-                "x": -8.5,
+                "x": -9.77,
                 "y": 0,
                 "label": "2"
             },
             {
                 "width": 14,
                 "height": 11,
-                "x": 8.5,
+                "x": 9.77,
                 "y": 0,
                 "label": "3"
             },
             {
                 "width": 14,
                 "height": 11,
-                "x": 25.5,
+                "x": 29.32,
                 "y": 0,
                 "label": "4"
             }
@@ -180,35 +180,35 @@
             {
                 "width": 16,
                 "height": 20,
-                "x": -10,
-                "y": 2,
+                "x": -11.5,
+                "y": 2.3,
                 "label": "Anchor"
             },
             {
                 "width": 11,
                 "height": 14,
-                "x": 9,
-                "y": -8,
+                "x": 10.35,
+                "y": -9.2,
                 "label": "Top Orbit"
             },
             {
                 "width": 11,
                 "height": 14,
-                "x": 9,
-                "y": 10,
+                "x": 10.35,
+                "y": 11.5,
                 "label": "Bottom Orbit"
             },
             {
                 "width": 8,
                 "height": 10,
-                "x": -8,
-                "y": -18,
+                "x": -9.2,
+                "y": -20.7,
                 "label": "Satellite Top"
             },
             {
                 "width": 8,
                 "height": 10,
-                "x": 22,
+                "x": 25.3,
                 "y": 0,
                 "label": "Satellite Far"
             }
@@ -223,35 +223,35 @@
             {
                 "width": 11,
                 "height": 14,
-                "x": -4,
+                "x": -4.6,
                 "y": 0,
                 "label": "Origin"
             },
             {
                 "width": 8,
                 "height": 10,
-                "x": 8,
+                "x": 9.2,
                 "y": 0,
                 "label": "Step 1"
             },
             {
                 "width": 8,
                 "height": 10,
-                "x": 7,
-                "y": 15,
+                "x": 8.05,
+                "y": 17.25,
                 "label": "Step 2"
             },
             {
                 "width": 8,
                 "height": 10,
-                "x": -6,
-                "y": 16,
+                "x": -6.9,
+                "y": 18.4,
                 "label": "Step 3"
             },
             {
                 "width": 10,
                 "height": 8,
-                "x": -20,
+                "x": -23,
                 "y": 0,
                 "label": "Step 4"
             },
@@ -259,7 +259,7 @@
                 "width": 11,
                 "height": 14,
                 "x": 0,
-                "y": -16,
+                "y": -18.4,
                 "label": "Step 5"
             }
         ]
@@ -280,50 +280,50 @@
             {
                 "width": 16,
                 "height": 20,
-                "x": -22,
-                "y": 6,
+                "x": -25.3,
+                "y": 6.9,
                 "label": "Left Heavy"
             },
             {
                 "width": 11,
                 "height": 14,
-                "x": 20,
-                "y": -9,
+                "x": 23,
+                "y": -10.35,
                 "label": "Right Upper"
             },
             {
                 "width": 11,
                 "height": 14,
-                "x": 20,
-                "y": 11,
+                "x": 23,
+                "y": 12.65,
                 "label": "Right Lower"
             },
             {
                 "width": 8,
                 "height": 10,
-                "x": -11,
-                "y": -20,
+                "x": -12.65,
+                "y": -23,
                 "label": "Top Accent"
             },
             {
                 "width": 14,
                 "height": 11,
-                "x": 4,
-                "y": -20,
+                "x": 4.6,
+                "y": -23,
                 "label": "Top Wide"
             },
             {
                 "width": 12,
                 "height": 12,
-                "x": -26,
-                "y": -14,
+                "x": -29.9,
+                "y": -16.1,
                 "label": "Far Corner"
             },
             {
                 "width": 14,
                 "height": 11,
                 "x": 0,
-                "y": 22,
+                "y": 25.3,
                 "label": "Base"
             }
         ]
@@ -344,29 +344,29 @@
             {
                 "width": 11,
                 "height": 14,
-                "x": -16,
-                "y": -5,
+                "x": -18.4,
+                "y": -5.75,
                 "label": "Left Wing Top"
             },
             {
                 "width": 11,
                 "height": 14,
-                "x": 16,
-                "y": -5,
+                "x": 18.4,
+                "y": -5.75,
                 "label": "Right Wing Top"
             },
             {
                 "width": 12,
                 "height": 12,
-                "x": -16,
-                "y": 14,
+                "x": -18.4,
+                "y": 16.1,
                 "label": "Left Wing Low"
             },
             {
                 "width": 12,
                 "height": 12,
-                "x": 16,
-                "y": 14,
+                "x": 18.4,
+                "y": 16.1,
                 "label": "Right Wing Low"
             }
         ]
@@ -380,8 +380,8 @@
             {
                 "width": 16,
                 "height": 20,
-                "x": -22,
-                "y": 12,
+                "x": -25.3,
+                "y": 13.8,
                 "label": "Base"
             },
             {
@@ -394,22 +394,22 @@
             {
                 "width": 16,
                 "height": 20,
-                "x": 22,
-                "y": -12,
+                "x": 25.3,
+                "y": -13.8,
                 "label": "Peak"
             },
             {
                 "width": 11,
                 "height": 14,
-                "x": -38,
-                "y": 24,
+                "x": -43.7,
+                "y": 27.6,
                 "label": "Entry"
             },
             {
                 "width": 11,
                 "height": 14,
-                "x": 38,
-                "y": -24,
+                "x": 43.7,
+                "y": -27.6,
                 "label": "Exit"
             }
         ]
@@ -423,8 +423,8 @@
             {
                 "width": 16,
                 "height": 20,
-                "x": 22,
-                "y": 12,
+                "x": 25.3,
+                "y": 13.8,
                 "label": "Base"
             },
             {
@@ -437,22 +437,22 @@
             {
                 "width": 16,
                 "height": 20,
-                "x": -22,
-                "y": -12,
+                "x": -25.3,
+                "y": -13.8,
                 "label": "Peak"
             },
             {
                 "width": 11,
                 "height": 14,
-                "x": 38,
-                "y": 24,
+                "x": 43.7,
+                "y": 27.6,
                 "label": "Entry"
             },
             {
                 "width": 11,
                 "height": 14,
-                "x": -38,
-                "y": -24,
+                "x": -43.7,
+                "y": -27.6,
                 "label": "Exit"
             }
         ]
@@ -466,14 +466,14 @@
             {
                 "width": 11,
                 "height": 14,
-                "x": -30,
+                "x": -34.5,
                 "y": 0,
                 "label": "Left Flank"
             },
             {
                 "width": 11,
                 "height": 14,
-                "x": 30,
+                "x": 34.5,
                 "y": 0,
                 "label": "Right Flank"
             },
@@ -481,21 +481,21 @@
                 "width": 14,
                 "height": 11,
                 "x": 0,
-                "y": -20,
+                "y": -23,
                 "label": "Crown Jewel"
             },
             {
                 "width": 14,
                 "height": 11,
-                "x": -18,
-                "y": -20,
+                "x": -20.7,
+                "y": -23,
                 "label": "Crown Left"
             },
             {
                 "width": 14,
                 "height": 11,
-                "x": 18,
-                "y": -20,
+                "x": 20.7,
+                "y": -23,
                 "label": "Crown Right"
             }
         ]
@@ -510,13 +510,13 @@
                 "width": 12,
                 "height": 12,
                 "x": 0,
-                "y": -16,
+                "y": -18.4,
                 "label": "North"
             },
             {
                 "width": 12,
                 "height": 12,
-                "x": 16,
+                "x": 18.4,
                 "y": 0,
                 "label": "East"
             },
@@ -524,13 +524,13 @@
                 "width": 12,
                 "height": 12,
                 "x": 0,
-                "y": 16,
+                "y": 18.4,
                 "label": "South"
             },
             {
                 "width": 12,
                 "height": 12,
-                "x": -16,
+                "x": -18.4,
                 "y": 0,
                 "label": "West"
             },

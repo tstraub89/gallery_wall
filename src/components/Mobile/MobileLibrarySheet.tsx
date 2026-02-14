@@ -10,8 +10,8 @@ import { useViewport } from '../../context/ViewportContext';
 import MobileAddFrameDialog from './MobileAddFrameDialog';
 import MobileCommonFrameDialog from './MobileCommonFrameDialog';
 import { SmartLayoutProvider } from '../Library/SmartLayout/SmartLayoutContext';
-import SmartLayoutSection from '../Library/SmartLayout/SmartLayoutSection';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
+import MobileTemplateList from './MobileTemplateList';
 
 interface MobileLibrarySheetProps {
     isOpen: boolean;
@@ -19,7 +19,8 @@ interface MobileLibrarySheetProps {
 }
 
 const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose }) => {
-    const [activeTab, setActiveTab] = useState<'frames' | 'layout' | 'photos'>('frames');
+    // Tabs: 'frames' | 'templates' | 'photos'
+    const [activeTab, setActiveTab] = useState<'frames' | 'templates' | 'photos'>('frames');
     const [isEditMode, setIsEditMode] = useState(false);
     const [showAddDialog, setShowAddDialog] = useState(false);
     const [showCommonDialog, setShowCommonDialog] = useState(false);
@@ -245,7 +246,7 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
                     </div>
 
                     <div className={styles.header}>
-                        <div className={styles.tabs} style={{ gap: '20px' }}>
+                        <div className={styles.tabs} style={{ gap: '10px' }}>
                             <button
                                 className={`${styles.tab} ${activeTab === 'frames' ? styles.activeTab : ''}`}
                                 onClick={() => setActiveTab('frames')}
@@ -253,10 +254,10 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
                                 Frames
                             </button>
                             <button
-                                className={`${styles.tab} ${activeTab === 'layout' ? styles.activeTab : ''}`}
-                                onClick={() => setActiveTab('layout')}
+                                className={`${styles.tab} ${activeTab === 'templates' ? styles.activeTab : ''}`}
+                                onClick={() => setActiveTab('templates')}
                             >
-                                Layout
+                                Templates
                             </button>
                             <button
                                 className={`${styles.tab} ${activeTab === 'photos' ? styles.activeTab : ''}`}
@@ -267,8 +268,8 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
                         </div>
 
                         <div style={{ display: 'flex', gap: '8px' }}>
-                            {/* Manage Button - Hide on Layout Tab */}
-                            {activeTab !== 'layout' && (
+                            {/* Manage Button - Hide on Templates Tab */}
+                            {activeTab !== 'templates' && (
                                 <button
                                     className={`${styles.editBtn} ${isEditMode ? styles.editActive : ''}`}
                                     onClick={() => setIsEditMode(!isEditMode)}
@@ -306,10 +307,8 @@ const MobileLibrarySheet: React.FC<MobileLibrarySheetProps> = ({ isOpen, onClose
                                 />
                             </>
                         )}
-                        {activeTab === 'layout' && (
-                            <div style={{ padding: '0 10px' }}>
-                                <SmartLayoutSection maxSolutions={4} onComplete={onClose} isMobile={true} />
-                            </div>
+                        {activeTab === 'templates' && (
+                            <MobileTemplateList onClose={onClose} />
                         )}
                         {activeTab === 'photos' && (
                             <PhotoLibrary

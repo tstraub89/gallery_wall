@@ -2,7 +2,7 @@ import React, { ReactNode, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import styles from './MobileLayout.module.css';
-import { Undo2, Redo2, Share2, ChevronDown, CircleHelp, Grid, SlidersHorizontal, Menu, Save, FolderOpen, Eraser, Printer, Sparkles, Bug } from 'lucide-react';
+import { Undo2, Redo2, Share2, ChevronDown, CircleHelp, Grid, SlidersHorizontal, Menu, Save, FolderOpen, Eraser, Printer, Sparkles, Bug, Wand2 } from 'lucide-react';
 import Logo from '../Header/Logo';
 import pkg from '../../../package.json';
 import { useProject } from '../../hooks/useProject';
@@ -16,6 +16,7 @@ const HelpModal = React.lazy(() => import('../Common/HelpModal'));
 const ProUpgradeDialog = React.lazy(() => import('../Common/ProUpgradeDialog'));
 import MobileLibrarySheet from '../Mobile/MobileLibrarySheet';
 import MobileEditSheet from '../Mobile/MobileEditSheet';
+import MobileSmartSheet from '../Mobile/MobileSmartSheet';
 import { importProjectBundle } from '../../utils/exportUtils';
 import { saveImage } from '../../utils/imageStore';
 import { v4 as uuidv4 } from 'uuid';
@@ -41,9 +42,9 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
     const isExporting = isBusy || isPDFBusy;
 
     const [showSwitcher, setShowSwitcher] = useState(false);
-    const [showMenu, setShowMenu] = useState(false);
-    const [showLibrary, setShowLibrary] = useState(false);
-    const [showEdit, setShowEdit] = useState(false);
+
+    // Bottom Sheet States (Exclusive)
+    const [activeSheet, setActiveSheet] = useState<'library' | 'smart' | 'edit' | 'menu' | null>(null);
 
     // Dialog States
     const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -51,10 +52,19 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
     const [showPro, setShowPro] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
+    // Helper to toggle sheet
+    const toggleSheet = (sheet: 'library' | 'smart' | 'edit' | 'menu') => {
+        if (activeSheet === sheet) {
+            setActiveSheet(null);
+        } else {
+            setActiveSheet(sheet);
+        }
+    };
+
     // --- Menu Actions --- //
 
     const handleClearCanvasClick = () => {
-        setShowMenu(false);
+        setActiveSheet(null);
         setShowClearConfirm(true);
     };
 
@@ -66,13 +76,13 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
     };
 
     const handleSaveProject = async () => {
-        setShowMenu(false);
+        setActiveSheet(null);
         await exportToGwall();
     };
 
 
     const handleImportClick = () => {
-        setShowMenu(false); // Close menu
+        setActiveSheet(null); // Close menu
         fileInputRef.current?.click(); // Trigger file input
     };
 
@@ -242,29 +252,34 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                 </main>
 
                 <nav className={styles.bottomNav}>
-                    <button className={`${styles.navItem} ${showLibrary ? styles.active : ''}`} onClick={() => { setShowLibrary(true); setShowEdit(false); setShowMenu(false); }}>
+                    <button className={`${styles.navItem} ${activeSheet === 'library' ? styles.active : ''}`} onClick={() => toggleSheet('library')}>
                         <Grid size={24} />
                         <span>Library</span>
                     </button>
-                    <button className={`${styles.navItem} ${showEdit ? styles.active : ''}`} onClick={() => { setShowEdit(true); setShowLibrary(false); setShowMenu(false); }}>
+                    <button className={`${styles.navItem} ${activeSheet === 'smart' ? styles.active : ''}`} onClick={() => toggleSheet('smart')}>
+                        <Wand2 size={24} />
+                        <span>Smart</span>
+                    </button>
+                    <button className={`${styles.navItem} ${activeSheet === 'edit' ? styles.active : ''}`} onClick={() => toggleSheet('edit')}>
                         <SlidersHorizontal size={24} />
                         <span>Edit</span>
                     </button>
-                    <button className={`${styles.navItem} ${showMenu ? styles.active : ''}`} onClick={() => { setShowMenu(true); setShowLibrary(false); setShowEdit(false); }}>
+                    <button className={`${styles.navItem} ${activeSheet === 'menu' ? styles.active : ''}`} onClick={() => toggleSheet('menu')}>
                         <Menu size={24} />
                         <span>Menu</span>
                     </button>
                 </nav>
 
-                <MobileLibrarySheet isOpen={showLibrary} onClose={() => setShowLibrary(false)} />
-                <MobileEditSheet isOpen={showEdit} onClose={() => setShowEdit(false)} />
+                <MobileLibrarySheet isOpen={activeSheet === 'library'} onClose={() => setActiveSheet(null)} />
+                <MobileSmartSheet isOpen={activeSheet === 'smart'} onClose={() => setActiveSheet(null)} />
+                <MobileEditSheet isOpen={activeSheet === 'edit'} onClose={() => setActiveSheet(null)} />
 
                 {/* Overlays */}
                 {showSwitcher && <ProjectSwitcher onClose={() => setShowSwitcher(false)} />}
 
                 {/* Expanded Menu Overlay */}
-                {showMenu && (
-                    <div className={styles.menuOverlay} onClick={() => setShowMenu(false)}>
+                {activeSheet === 'menu' && (
+                    <div className={styles.menuOverlay} onClick={() => setActiveSheet(null)}>
                         <div className={styles.menuSheet} onClick={e => e.stopPropagation()}>
 
                             <div className={styles.menuSectionLabel}>Account / Plan</div>
@@ -282,7 +297,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                                 <div
                                     className={styles.proSection}
                                     title="During beta, Pro features are unlocked for free."
-                                    onClick={() => { setShowMenu(false); setShowPro(true); }}
+                                    onClick={() => { setActiveSheet(null); setShowPro(true); }}
                                     style={{ cursor: 'pointer', opacity: 1 }}
                                 >
                                     <div className={styles.proBadge}>
@@ -296,7 +311,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                             )}
 
                             <div className={styles.menuSectionLabel}>Export</div>
-                            <div className={styles.menuItem} onClick={() => { setShowMenu(false); shareProjectImage(); }}>
+                            <div className={styles.menuItem} onClick={() => { setActiveSheet(null); shareProjectImage(); }}>
                                 <Share2 size={16} style={{ marginRight: 8 }} />
                                 Share Snapshot
                             </div>
@@ -307,7 +322,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                                     <ProBadge isOverlay style={{ position: 'absolute', right: 0 }} />
                                 </div>
                             </div>
-                            <div className={styles.menuItem} onClick={() => { setShowMenu(false); exportToPDFGuide(); }}>
+                            <div className={styles.menuItem} onClick={() => { setActiveSheet(null); exportToPDFGuide(); }}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', position: 'relative' }}>
                                     <Printer size={16} style={{ marginRight: 8 }} />
                                     <span>Export Hanging Guide (PDF)</span>
@@ -323,11 +338,11 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                                     <ProBadge isOverlay style={{ position: 'absolute', right: 0 }} />
                                 </div>
                             </div>
-                            <div className={styles.menuItem} onClick={() => { setShowMenu(false); reportBug(); }}>
+                            <div className={styles.menuItem} onClick={() => { setActiveSheet(null); reportBug(); }}>
                                 <Bug size={16} style={{ marginRight: 8 }} />
                                 Report an Issue (Beta)
                             </div>
-                            <div className={styles.menuItem} onClick={() => { setShowMenu(false); setShowHelp(true); }}>
+                            <div className={styles.menuItem} onClick={() => { setActiveSheet(null); setShowHelp(true); }}>
                                 <CircleHelp size={16} style={{ marginRight: 8 }} />
                                 Help & Guide
                             </div>
@@ -341,14 +356,14 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                                     to="/changelog"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    onClick={() => setShowMenu(false)}
+                                    onClick={() => setActiveSheet(null)}
                                     style={{ textDecoration: 'none', color: '#8e8e93', fontSize: '11px', opacity: 0.7 }}
                                 >
                                     Gallery Planner v{pkg.version} beta
                                 </Link>
                             </div>
 
-                            <div className={styles.menuCancel} onClick={() => setShowMenu(false)}>Cancel</div>
+                            <div className={styles.menuCancel} onClick={() => setActiveSheet(null)}>Cancel</div>
                         </div>
                     </div>
                 )}

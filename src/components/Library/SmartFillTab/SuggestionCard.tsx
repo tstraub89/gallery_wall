@@ -7,6 +7,7 @@ import { AlertCircle, Check } from 'lucide-react';
 interface SuggestionCardProps {
     suggestion: FrameSuggestion;
     onClick: (suggestion: FrameSuggestion) => void;
+    onScoreClick?: (suggestion: FrameSuggestion) => void;
     showFaceScore?: boolean;
     aspectRatio?: number;
     isUsedElsewhere?: boolean;
@@ -16,13 +17,14 @@ interface SuggestionCardProps {
 const SuggestionCard: React.FC<SuggestionCardProps> = ({
     suggestion,
     onClick,
+    onScoreClick,
     showFaceScore = false,
     aspectRatio = 1,
     isUsedElsewhere = false,
     isCurrentMatch = false
 }) => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
-    // ... useEffect remains same ...
+
     useEffect(() => {
         let active = true;
         const load = async () => {
@@ -52,6 +54,13 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
         `Faces: ${showFaceScore ? `${breakdown.faceHandling}/15` : 'N/A'}`
     ].join('\n');
 
+    const handleScoreClick = (e: React.MouseEvent) => {
+        if (onScoreClick) {
+            e.stopPropagation();
+            onScoreClick(suggestion);
+        }
+    };
+
     return (
         <div
             className={styles.card}
@@ -75,7 +84,11 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({
                     </div>
                 ) : null}
 
-                <div className={styles.scoreBadge} style={{ backgroundColor: scoreColor }}>
+                <div
+                    className={styles.scoreBadge}
+                    style={{ backgroundColor: scoreColor, cursor: onScoreClick ? 'pointer' : 'default' }}
+                    onClick={handleScoreClick}
+                >
                     {Math.round(suggestion.matchScore.totalScore)}
                 </div>
             </div>
