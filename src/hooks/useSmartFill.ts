@@ -76,19 +76,17 @@ export function useSmartFill() {
                 }
 
                 if (blob) {
-                    const objectUrl = URL.createObjectURL(blob);
-
                     workerRef.current.postMessage({
                         id: id,
                         type: 'ANALYZE_PHOTO',
                         payload: {
                             imageId: id,
-                            imageUrl: objectUrl,
+                            imageBlob: blob,
                             width: 0, // Worker will load metadata
                             height: 0,
                             detectFaces: options.detectFaces
                         }
-                    } as SmartFillWorkerMessage);
+                    } as any); // Use any or update type definition
                 } else {
                     // If image missing, decrement immediately
                     setPendingCount(prev => Math.max(0, prev - 1));

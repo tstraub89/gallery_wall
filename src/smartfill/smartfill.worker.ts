@@ -15,7 +15,8 @@ ctx.onmessage = async (event: MessageEvent<SmartFillWorkerMessage>) => {
     try {
         switch (type) {
             case 'ANALYZE_PHOTO':
-                await handleAnalyzePhoto(id, payload);
+                if (!payload.imageBlob) throw new Error("Missing imageBlob in payload");
+                await handleAnalyzePhoto(id, payload as { imageId: string; imageBlob: Blob; width: number; height: number });
                 break;
 
             case 'ANALYZE_BATCH':
@@ -36,18 +37,18 @@ ctx.onmessage = async (event: MessageEvent<SmartFillWorkerMessage>) => {
 
 async function handleAnalyzePhoto(messageId: string, payload: {
     imageId: string;
-    imageUrl: string; // Blob URL or Data URL
+    imageBlob: Blob; // Changed from imageUrl
     width: number;
     height: number;
 }) {
-    const { imageId, imageUrl, width, height } = payload;
+    const { imageId, imageBlob, width, height } = payload;
 
     // 1. Load image (using OffscreenCanvas or fetch+Bitmap)
     // For worker, fetch + createImageBitmap is best
-    const response = await fetch(imageUrl);
-    const blob = await response.blob();
-    const bitmap = await createImageBitmap(blob);
-    URL.revokeObjectURL(imageUrl); // Clean up immediately after loading into bitmap
+    // const response = await fetch(imageUrl);
+    // const blob = await response.blob();
+    const bitmap = await createImageBitmap(imageBlob);
+    // URL.revokeObjectURL(imageUrl); // Clean up immediately after loading into bitmap
 
     const actualWidth = bitmap.width;
     const actualHeight = bitmap.height;

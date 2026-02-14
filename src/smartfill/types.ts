@@ -66,7 +66,14 @@ export type WorkerMessageType =
 export interface SmartFillWorkerMessage {
     id: string;
     type: WorkerMessageType;
-    payload: any;
+    payload: {
+        imageId: string;
+        imageBlob?: Blob;
+        imageUrl?: string;
+        width: number;
+        height: number;
+        detectFaces?: boolean;
+    };
 }
 
 export interface SmartFillWorkerResponse {
