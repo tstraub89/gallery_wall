@@ -81,7 +81,7 @@ export function useSmartFill() {
                             height: 0,
                             detectFaces: options.detectFaces
                         }
-                    } as any); // Use any or update type definition
+                    } as SmartFillWorkerMessage);
                 } else {
                     // If image missing, decrement immediately
                     setPendingCount(prev => Math.max(0, prev - 1));
