@@ -37,6 +37,15 @@ const LandingPage: React.FC = () => {
         if (proVisible) trackEvent(LANDING_EVENTS.VIEW_PRO);
     }, [proVisible]);
 
+    // Set Page Title & Meta on Mount
+    useEffect(() => {
+        document.title = "GalleryPlanner | Free Gallery Wall Layout Tool";
+        const metaDescription = document.querySelector('meta[name="description"]');
+        if (metaDescription) {
+            metaDescription.setAttribute('content', "Visualize your perfect wall before you hammer a nail. Design complex gallery layouts with real frames and personal photos.");
+        }
+    }, []);
+
     return (
         <div className={styles.container}>
             {/* Header */}
