@@ -6,8 +6,11 @@ import { SmartFillWorkerMessage, SmartFillWorkerResponse, ColorProfile, Composit
 // Simple context type for worker
 const ctx: Worker = self as any;
 
+console.log("[SmartFill Worker] Initialized");
+
 ctx.onmessage = async (event: MessageEvent<SmartFillWorkerMessage>) => {
     const { id, type, payload } = event.data;
+    console.log(`[SmartFill Worker] Received message: ${type}`, payload);
 
     try {
         switch (type) {
