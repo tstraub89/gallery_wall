@@ -8,15 +8,16 @@ import { StaticDataProvider } from './context/StaticDataContext.tsx';
 import LandingPage from './components/Landing/LandingPage';
 import ScrollToTop from './components/Common/ScrollToTop';
 
-import HelpPage from './components/Help/HelpPage';
-import PrivacyPolicy from './components/Landing/PrivacyPolicy';
-import AboutPage from './components/Landing/AboutPage';
-import ChangelogPage from './components/Landing/ChangelogPage';
-import ResourcesHub from './components/Resources/ResourcesHub';
-import ArticleLayout from './components/Resources/ArticleLayout';
-import NotFound from './components/Common/NotFound';
+// Lazy Load Pages
+const HelpPage = React.lazy(() => import('./components/Help/HelpPage'));
+const PrivacyPolicy = React.lazy(() => import('./components/Landing/PrivacyPolicy'));
+const AboutPage = React.lazy(() => import('./components/Landing/AboutPage'));
+const ChangelogPage = React.lazy(() => import('./components/Landing/ChangelogPage'));
+const ResourcesHub = React.lazy(() => import('./components/Resources/ResourcesHub'));
+const ArticleLayout = React.lazy(() => import('./components/Resources/ArticleLayout'));
+const NotFound = React.lazy(() => import('./components/Common/NotFound'));
 
-// Lazy load the Main App & Contexts to avoid bloating the Landing Page
+// Lazy load the Main App & Contexts
 const EditorContextWrapper = React.lazy(() => import('./components/Layout/EditorContextWrapper'));
 const GalleryApp = React.lazy(() => import('./components/Layout/GalleryApp'));
 

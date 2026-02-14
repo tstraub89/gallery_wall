@@ -7,7 +7,6 @@ import WebsiteFooter from './WebsiteFooter';
 import BackToTop from '../Common/BackToTop';
 import styles from './StaticPageLayout.module.css';
 import { useStaticData } from '../../context/StaticDataContext.tsx';
-import * as LucideIcons from 'lucide-react';
 import { getTextContent } from '../../utils/stringUtils';
 
 interface StaticPageLayoutProps {
@@ -15,13 +14,6 @@ interface StaticPageLayoutProps {
     title?: string;
     description?: string;
 }
-
-const Icon = ({ name, size = 20, className = "" }: { name: string, size?: number, className?: string }) => {
-    // Convert icon-name to IconName
-    const pascalName = name.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('');
-    const IconComponent = (LucideIcons as any)[pascalName] || (LucideIcons as any)[name] || LucideIcons.HelpCircle;
-    return <IconComponent size={size} className={className} />;
-};
 
 const StaticPageLayout: React.FC<StaticPageLayoutProps> = ({ slug, title: defaultTitle, description: defaultDescription }) => {
     const staticData = useStaticData();
@@ -75,44 +67,8 @@ const StaticPageLayout: React.FC<StaticPageLayoutProps> = ({ slug, title: defaul
     }, [content, slug, defaultTitle, defaultDescription]);
 
     const components: any = {
-        h2: ({ children }: any) => {
-            const text = getTextContent(children);
-            const iconMatch = text.match(/\[icon:(.+?)\]/);
-            const cleanText = text.replace(/\[icon:.+?\]\s*/, '');
-
-            if (iconMatch) {
-                return (
-                    <div className={styles.card}>
-                        <h2>
-                            <div className={styles.iconWrapper}>
-                                <Icon name={iconMatch[1]} size={24} />
-                            </div>
-                            {cleanText}
-                        </h2>
-                    </div>
-                );
-            }
-            return <h2>{children}</h2>;
-        },
-        h3: ({ children }: any) => {
-            const text = getTextContent(children);
-            const iconMatch = text.match(/\[icon:(.+?)\]/);
-            const cleanText = text.replace(/\[icon:.+?\]\s*/, '');
-
-            if (iconMatch) {
-                return (
-                    <div className={styles.card}>
-                        <h2>
-                            <div className={styles.iconWrapper}>
-                                <Icon name={iconMatch[1]} size={24} />
-                            </div>
-                            {cleanText}
-                        </h2>
-                    </div>
-                );
-            }
-            return <h3>{children}</h3>;
-        },
+        h2: ({ children }: any) => <h2>{children}</h2>,
+        h3: ({ children }: any) => <h3>{children}</h3>,
         p: ({ children }: any) => {
             // Check if it's just a profile image
             if (React.Children.count(children) === 1) {
@@ -129,7 +85,6 @@ const StaticPageLayout: React.FC<StaticPageLayoutProps> = ({ slug, title: defaul
         a: ({ href, children, ...props }: any) => {
             const text = getTextContent(children);
             const isButton = href?.startsWith('btn:');
-            const isSocial = text.includes('[icon:');
 
             if (isButton) {
                 const type = href.split(':')[1];
@@ -148,17 +103,6 @@ const StaticPageLayout: React.FC<StaticPageLayoutProps> = ({ slug, title: defaul
                         }}
                     >
                         {text}
-                    </a>
-                );
-            }
-
-            if (isSocial) {
-                const iconMatch = text.match(/\[icon:(.+?)\]/);
-                const cleanText = text.replace(/\[icon:.+?\]\s*/, '');
-                return (
-                    <a href={href} target="_blank" rel="noopener noreferrer" className={styles.socialLink}>
-                        {iconMatch && <Icon name={iconMatch[1]} size={20} />}
-                        {cleanText}
                     </a>
                 );
             }
