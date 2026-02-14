@@ -200,18 +200,16 @@ const HelpModal: React.FC<HelpModalProps> = ({ onClose }) => {
                     )}
                 </div>
 
-                <footer className={styles.footer}>
-                    <div style={{
-                        paddingTop: isMobile ? '12px' : '0',
-                        borderTop: isMobile ? '1px solid rgba(0,0,0,0.05)' : 'none',
-                        fontSize: '11px',
-                        color: '#8e8e93',
-                        textAlign: 'center',
-                        lineHeight: '1.5'
-                    }}>
-                        GalleryPlanner runs locally in your browser, keeps your photos and layouts on your device, and only collects anonymous, cookie-free usage metrics.
-                    </div>
-                </footer>
+                <div style={{
+                    paddingTop: isMobile ? '12px' : '0',
+                    borderTop: isMobile ? '1px solid rgba(0,0,0,0.05)' : 'none',
+                    fontSize: '11px',
+                    color: '#8e8e93',
+                    textAlign: 'center',
+                    lineHeight: '1.5'
+                }}>
+                    GalleryPlanner™ runs locally in your browser, keeps your photos and layouts on your device, and only collects anonymous, cookie-free usage metrics.
+                </div>
             </div>
         </div>
     );

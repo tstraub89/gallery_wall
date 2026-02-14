@@ -164,7 +164,7 @@ const FrameLibrary: React.FC = () => {
                         rel="noopener noreferrer"
                         style={{ textDecoration: 'none', color: 'inherit' }}
                     >
-                        <span>Gallery Planner v{pkg.version} beta</span>
+                        <span>GalleryPlanner v{pkg.version} beta</span>
                     </Link>
                     <span style={{ marginTop: '6px', fontSize: '9px', opacity: 0.5 }}>© 2026 Timothy Straub</span>
                 </div>

@@ -13,7 +13,7 @@ const WebsiteFooter: React.FC = () => {
                         <Logo hideStatus />
                     </Link>
                     <div className={styles.copyright}>
-                        © 2026 Timothy Straub.<br />
+                        © 2026 Timothy Straub. GalleryPlanner™<br />
                         Built with precision for beautiful homes.<br />
                         <span style={{ color: '#6e6e73', fontSize: '0.9em' }}>Proudly built with AI assistance.</span>
                     </div>

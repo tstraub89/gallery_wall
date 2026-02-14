@@ -50,7 +50,9 @@ const Logo: React.FC<LogoProps> = ({ hideStatus = false, scale = 1, stacked = fa
             </div>
             <div className={`${styles.text} ${stacked ? styles.stacked : ''}`} onClick={handleLogoClick} style={{ cursor: 'pointer' }}>
                 <span className={styles.bold}>Gallery</span>
-                <span className={styles.light}>Planner</span>
+                <span className={styles.light}>
+                    Planner<span className={styles.tm}>™</span>
+                </span>
             </div>
             {!isMobile && !hideStatus && (
                 <span

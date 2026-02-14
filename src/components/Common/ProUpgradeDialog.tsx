@@ -45,7 +45,7 @@ const ProUpgradeDialog: React.FC<ProUpgradeDialogProps> = ({ onClose }) => {
                     <p style={{ marginBottom: '20px', color: '#636366', fontSize: '15px', lineHeight: '1.5' }}>
                         {isAlreadyPro
                             ? "Thank you for testing the beta! You have fully unlocked all Pro features."
-                            : "Unlock the full potential of GalleryPlanner and create your dream wall with ease."
+                            : "Unlock the full potential of GalleryPlanner™ and create your dream wall with ease."
                         }
                     </p>
 

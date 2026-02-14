@@ -18,7 +18,7 @@ import { useBugReporter } from '../../hooks/useBugReporter';
 
 const HelpPage: React.FC = () => {
     React.useEffect(() => {
-        const title = "Help Center & Resources | GalleryPlanner";
+        const title = "Help Center & Resources | GalleryPlanner™";
         const description = "Everything you need to know about creating your perfect gallery wall. Learn how to manage inventory, arrange layouts, and export for installation.";
 
         document.title = title;

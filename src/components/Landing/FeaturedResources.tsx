@@ -60,7 +60,7 @@ const FeaturedResources: React.FC<FeaturedResourcesProps> = ({ id }) => {
                                 <span>•</span>
                                 <span>2 min video</span>
                             </div>
-                            <h3>GalleryPlanner: Complete User Guide</h3>
+                            <h3>GalleryPlanner™: Complete User Guide</h3>
                             <p>Master our tool with this comprehensive walkthrough of features and best practices.</p>
                             <span className={styles.link}>Read Guide <ArrowRight size={16} /></span>
                         </div>

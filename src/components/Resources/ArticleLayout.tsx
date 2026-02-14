@@ -95,7 +95,7 @@ const ArticleLayout: React.FC = () => {
     useEffect(() => {
         if (article) {
             // 1. Update Title
-            document.title = `${article.title} | GalleryPlanner Resources`;
+            document.title = `${article.title} | GalleryPlanner™ Resources`;
 
             // 2. Update Meta Description
             const metaDescription = document.querySelector('meta[name="description"]');

@@ -17,7 +17,7 @@ const ResourcesHub: React.FC = () => {
 
     // SEO: Set document title
     React.useEffect(() => {
-        document.title = 'Resources & Guides | GalleryPlanner';
+        document.title = 'Resources & Guides | GalleryPlanner™';
 
         const metaDescription = document.querySelector('meta[name="description"]');
         const description = 'Learn how to design, plan, and install stunning gallery walls with our comprehensive guides and tutorials.';

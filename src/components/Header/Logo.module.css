@@ -63,6 +63,14 @@
     font-size: 12px;
 }
 
+.tm {
+    font-size: 0.4em;
+    vertical-align: super;
+    margin-left: 2px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
 .beta,
 .pro,
 .free {

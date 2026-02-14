@@ -6,7 +6,7 @@ import WebsiteFooter from '../Layout/WebsiteFooter';
 
 const AboutPage: React.FC = () => {
     React.useEffect(() => {
-        const title = "About the Founder | GalleryPlanner";
+        const title = "About the Founder | GalleryPlanner™";
         const description = "Meet Timothy Straub, the scientist and hobbyist who built GalleryPlanner with a privacy-first, local-only philosophy.";
 
         document.title = title;

@@ -55,7 +55,7 @@ const StaticPageLayout: React.FC<StaticPageLayoutProps> = ({ slug, title: defaul
         if (content) {
             const titleMatch = content.match(/^#\s+(.+)$/m);
             const pageTitle = titleMatch ? titleMatch[1] : (defaultTitle || slug);
-            document.title = `${pageTitle} | GalleryPlanner`;
+            document.title = `${pageTitle} | GalleryPlanner™`;
 
             if (defaultDescription) {
                 const metaDescription = document.querySelector('meta[name="description"]');

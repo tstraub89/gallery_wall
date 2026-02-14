@@ -359,7 +359,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({ children, onUndo, on
                                     onClick={() => setActiveSheet(null)}
                                     style={{ textDecoration: 'none', color: '#8e8e93', fontSize: '11px', opacity: 0.7 }}
                                 >
-                                    Gallery Planner v{pkg.version} beta
+                                    GalleryPlanner™ v{pkg.version} beta
                                 </Link>
                             </div>
 
