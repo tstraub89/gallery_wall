@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.5] - 2026-02-13
+
+### 🐛 Bug Fixes
+- **Smart Fill Reliability**: Fixed a critical issue in the Smart Fill worker where strict security policies prevented photo analysis. The engine now transfers image data directly to the worker, ensuring 100% reliability across all environments.
+
 ## [0.6.4] - 2026-02-13
 
 ### ✨ Mobile Experience & Project Flow
