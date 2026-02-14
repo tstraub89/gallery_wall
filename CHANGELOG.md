@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.6] - 2026-02-14
+
+### ✨ Help Center & SEO Overhaul
+- **Interactive Navigation**: Added a sticky Table of Contents (TOC) to the Help page with on-scroll active state highlighting, making it easier to navigate long guides.
+- **10-Question FAQ**: Launched a comprehensive FAQ section covering privacy, pricing, and technical setup.
+- **OS-Aware Shortcuts**: The Shortcuts Reference now dynamically displays **⌘** (Mac/iOS) or **Ctrl** (Windows/Linux) based on the user's platform.
+- **Improved Discoverability**: Integrated `FAQPage` and `AboutPage` JSON-LD schemas and refined pre-rendered meta tags for superior SEO and search engine rich results.
+- **Markdown Sourcing**: Refactored the Privacy Policy and Changelog pages to source their content directly from Markdown files for better maintainability.
+- **Visual Polish**: Increased whitespace and fixed anchor scroll offsets to ensure clicked links land perfectly below the sticky header.
+
 ## [0.6.5] - 2026-02-13
 
 ### 🐛 Bug Fixes

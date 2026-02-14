@@ -53,7 +53,7 @@
 .hero {
     text-align: center;
     margin-bottom: 60px;
-    padding-top: 40px;
+    padding-top: 100px;
 }
 
 .hero h1 {
@@ -92,6 +92,78 @@
     color: #4b5563;
 }
 
+/* Layout with Sidebar */
+.layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+.sidebar {
+    width: 200px;
+    flex-shrink: 0;
+    display: block;
+    position: sticky;
+    top: 110px;
+    z-index: 10;
+}
+
+.sidebar h3 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #8e8e93;
+    margin-bottom: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    margin-bottom: 12px;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: #636366;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: block;
+}
+
+.sidebar a:hover {
+    color: #1c1c1e;
+}
+
+.activeNav a {
+    color: #0071e3 !important;
+    font-weight: 600;
+}
+
+.mainContent {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.desktopBadge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: #f2f2f7;
+    color: #8e8e93;
+    padding: 2px 8px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-left: 10px;
+}
+
 .cardGrid {
     display: grid;
     grid-template-columns: 1fr;
@@ -106,6 +178,7 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 10px 15px -3px rgba(0, 0, 0, 0.03);
     border: 1px solid rgba(0, 0, 0, 0.02);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    scroll-margin-top: 100px;
 }
 
 .card:hover {
@@ -262,6 +335,14 @@
         display: none;
     }
 
+    .layout {
+        display: block;
+    }
+
+    .sidebar {
+        display: none;
+    }
+
     /* Simplify nav on mobile if needed, or keep */
     .hero h1 {
         font-size: 32px;
@@ -278,5 +359,97 @@
 
     .card h2 {
         font-size: 20px;
+    }
+
+    #shortcuts {
+        display: none;
+    }
+}
+
+/* FAQ Section */
+.faqSection {
+    margin-top: 80px;
+    background: #fff;
+    border-radius: 24px;
+    padding: 60px 40px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    scroll-margin-top: 100px;
+}
+
+.faqHeader {
+    text-align: center;
+    margin-bottom: 48px;
+}
+
+.faqHeader h2 {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 12px;
+}
+
+.faqHeader p {
+    color: #636366;
+    font-size: 17px;
+}
+
+.faqGrid {
+    display: grid;
+    gap: 32px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.faqItem {
+    border-bottom: 1px solid #f2f2f7;
+    padding-bottom: 32px;
+}
+
+.faqItem:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.faqItem h3 {
+    font-size: 19px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #1c1c1e;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.faqQuestionIcon {
+    color: #0071e3;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.faqItem p {
+    color: #48484a;
+    line-height: 1.6;
+    font-size: 16px;
+    margin: 0;
+    padding-left: 32px;
+}
+
+@media (max-width: 768px) {
+    .faqSection {
+        padding: 40px 20px;
+        margin-top: 60px;
+    }
+
+    .faqHeader h2 {
+        font-size: 26px;
+    }
+
+    .faqItem h3 {
+        font-size: 17px;
+    }
+
+    .faqItem p {
+        padding-left: 0;
+        font-size: 15px;
     }
 }

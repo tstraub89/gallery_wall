@@ -40,10 +40,30 @@ async function prerender() {
 
         const routes: RoutePath[] = [
             { path: '/', name: 'index' },
-            { path: '/about', name: 'about' },
-            { path: '/help', name: 'help' },
-            { path: '/privacy', name: 'privacy' },
-            { path: '/changelog', name: 'changelog' },
+            {
+                path: '/about',
+                name: 'about',
+                title: 'About the Founder',
+                description: 'Meet Timothy Straub, the scientist and hobbyist who built GalleryPlanner with a privacy-first, local-only philosophy.'
+            },
+            {
+                path: '/help',
+                name: 'help',
+                title: 'Help Center & Resources',
+                description: 'Everything you need to know about creating your perfect gallery wall. Learn how to manage inventory, arrange layouts, and export for installation.'
+            },
+            {
+                path: '/privacy',
+                name: 'privacy',
+                title: 'Privacy Policy',
+                description: 'Our commitment to your data privacy and local-first philosophy.'
+            },
+            {
+                path: '/changelog',
+                name: 'changelog',
+                title: "What's New",
+                description: 'The latest updates and improvements to GalleryPlanner.'
+            },
             { path: '/learn', name: 'learn' },
             ...articles.map(article => ({
                 path: `/learn/${article.slug}`,
@@ -64,6 +84,18 @@ async function prerender() {
                     const articlePath = path.join(__dirname, `../src/content/articles/${route.id}.md`);
                     if (fs.existsSync(articlePath)) {
                         data = { content: fs.readFileSync(articlePath, 'utf-8') };
+                    }
+                } else if (['privacy', 'changelog'].includes(route.name)) {
+                    // Pre-load common static pages
+                    let contentPath = '';
+                    if (route.name === 'changelog') {
+                        contentPath = path.join(__dirname, '../CHANGELOG.md');
+                    } else {
+                        contentPath = path.join(__dirname, `../src/content/pages/${route.name}.md`);
+                    }
+
+                    if (fs.existsSync(contentPath)) {
+                        data = { content: fs.readFileSync(contentPath, 'utf-8') };
                     }
                 }
 

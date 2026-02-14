@@ -5,6 +5,46 @@ import WebsiteHeader from '../Layout/WebsiteHeader';
 import WebsiteFooter from '../Layout/WebsiteFooter';
 
 const AboutPage: React.FC = () => {
+    React.useEffect(() => {
+        const title = "About the Founder | GalleryPlanner";
+        const description = "Meet Timothy Straub, the scientist and hobbyist who built GalleryPlanner with a privacy-first, local-only philosophy.";
+
+        document.title = title;
+        const metaDescription = document.querySelector('meta[name="description"]');
+        if (metaDescription) {
+            metaDescription.setAttribute('content', description);
+        }
+
+        const schemaData = {
+            "@context": "https://schema.org",
+            "@type": "AboutPage",
+            "mainEntity": {
+                "@type": "Person",
+                "name": "Timothy Straub",
+                "jobTitle": "Data Scientist",
+                "worksFor": {
+                    "@type": "Organization",
+                    "name": "Tiny Health"
+                },
+                "url": "https://gallery-planner.com/about",
+                "sameAs": [
+                    "https://github.com/tstraub89/",
+                    "https://www.linkedin.com/in/tjstraub/"
+                ]
+            },
+            "description": description
+        };
+
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.text = JSON.stringify(schemaData);
+        document.head.appendChild(script);
+
+        return () => {
+            document.head.removeChild(script);
+        };
+    }, []);
+
     return (
         <div className={styles.container}>
             <WebsiteHeader />
