@@ -85,6 +85,17 @@ The "Auto-Layout" feature runs in a separate Web Worker (`src/recommender/recomm
 *   `src/utils/`: Helper functions for geometry, export, and image handling.
 *   `public/`: Static assets and example files.
 
+## Asset Management
+
+### Image Assets
+*   **Format**: All static images (heros, featured resources) MUST be in **WebP** format.
+*   **Generation**: When generating new images via AI, they must be converted from PNG to WebP before being committed to `/public`.
+*   **Conversion Command**: 
+    ```bash
+    npx -y cwebp-bin -q 80 ${file}.png -o ${file}.webp
+    ```
+*   **Cleanup**: Original PNG files should be removed after successful conversion.
+
 ## Conventions
 *   **Styling**: Use CSS Modules for component-specific styles.
 *   **Typing**: Strict TypeScript usage. Interfaces are defined in `src/types.ts`.

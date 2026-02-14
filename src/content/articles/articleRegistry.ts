@@ -17,7 +17,7 @@ export interface ArticleMetadata {
     author: string;
 }
 
-export const articles: ArticleMetadata[] = [
+const allArticles: ArticleMetadata[] = [
     // Pillar Pages
     {
         id: 'pillar-gallery-walls',
@@ -29,7 +29,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 12,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['gallery-wall-styles', 'choosing-frame-sizes', 'spacing-alignment'],
+        relatedArticles: ['gallery-wall-styles', 'choosing-frame-sizes', 'spacing-alignment', 'upcycled-vintage-frames'],
         video: '/learn/video-gallery-walls.mp4',
         videoDuration: '3 min video',
         heroImage: '/learn/hero-gallery-walls.webp',
@@ -46,7 +46,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 10,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['getting-started', 'smart-layout', 'smart-fill', 'spacing-alignment'],
+        relatedArticles: ['getting-started', 'smart-layout', 'smart-fill', 'designing-with-constraints'],
         video: '/learn/video-galleryplanner-guide.mp4',
         videoDuration: '2 min video',
         heroImage: '/learn/hero-user-guide.webp',
@@ -64,7 +64,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 5,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['pillar-app-guide', 'smart-layout'],
+        relatedArticles: ['pillar-app-guide', 'smart-layout', 'designing-with-constraints'],
         heroImage: '/learn/hero-getting-started.webp',
         keywords: ['GalleryPlanner quick start', 'how to start with GalleryPlanner', 'gallery wall planner beginner'],
         author: 'Timothy Straub'
@@ -78,7 +78,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 7,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['pillar-app-guide', 'getting-started', 'smart-fill'],
+        relatedArticles: ['pillar-app-guide', 'getting-started', 'evolving-family-galleries'],
         video: '/learn/video-smart-layout.mp4',
         videoDuration: '1 min video',
         heroImage: '/learn/hero-smart-layout.webp',
@@ -94,7 +94,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 5,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['pillar-app-guide', 'smart-layout', 'getting-started'],
+        relatedArticles: ['pillar-app-guide', 'smart-layout', 'upcycled-vintage-frames'],
         heroImage: '/learn/hero-pro-features.webp',
         keywords: ['GalleryPlanner Pro', 'Pro features', 'GalleryPlanner pricing', 'Smart Layout', 'PDF hanging guide'],
         author: 'Timothy Straub'
@@ -108,7 +108,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 6,
         publishedDate: '2026-02-08',
         lastUpdated: '2026-02-08',
-        relatedArticles: ['pillar-app-guide', 'smart-layout', 'pro-features-guide'],
+        relatedArticles: ['pillar-app-guide', 'smart-layout', 'evolving-family-galleries'],
         heroImage: '/learn/hero-smart-fill.webp',
         keywords: ['GalleryPlanner smart fill', 'AI photo selection', 'automatic photo framing', 'gallery wall photo picker'],
         author: 'Timothy Straub'
@@ -124,7 +124,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 6,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['pillar-gallery-walls', 'choosing-frame-sizes'],
+        relatedArticles: ['pillar-gallery-walls', 'choosing-frame-sizes', 'upcycled-vintage-frames'],
         heroImage: '/learn/hero-gallery-wall-styles.webp',
         keywords: ['gallery wall styles', 'types of gallery walls', 'gallery wall ideas', 'salon wall', 'grid gallery wall'],
         author: 'Timothy Straub'
@@ -138,7 +138,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 6,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['pillar-gallery-walls', 'gallery-wall-styles', 'spacing-alignment'],
+        relatedArticles: ['pillar-gallery-walls', 'gallery-wall-styles', 'upcycled-vintage-frames'],
         heroImage: '/learn/hero-frame-sizes.webp',
         keywords: ['best frame sizes for gallery wall', 'gallery wall frame proportions', 'mixing frame sizes', 'standard frame sizes'],
         author: 'Timothy Straub'
@@ -152,7 +152,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 7,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['pillar-gallery-walls', 'choosing-frame-sizes'],
+        relatedArticles: ['pillar-gallery-walls', 'choosing-frame-sizes', 'designing-with-constraints'],
         heroImage: '/learn/hero-spacing.webp',
         keywords: ['gallery wall spacing', 'how to align gallery wall frames', 'picture spacing guidelines', 'gallery wall measurements'],
         author: 'Timothy Straub'
@@ -168,7 +168,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 8,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['pillar-gallery-walls', 'hanging-hardware-guide', 'spacing-alignment'],
+        relatedArticles: ['pillar-gallery-walls', 'hanging-hardware-guide', 'designing-with-constraints'],
         heroImage: '/learn/hero-staircase.webp',
         keywords: ['staircase gallery wall', 'diagonal gallery wall', 'stair angle frames', 'sloped wall art'],
         author: 'Timothy Straub'
@@ -182,7 +182,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 7,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['staircase-gallery-walls', 'spacing-alignment', 'pillar-gallery-walls'],
+        relatedArticles: ['staircase-gallery-walls', 'spacing-alignment', 'designing-with-constraints'],
         heroImage: '/learn/hero-hardware.webp',
         keywords: ['picture hanging hardware', 'wall anchors', 'toggle bolts', 'damage-free hanging', 'command strips'],
         author: 'Timothy Straub'
@@ -196,7 +196,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 5,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['hanging-hardware-guide', 'spacing-alignment', 'pillar-gallery-walls'],
+        relatedArticles: ['hanging-hardware-guide', 'spacing-alignment', 'evolving-family-galleries'],
         heroImage: '/learn/hero-renter.webp',
         keywords: ['renter gallery wall', 'damage-free hanging', 'command strips', 'picture ledges', 'no-drill gallery wall'],
         author: 'Timothy Straub'
@@ -256,7 +256,7 @@ export const articles: ArticleMetadata[] = [
         readingTime: 6,
         publishedDate: '2026-02-07',
         lastUpdated: '2026-02-07',
-        relatedArticles: ['gallery-wall-styles', 'pillar-gallery-walls'],
+        relatedArticles: ['gallery-wall-styles', 'pillar-gallery-walls', 'upcycled-vintage-frames'],
         heroImage: '/learn/hero-color-curation.webp',
         keywords: ['photo curation', 'color mixing', 'black and white photos', 'gallery wall curation', 'color psychology'],
         author: 'Timothy Straub'
@@ -274,8 +274,59 @@ export const articles: ArticleMetadata[] = [
         heroImage: '/learn/hero-frame-tv.webp',
         keywords: ['TV gallery wall', 'Samsung Frame', 'TV art wall', 'television gallery wall'],
         author: 'Timothy Straub'
+    },
+    {
+        id: 'upcycled-vintage-frames',
+        slug: 'vintage-upcycled-gallery-walls',
+        title: 'The Vintage Vibe: Design with Upcycled & Thrifted Frames',
+        description: 'Learn how to create a cohesive gallery wall using unique, thrifted, and upcycled frames with custom dimensions.',
+        category: 'Design 101',
+        readingTime: 6,
+        publishedDate: '2026-02-19',
+        lastUpdated: '2026-02-14',
+        relatedArticles: ['choosing-frame-sizes', 'gallery-wall-styles', 'pillar-gallery-walls'],
+        heroImage: '/learn/hero-vintage-frames.webp',
+        keywords: ['vintage frames', 'thrifted gallery wall', 'upcycled frames', 'custom frame sizes', 'salon wall'],
+        author: 'Timothy Straub'
+    },
+    {
+        id: 'evolving-family-galleries',
+        slug: 'evolving-family-gallery-walls',
+        title: 'The Evolving Gallery: Designing Walls That Grow With Your Family',
+        description: 'Strategies for designing a flexible gallery wall that can expand and change as your family grows.',
+        category: 'Design 101',
+        readingTime: 5,
+        publishedDate: '2026-02-24',
+        lastUpdated: '2026-02-14',
+        relatedArticles: ['smart-layout', 'getting-started', 'renter-friendly-galleries'],
+        heroImage: '/learn/hero-evolving-gallery.webp',
+        keywords: ['family gallery wall', 'growing gallery wall', 'modular gallery', 'nursery art', 'kids art display'],
+        author: 'Timothy Straub'
+    },
+    {
+        id: 'designing-with-constraints',
+        slug: 'designing-around-wall-constraints',
+        title: 'Beyond the Frame: Designing Around Sconces, Switches, and Vents',
+        description: 'Master the art of planning your gallery wall around light switches, sconces, and other architectural obstacles.',
+        category: 'Installation',
+        readingTime: 6,
+        publishedDate: '2026-02-16',
+        lastUpdated: '2026-02-14',
+        relatedArticles: ['pillar-app-guide', 'getting-started', 'spacing-alignment'],
+        heroImage: '/learn/hero-constraints.webp',
+        keywords: ['designing around switches', 'wall constraints', 'sconce gallery wall', 'thermostat gallery wall', 'placeholder frames'],
+        author: 'Timothy Straub'
     }
 ];
+
+export const articles = allArticles.filter(article => {
+    // During development, show all articles
+    if (process.env.NODE_ENV === 'development') return true;
+
+    // Filter by date for production builds
+    const today = new Date().toISOString().split('T')[0];
+    return article.publishedDate <= today;
+});
 
 // Helper function to get article by slug
 export const getArticleBySlug = (slug: string): ArticleMetadata | undefined => {

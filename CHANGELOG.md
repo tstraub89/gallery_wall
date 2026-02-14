@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.1] - 2026-02-14
+
+### ✨ New Design Guides & Content
+- **Three New Articles**: Expanded the Learn Hub with in-depth guides on specialized wall design:
+    - **The Vintage Vibe**: A guide to designing with eclectic, thrifted, and upcycled frames using custom dimensions.
+    - **The Evolving Gallery**: Strategies for building modular gallery walls that grow with your family.
+    - **Beyond the Frame**: Professional tips for designing around architectural obstacles like light switches, sconces, and vents.
+- **Optimized Assets**: All new hero images are delivered in high-performance WebP format, following our strict asset quality standards.
+
+### ⚡️ Automated Staggered Release
+- **Build-Time Filtering**: Implemented an intelligent article registry that filters content by `publishedDate`. Articles now stay hidden from production (and sitemaps/RSS) until their scheduled release date.
+- **Vercel Cron Integration**: Configured a daily rebuild cycle via Vercel Cron and serverless functions, ensuring content goes live automatically on schedule without manual code pushes.
+- **SEO/AIO Optimization**: Enhanced internal cross-linking between new and existing guides to boost topical authority and search engine discoverability.
+
+### 🛠 Asset Management
+- **Image Workflow**: Codified the asset generation process, requiring WebP conversion and PNG cleanup to maintain a lightweight repository.
+
 ## [0.7.0] - 2026-02-14
 
 ### ✨ Mobile Experience Overhaul
